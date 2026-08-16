@@ -1,8 +1,9 @@
 import { Navigate, Outlet } from 'react-router';
+import { useAuthStore } from '@/features/auth';
 import { ROUTES } from './routes';
 
 export const ProtectedRoute = () => {
-  const isAuthenticated = false; // TODO: wire to auth store when /fe-crud auth feature lands
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   if (!isAuthenticated) {
     return <Navigate to={ROUTES.LOGIN} replace />;

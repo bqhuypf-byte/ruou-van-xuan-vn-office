@@ -5,6 +5,10 @@ import { AppService } from './app.service';
 import appConfig from './config/app.config';
 import databaseConfig from './config/database.config';
 import jwtConfig from './config/jwt.config';
+import { DatabaseModule } from './core/database/database.module';
+import { AuthModule } from './features/auth/auth.module';
+import { RolesModule } from './features/roles/roles.module';
+import { UsersModule } from './features/users/users.module';
 
 @Module({
   imports: [
@@ -12,6 +16,10 @@ import jwtConfig from './config/jwt.config';
       isGlobal: true,
       load: [appConfig, databaseConfig, jwtConfig],
     }),
+    DatabaseModule,
+    RolesModule,
+    UsersModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

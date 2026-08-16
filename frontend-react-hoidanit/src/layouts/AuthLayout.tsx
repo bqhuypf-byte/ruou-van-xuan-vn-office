@@ -1,9 +1,24 @@
-import { Outlet } from 'react-router';
+import { Outlet, Link } from 'react-router';
+import { ROUTES } from '@/routes/routes';
 
 export const AuthLayout = () => {
   return (
-    <div>
-      <Outlet />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-950 px-4 py-12">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <Link to={ROUTES.HOME} className="inline-flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/30">
+              AX
+            </div>
+            <span className="font-bold text-xl tracking-wide text-slate-900 dark:text-white">
+              hoidanit-ecommerce
+            </span>
+          </Link>
+        </div>
+        <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm p-6 sm:p-8">
+          <Outlet />
+        </div>
+      </div>
     </div>
   );
 };

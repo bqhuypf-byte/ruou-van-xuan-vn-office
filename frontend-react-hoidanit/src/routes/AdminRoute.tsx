@@ -1,10 +1,16 @@
 import { Navigate, Outlet } from 'react-router';
+import { useAuthStore } from '@/features/auth';
 import { ROUTES } from './routes';
 
 export const AdminRoute = () => {
-  const isAdmin = false; // TODO: wire to auth store when /fe-crud auth feature lands
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const user = useAuthStore((state) => state.user);
 
-  if (!isAdmin) {
+  if (!isAuthenticated) {
+    return <Navigate to={ROUTES.LOGIN} replace />;
+  }
+
+  if (user?.role !== 'admin') {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
