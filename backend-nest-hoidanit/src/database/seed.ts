@@ -1,21 +1,54 @@
 import { AppDataSource } from './data-source';
 import { seedRoles } from './seeds/roles.seed';
+import { seedUsers } from './seeds/users.seed';
+import { seedAddresses } from './seeds/addresses.seed';
+import { seedCategories } from './seeds/categories.seed';
+import { seedProducts } from './seeds/products.seed';
+import { seedCarts } from './seeds/carts.seed';
+import { seedOrders } from './seeds/orders.seed';
 
-const seeders: Record<string, (dataSource: typeof AppDataSource) => Promise<void>> = {
+const seeders: Record<
+  string,
+  (dataSource: typeof AppDataSource, count?: number) => Promise<void>
+> = {
   roles: seedRoles,
+  users: seedUsers,
+  addresses: seedAddresses,
+  categories: seedCategories,
+  products: seedProducts,
+  carts: seedCarts,
+  orders: seedOrders,
 };
 
-async function main() {
-  const entity = process.argv[2];
-  const seeder = seeders[entity];
+async function seedAll(count?: number) {
+  await seedRoles(AppDataSource);
+  await seedUsers(AppDataSource, count);
+  await seedAddresses(AppDataSource);
+  await seedCategories(AppDataSource);
+  await seedProducts(AppDataSource);
+  await seedCarts(AppDataSource);
+  await seedOrders(AppDataSource);
+}
 
-  if (!seeder) {
-    console.error(`Unknown seed target "${entity}". Available: ${Object.keys(seeders).join(', ')}`);
-    process.exit(1);
-  }
+async function main() {
+  const entity = process.argv[2] ?? 'all';
+  const count = process.argv[3] ? parseInt(process.argv[3], 10) : undefined;
 
   await AppDataSource.initialize();
-  await seeder(AppDataSource);
+
+  if (entity === 'all') {
+    await seedAll(count);
+  } else {
+    const seeder = seeders[entity];
+    if (!seeder) {
+      console.error(
+        `Unknown seed target "${entity}". Available: all, ${Object.keys(seeders).join(', ')}`,
+      );
+      process.exit(1);
+    }
+    await seeder(AppDataSource, count);
+  }
+
   await AppDataSource.destroy();
 }
 

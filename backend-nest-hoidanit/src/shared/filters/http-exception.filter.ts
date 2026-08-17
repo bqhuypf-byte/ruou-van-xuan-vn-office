@@ -34,10 +34,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     response.status(status).json({
       success: false,
       error: {
-        code:
-          exception instanceof HttpException
-            ? exception.name
-            : 'SYS_001',
+        code: exception instanceof HttpException ? exception.name : 'SYS_001',
         message:
           typeof message === 'string'
             ? message
