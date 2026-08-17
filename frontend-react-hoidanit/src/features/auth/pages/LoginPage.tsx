@@ -5,16 +5,24 @@ import type { LoginFormData } from '../components/LoginForm';
 import { useLogin } from '../hooks/useLogin';
 import { ROUTES } from '@/routes/routes';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
+import { useMergeCart } from '@/features/cart';
 
 export const LoginPage = () => {
   const navigate = useNavigate();
   const loginMutation = useLogin();
+  const mergeCartMutation = useMergeCart();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSubmit = async (data: LoginFormData) => {
     setErrorMessage(null);
     try {
       await loginMutation.mutateAsync(data);
+      try {
+        await mergeCartMutation.mutateAsync();
+      } catch {
+        // Best-effort: a guest cart may not exist, or the merge may fail transiently.
+        // Login itself already succeeded, so we don't block navigation on this.
+      }
       navigate(ROUTES.HOME);
     } catch (err: unknown) {
       setErrorMessage(getApiErrorMessage(err, 'Email hoặc mật khẩu không đúng.'));

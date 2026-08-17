@@ -3,6 +3,7 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { LoginPage } from './LoginPage';
 import { useLogin } from '../hooks/useLogin';
+import { useMergeCart } from '@/features/cart';
 
 const navigateMock = vi.fn();
 
@@ -17,9 +18,17 @@ vi.mock('../hooks/useLogin', () => ({
   useLogin: vi.fn(),
 }));
 
+vi.mock('@/features/cart', () => ({
+  useMergeCart: vi.fn(),
+}));
+
 describe('LoginPage', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(useMergeCart).mockReturnValue({
+      mutateAsync: vi.fn().mockResolvedValue(undefined),
+      isPending: false,
+    } as unknown as ReturnType<typeof useMergeCart>);
   });
 
   it('renders the login form and a link to register', () => {
@@ -51,6 +60,25 @@ describe('LoginPage', () => {
         password: 'password123',
       }),
     );
+    await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/'));
+    expect(vi.mocked(useMergeCart)().mutateAsync).toHaveBeenCalled();
+  });
+
+  it('still navigates home when the guest cart merge fails after a successful login', async () => {
+    const user = userEvent.setup();
+    const mutateAsync = vi.fn().mockResolvedValue(undefined);
+    vi.mocked(useLogin).mockReturnValue({ mutateAsync, isPending: false } as unknown as ReturnType<typeof useLogin>);
+    vi.mocked(useMergeCart).mockReturnValue({
+      mutateAsync: vi.fn().mockRejectedValue(new Error('no guest cart')),
+      isPending: false,
+    } as unknown as ReturnType<typeof useMergeCart>);
+
+    render(<LoginPage />);
+
+    await user.type(screen.getByLabelText(/email/i), 'jane@example.com');
+    await user.type(screen.getByLabelText(/mật khẩu/i), 'password123');
+    await user.click(screen.getByRole('button', { name: /đăng nhập/i }));
+
     await waitFor(() => expect(navigateMock).toHaveBeenCalledWith('/'));
   });
 

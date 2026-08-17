@@ -12,7 +12,9 @@ export const ROUTES = {
   PROFILE: '/profile',
   ADMIN_ROLES: '/admin/roles',
   ADMIN_USERS: '/admin/users',
+  ADMIN_CATEGORIES: '/admin/categories',
   ADMIN_PRODUCTS: '/admin/products',
+  ADMIN_PRODUCT_DETAIL: '/admin/products/:slug',
   ADMIN_ORDERS: '/admin/orders',
 } as const;
 

@@ -9,6 +9,7 @@ import {
   X,
   UserCheck,
   LogOut,
+  FolderTree,
 } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
 import { ROUTES } from '@/routes/routes';
@@ -35,6 +36,11 @@ export const AdminLayout = () => {
       label: 'Quản Lý Người Dùng',
       path: ROUTES.ADMIN_USERS,
       icon: Users,
+    },
+    {
+      label: 'Danh Mục',
+      path: ROUTES.ADMIN_CATEGORIES,
+      icon: FolderTree,
     },
     {
       label: 'Sản Phẩm',
