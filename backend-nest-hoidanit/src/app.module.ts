@@ -9,6 +9,10 @@ import { DatabaseModule } from './core/database/database.module';
 import { AuthModule } from './features/auth/auth.module';
 import { RolesModule } from './features/roles/roles.module';
 import { UsersModule } from './features/users/users.module';
+import { UserProfileModule } from './features/user-profile/user-profile.module';
+import { ProductModule } from './features/product/product.module';
+import { CartModule } from './features/cart/cart.module';
+import { OrderModule } from './features/order/order.module';
 
 @Module({
   imports: [
@@ -20,6 +24,10 @@ import { UsersModule } from './features/users/users.module';
     RolesModule,
     UsersModule,
     AuthModule,
+    UserProfileModule,
+    ProductModule,
+    CartModule,
+    OrderModule,
   ],
   controllers: [AppController],
   providers: [AppService],
