@@ -20,6 +20,8 @@ const mockDetail: ProductDetail = {
   description: null,
   thumbnailUrl: null,
   isActive: true,
+  isFeaturedDeal: false,
+  dealSortOrder: 0,
   variants: [
     { id: 10, productId: 1, sku: 'IP15-BLK-128', color: 'Black', size: '128GB', price: '999.99', salePrice: null, stockQuantity: 50 },
   ],

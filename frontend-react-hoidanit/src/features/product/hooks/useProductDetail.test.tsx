@@ -20,6 +20,8 @@ const mockDetail: ProductDetail = {
   description: null,
   thumbnailUrl: null,
   isActive: true,
+  isFeaturedDeal: false,
+  dealSortOrder: 0,
   variants: [],
   images: [],
 };

@@ -15,6 +15,7 @@ import { RolesGuard } from '../../../shared/guards/roles.guard';
 import { CategoryService } from '../services/category.service';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
+import { ReassignCategoryProductsDto } from '../dto/reassign-category-products.dto';
 
 @Controller()
 export class CategoryController {
@@ -50,7 +51,10 @@ export class CategoryController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
   @Delete('admin/categories/:id')
-  remove(@Param('id', ParseIntPipe) id: number) {
-    return this.categoryService.remove(id);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReassignCategoryProductsDto,
+  ) {
+    return this.categoryService.remove(id, dto.targetCategoryId);
   }
 }

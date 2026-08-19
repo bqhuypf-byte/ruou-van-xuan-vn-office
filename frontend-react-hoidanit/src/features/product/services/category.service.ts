@@ -7,6 +7,13 @@ import type {
 } from '../types/category.types';
 
 export const categoryService = {
+  getCategoryBySlug: async (slug: string): Promise<Category> => {
+    const response = await axiosInstance.get<ApiResponse<Category>>(
+      `/categories/${slug}`,
+    );
+    return response.data.data;
+  },
+
   getCategories: async (): Promise<Category[]> => {
     const response = await axiosInstance.get<ApiResponse<Category[]> | Category[]>(
       '/categories',
@@ -39,7 +46,9 @@ export const categoryService = {
     return response.data as Category;
   },
 
-  deleteCategory: async (id: number): Promise<void> => {
-    await axiosInstance.delete(`/admin/categories/${id}`);
+  deleteCategory: async (id: number, targetCategoryId?: number): Promise<void> => {
+    await axiosInstance.delete(`/admin/categories/${id}`, {
+      data: { targetCategoryId },
+    });
   },
 };

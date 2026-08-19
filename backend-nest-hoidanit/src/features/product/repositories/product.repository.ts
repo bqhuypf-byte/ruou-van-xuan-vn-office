@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { Product } from '../entities/product.entity';
 import { QueryProductDto } from '../dto/query-product.dto';
 
@@ -20,15 +20,20 @@ export class ProductRepository {
     query: QueryProductDto,
     page: number,
     limit: number,
+    categoryIds?: number[],
   ): Promise<PaginatedProducts> {
     const qb = this.repository
       .createQueryBuilder('product')
       .leftJoin('product.variants', 'variant');
 
-    if (query.categoryId !== undefined) {
-      qb.andWhere('product.categoryId = :categoryId', {
-        categoryId: query.categoryId,
-      });
+    if (query.search) {
+      qb.andWhere(
+        '(product.name LIKE :search OR product.slug LIKE :search)',
+        { search: `%${query.search}%` },
+      );
+    }
+    if (categoryIds !== undefined) {
+      qb.andWhere('product.categoryId IN (:...categoryIds)', { categoryIds });
     }
     if (query.isActive !== undefined) {
       qb.andWhere('product.isActive = :isActive', { isActive: query.isActive });
@@ -39,14 +44,44 @@ export class ProductRepository {
     if (query.maxPrice !== undefined) {
       qb.andWhere('variant.price <= :maxPrice', { maxPrice: query.maxPrice });
     }
+    if (query.isFeaturedDeal !== undefined) {
+      qb.andWhere('product.isFeaturedDeal = :isFeaturedDeal', {
+        isFeaturedDeal: query.isFeaturedDeal,
+      });
+    }
 
-    qb.distinct(true)
-      .orderBy('product.createdAt', 'DESC')
+    qb.distinct(true);
+
+    if (query.isFeaturedDeal) {
+      qb.orderBy('product.dealSortOrder', 'ASC');
+    }
+    qb.addOrderBy('product.createdAt', 'DESC')
       .skip((page - 1) * limit)
       .take(limit);
 
     const [items, total] = await qb.getManyAndCount();
     return { items, total };
+  }
+
+  countByCategoryId(categoryId: number): Promise<number> {
+    return this.repository.count({ where: { categoryId } });
+  }
+
+  async reassignCategory(
+    fromCategoryId: number,
+    toCategoryId: number,
+  ): Promise<void> {
+    await this.repository.update(
+      { categoryId: fromCategoryId },
+      { categoryId: toCategoryId },
+    );
+  }
+
+  findActiveByCategoryIds(categoryIds: number[]): Promise<Product[]> {
+    return this.repository.find({
+      where: { categoryId: In(categoryIds), isActive: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   findBySlug(slug: string): Promise<Product | null> {

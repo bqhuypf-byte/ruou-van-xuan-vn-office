@@ -6,6 +6,10 @@ import { seedCategories } from './seeds/categories.seed';
 import { seedProducts } from './seeds/products.seed';
 import { seedCarts } from './seeds/carts.seed';
 import { seedOrders } from './seeds/orders.seed';
+import { seedReviews } from './seeds/reviews.seed';
+import { seedBanners } from './seeds/banners.seed';
+import { seedBrands } from './seeds/brands.seed';
+import { seedSiteSettings } from './seeds/site-settings.seed';
 
 const seeders: Record<
   string,
@@ -18,6 +22,10 @@ const seeders: Record<
   products: seedProducts,
   carts: seedCarts,
   orders: seedOrders,
+  reviews: seedReviews,
+  banners: seedBanners,
+  brands: seedBrands,
+  'site-settings': seedSiteSettings,
 };
 
 async function seedAll(count?: number) {
@@ -28,6 +36,10 @@ async function seedAll(count?: number) {
   await seedProducts(AppDataSource);
   await seedCarts(AppDataSource);
   await seedOrders(AppDataSource);
+  await seedReviews(AppDataSource);
+  await seedBanners(AppDataSource);
+  await seedBrands(AppDataSource);
+  await seedSiteSettings(AppDataSource);
 }
 
 async function main() {

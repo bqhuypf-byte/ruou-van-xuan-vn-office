@@ -33,4 +33,12 @@ export class CreateProductDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isFeaturedDeal?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  dealSortOrder?: number;
 }

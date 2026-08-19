@@ -28,6 +28,7 @@ export const ProductsPage = () => {
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState('');
+  const [statusFilter, setStatusFilter] = useState<'' | 'active' | 'inactive'>('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -40,6 +41,7 @@ export const ProductsPage = () => {
     search,
     page,
     categoryId: categoryFilter ? Number(categoryFilter) : undefined,
+    isActive: statusFilter === '' ? undefined : statusFilter === 'active',
   });
   const { allCategories } = useCategories();
 
@@ -210,6 +212,18 @@ export const ProductsPage = () => {
               {category.name}
             </option>
           ))}
+        </select>
+        <select
+          className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+          value={statusFilter}
+          onChange={(e) => {
+            setStatusFilter(e.target.value as '' | 'active' | 'inactive');
+            setPage(1);
+          }}
+        >
+          <option value="">Tất cả trạng thái</option>
+          <option value="active">Đang bán</option>
+          <option value="inactive">Ngừng bán</option>
         </select>
       </div>
 

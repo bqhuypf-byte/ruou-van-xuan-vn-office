@@ -14,8 +14,32 @@ vi.mock('../hooks/useCategories');
 vi.mock('../hooks/useCategoryMutations');
 
 const mockCategories: FlatCategory[] = [
-  { id: 1, parentId: null, name: 'Electronics', slug: 'electronics', depth: 0, parentName: null },
-  { id: 2, parentId: 1, name: 'Phones', slug: 'phones', depth: 1, parentName: 'Electronics' },
+  {
+    id: 1,
+    parentId: null,
+    name: 'Electronics',
+    slug: 'electronics',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 0,
+    parentName: null,
+  },
+  {
+    id: 2,
+    parentId: 1,
+    name: 'Phones',
+    slug: 'phones',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 1,
+    parentName: 'Electronics',
+  },
 ];
 
 const baseMutation = () => ({
@@ -92,7 +116,13 @@ describe('CategoriesPage', () => {
     await user.click(screen.getByRole('button', { name: 'Tạo Mới' }));
 
     await waitFor(() =>
-      expect(mutateAsync).toHaveBeenCalledWith({ name: 'Laptops', slug: 'laptops' }),
+      expect(mutateAsync).toHaveBeenCalledWith({
+        name: 'Laptops',
+        slug: 'laptops',
+        showInTopCategories: false,
+        showInDailyEssentials: false,
+        homeSortOrder: 0,
+      }),
     );
     expect(
       await screen.findByText('Đã tạo danh mục "Laptops" thành công.'),
@@ -112,7 +142,42 @@ describe('CategoriesPage', () => {
     await user.click(screen.getAllByTitle('Xóa')[0]);
     await user.click(screen.getByRole('button', { name: 'Xóa Danh Mục' }));
 
-    await waitFor(() => expect(mutateAsync).toHaveBeenCalledWith(1));
+    await waitFor(() =>
+      expect(mutateAsync).toHaveBeenCalledWith({ id: 1, targetCategoryId: undefined }),
+    );
+    expect(
+      await screen.findByText('Đã xóa danh mục "Electronics" thành công.'),
+    ).toBeInTheDocument();
+  });
+
+  it('prompts to reassign products when deleting a category that still has products', async () => {
+    const mutateAsync = vi
+      .fn()
+      .mockRejectedValueOnce({
+        response: { data: { error: { code: 'CategoryHasProductsException' } } },
+      })
+      .mockResolvedValueOnce(undefined);
+    vi.mocked(useDeleteCategory).mockReturnValue({
+      mutateAsync,
+      isPending: false,
+    } as unknown as ReturnType<typeof useDeleteCategory>);
+
+    const user = userEvent.setup();
+    render(<CategoriesPage />);
+
+    await user.click(screen.getAllByTitle('Xóa')[0]);
+    await user.click(screen.getByRole('button', { name: 'Xóa Danh Mục' }));
+
+    expect(
+      await screen.findByText(/vẫn còn sản phẩm bên trong/i),
+    ).toBeInTheDocument();
+
+    await user.selectOptions(screen.getByRole('combobox'), '2');
+    await user.click(screen.getByRole('button', { name: 'Chuyển & Xóa' }));
+
+    await waitFor(() =>
+      expect(mutateAsync).toHaveBeenLastCalledWith({ id: 1, targetCategoryId: 2 }),
+    );
     expect(
       await screen.findByText('Đã xóa danh mục "Electronics" thành công.'),
     ).toBeInTheDocument();

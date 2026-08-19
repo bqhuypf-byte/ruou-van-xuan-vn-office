@@ -35,6 +35,7 @@ export async function seedProducts(dataSource: DataSource, count = 30) {
   let variantTotal = 0;
   let imageTotal = 0;
   const remaining = count - existingCount;
+  const dealCount = Math.min(6, remaining);
 
   for (let i = 0; i < remaining; i++) {
     const category = faker.helpers.arrayElement(pool);
@@ -50,6 +51,8 @@ export async function seedProducts(dataSource: DataSource, count = 30) {
         description: faker.commerce.productDescription(),
         thumbnailUrl: faker.image.urlPicsumPhotos(),
         isActive: true,
+        isFeaturedDeal: i < dealCount,
+        dealSortOrder: i < dealCount ? i : 0,
       }),
     );
 

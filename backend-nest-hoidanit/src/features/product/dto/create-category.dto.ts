@@ -1,4 +1,5 @@
 import {
+  IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -20,4 +21,25 @@ export class CreateCategoryDto {
   @IsOptional()
   @IsInt()
   parentId?: number;
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  thumbnailUrl?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  showInTopCategories?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  showInDailyEssentials?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  homeSortOrder?: number;
 }

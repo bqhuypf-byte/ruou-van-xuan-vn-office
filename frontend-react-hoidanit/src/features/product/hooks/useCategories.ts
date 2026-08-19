@@ -16,11 +16,26 @@ export const flattenCategories = (categories: Category[], depth = 0): FlatCatego
       parentId: category.parentId,
       name: category.name,
       slug: category.slug,
+      description: category.description,
+      thumbnailUrl: category.thumbnailUrl,
+      showInTopCategories: category.showInTopCategories,
+      showInDailyEssentials: category.showInDailyEssentials,
+      homeSortOrder: category.homeSortOrder,
       depth,
       parentName: null,
     },
     ...flattenCategories(category.children, depth + 1),
   ]);
+
+export const getTopCategories = (tree: Category[]): Category[] =>
+  tree
+    .filter((category) => category.showInTopCategories)
+    .sort((a, b) => a.homeSortOrder - b.homeSortOrder);
+
+export const getDailyEssentialCategories = (tree: Category[]): FlatCategory[] =>
+  flattenCategories(tree)
+    .filter((category) => category.showInDailyEssentials)
+    .sort((a, b) => a.homeSortOrder - b.homeSortOrder);
 
 export const useCategories = (params?: CategoryFilterParams) => {
   const query = useQuery({

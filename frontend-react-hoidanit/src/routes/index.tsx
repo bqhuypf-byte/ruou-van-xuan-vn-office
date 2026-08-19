@@ -11,9 +11,13 @@ import {
   ProductDetailPage,
   HomePage,
   ProductViewPage,
+  CategoryPage,
 } from '@/features/product';
 import { CartPage } from '@/features/cart';
 import { OrdersPage, OrderDetailPage } from '@/features/order';
+import { AddressesPage } from '@/features/user-profile';
+import { SiteContentPage } from '@/features/site-content';
+import { BannersPage, BrandsPage, SiteSettingsPage } from '@/features/home';
 import { AdminRoute } from './AdminRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { ROUTES } from './routes';
@@ -25,6 +29,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <HomePage /> },
       { path: 'products/:slug', element: <ProductViewPage /> },
+      { path: 'categories/:slug', element: <CategoryPage /> },
       { path: 'cart', element: <CartPage /> },
     ],
   },
@@ -36,6 +41,7 @@ export const router = createBrowserRouter([
         children: [
           { path: 'orders', element: <OrdersPage /> },
           { path: 'orders/:id', element: <OrderDetailPage /> },
+          { path: 'profile', element: <AddressesPage /> },
         ],
       },
     ],
@@ -58,6 +64,10 @@ export const router = createBrowserRouter([
           { path: 'roles', element: <RolesPage /> },
           { path: 'users', element: <UsersPage /> },
           { path: 'categories', element: <CategoriesPage /> },
+          { path: 'site-content', element: <SiteContentPage /> },
+          { path: 'banners', element: <BannersPage /> },
+          { path: 'brands', element: <BrandsPage /> },
+          { path: 'site-settings', element: <SiteSettingsPage /> },
           { path: 'products', element: <ProductsPage /> },
           { path: 'products/:slug', element: <ProductDetailPage /> },
         ],

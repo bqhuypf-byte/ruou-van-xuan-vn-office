@@ -1,16 +1,32 @@
-import { Type } from 'class-transformer';
-import { IsBoolean, IsInt, IsOptional, IsPositive, Min } from 'class-validator';
+import { Transform, Type } from 'class-transformer';
+import {
+  IsBoolean,
+  IsInt,
+  IsOptional,
+  IsPositive,
+  IsString,
+  Min,
+} from 'class-validator';
 
 export class QueryProductDto {
+  @IsOptional()
+  @IsString()
+  search?: string;
+
   @IsOptional()
   @Type(() => Number)
   @IsInt()
   categoryId?: number;
 
   @IsOptional()
-  @Type(() => Boolean)
+  @Transform(({ value }) => (value === undefined ? value : value === true || value === 'true'))
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @Transform(({ value }) => (value === undefined ? value : value === true || value === 'true'))
+  @IsBoolean()
+  isFeaturedDeal?: boolean;
 
   @IsOptional()
   @Type(() => Number)

@@ -23,7 +23,10 @@ export const productService = {
   getProducts: async (params?: ProductFilterParams): Promise<ProductListResult> => {
     const response = await axiosInstance.get<PaginatedResponse<Product>>('/products', {
       params: {
+        search: params?.search,
         categoryId: params?.categoryId,
+        isActive: params?.isActive,
+        isFeaturedDeal: params?.isFeaturedDeal,
         page: params?.page,
         limit: params?.limit,
       },

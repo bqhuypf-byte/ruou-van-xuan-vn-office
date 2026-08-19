@@ -18,12 +18,24 @@ vi.mock('../hooks/useCategories');
 vi.mock('../hooks/useProductMutations');
 
 const mockProducts: Product[] = [
-  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, thumbnailUrl: null, isActive: true },
-  { id: 2, categoryId: 2, name: 'iPhone 14', slug: 'iphone-14', description: null, thumbnailUrl: null, isActive: false },
+  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, thumbnailUrl: null, isActive: true, isFeaturedDeal: false, dealSortOrder: 0 },
+  { id: 2, categoryId: 2, name: 'iPhone 14', slug: 'iphone-14', description: null, thumbnailUrl: null, isActive: false, isFeaturedDeal: false, dealSortOrder: 0 },
 ];
 
 const mockCategories: FlatCategory[] = [
-  { id: 2, parentId: null, name: 'Phones', slug: 'phones', depth: 0, parentName: null },
+  {
+    id: 2,
+    parentId: null,
+    name: 'Phones',
+    slug: 'phones',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 0,
+    parentName: null,
+  },
 ];
 
 const baseMutation = () => ({
@@ -42,7 +54,6 @@ describe('ProductsPage', () => {
   beforeEach(() => {
     vi.mocked(useProducts).mockReturnValue({
       products: mockProducts,
-      allProducts: mockProducts,
       meta: { page: 1, limit: 10, total: 2, totalPages: 1 },
       totalCount: 2,
       isLoading: false,
@@ -85,7 +96,6 @@ describe('ProductsPage', () => {
     const refetch = vi.fn();
     vi.mocked(useProducts).mockReturnValue({
       products: [],
-      allProducts: [],
       meta: undefined,
       totalCount: 0,
       isLoading: false,

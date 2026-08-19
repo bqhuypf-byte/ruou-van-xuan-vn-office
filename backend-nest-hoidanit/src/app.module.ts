@@ -13,6 +13,11 @@ import { UserProfileModule } from './features/user-profile/user-profile.module';
 import { ProductModule } from './features/product/product.module';
 import { CartModule } from './features/cart/cart.module';
 import { OrderModule } from './features/order/order.module';
+import { ReviewModule } from './features/review/review.module';
+import { SiteContentModule } from './features/site-content/site-content.module';
+import { BannerModule } from './features/banner/banner.module';
+import { BrandModule } from './features/brand/brand.module';
+import { SiteSettingsModule } from './features/site-settings/site-settings.module';
 
 @Module({
   imports: [
@@ -28,6 +33,11 @@ import { OrderModule } from './features/order/order.module';
     ProductModule,
     CartModule,
     OrderModule,
+    ReviewModule,
+    SiteContentModule,
+    BannerModule,
+    BrandModule,
+    SiteSettingsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

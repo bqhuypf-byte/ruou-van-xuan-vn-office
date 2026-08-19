@@ -23,21 +23,28 @@ export async function seedCategories(dataSource: DataSource) {
   }
 
   let total = 0;
+  let sortOrder = 0;
   for (const [parentName, childNames] of Object.entries(TREE)) {
     const parent = await repo.save(
       repo.create({
         name: parentName,
         slug: slugify(parentName),
         parentId: null,
+        thumbnailUrl: faker.image.urlPicsumPhotos(),
+        showInTopCategories: true,
+        homeSortOrder: sortOrder++,
       }),
     );
     total += 1;
 
-    const children = childNames.map((childName) =>
+    const children = childNames.map((childName, idx) =>
       repo.create({
         name: childName,
         slug: slugify(childName),
         parentId: parent.id,
+        thumbnailUrl: faker.image.urlPicsumPhotos(),
+        showInDailyEssentials: idx === 0,
+        homeSortOrder: idx,
       }),
     );
     await repo.save(children);

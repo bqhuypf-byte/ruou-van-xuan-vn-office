@@ -34,15 +34,17 @@ export class ProductService {
   ): Promise<{ items: Product[]; meta: PaginationMeta }> {
     const page = query.page ?? DEFAULT_PAGE;
     const limit = Math.min(query.limit ?? DEFAULT_LIMIT, MAX_LIMIT);
-    const effectiveQuery: QueryProductDto = {
-      ...query,
-      isActive: query.isActive ?? true,
-    };
+
+    const categoryIds =
+      query.categoryId !== undefined
+        ? await this.categoryRepository.findDescendantIds(query.categoryId)
+        : undefined;
 
     const { items, total } = await this.productRepository.findAll(
-      effectiveQuery,
+      query,
       page,
       limit,
+      categoryIds,
     );
 
     return {

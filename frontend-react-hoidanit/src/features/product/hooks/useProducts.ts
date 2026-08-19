@@ -9,25 +9,33 @@ export const useProducts = (params?: ProductFilterParams) => {
   const limit = params?.limit ?? 10;
 
   const query = useQuery({
-    queryKey: [...PRODUCT_QUERY_KEY, { categoryId: params?.categoryId, page, limit }],
-    queryFn: () => productService.getProducts({ categoryId: params?.categoryId, page, limit }),
+    queryKey: [
+      ...PRODUCT_QUERY_KEY,
+      {
+        search: params?.search,
+        categoryId: params?.categoryId,
+        isActive: params?.isActive,
+        isFeaturedDeal: params?.isFeaturedDeal,
+        page,
+        limit,
+      },
+    ],
+    queryFn: () =>
+      productService.getProducts({
+        search: params?.search,
+        categoryId: params?.categoryId,
+        isActive: params?.isActive,
+        isFeaturedDeal: params?.isFeaturedDeal,
+        page,
+        limit,
+      }),
   });
 
-  const allProducts = query.data?.products ?? [];
-  const filteredProducts = allProducts.filter((product) => {
-    if (!params?.search) return true;
-    const term = params.search.toLowerCase();
-    return (
-      product.name.toLowerCase().includes(term) ||
-      product.slug.toLowerCase().includes(term) ||
-      product.id.toString().includes(term)
-    );
-  });
+  const products = query.data?.products ?? [];
 
   return {
     ...query,
-    products: filteredProducts,
-    allProducts,
+    products,
     meta: query.data?.meta,
     totalCount: query.data?.meta.total ?? 0,
   };

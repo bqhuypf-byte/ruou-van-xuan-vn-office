@@ -21,6 +21,8 @@ const productSchema = z.object({
   description: z.string().optional(),
   thumbnailUrl: z.string().optional(),
   isActive: z.boolean(),
+  isFeaturedDeal: z.boolean(),
+  dealSortOrder: z.string().optional(),
 });
 
 type ProductFormData = z.infer<typeof productSchema>;
@@ -32,6 +34,8 @@ export interface ProductFormSubmitData {
   description?: string;
   thumbnailUrl?: string;
   isActive: boolean;
+  isFeaturedDeal: boolean;
+  dealSortOrder?: number;
 }
 
 export interface ProductFormModalProps {
@@ -67,6 +71,8 @@ export const ProductFormModal = ({
       description: '',
       thumbnailUrl: '',
       isActive: true,
+      isFeaturedDeal: false,
+      dealSortOrder: '0',
     },
   });
 
@@ -80,6 +86,8 @@ export const ProductFormModal = ({
           description: productToEdit.description ?? '',
           thumbnailUrl: productToEdit.thumbnailUrl ?? '',
           isActive: productToEdit.isActive,
+          isFeaturedDeal: productToEdit.isFeaturedDeal,
+          dealSortOrder: String(productToEdit.dealSortOrder ?? 0),
         });
       } else {
         reset({
@@ -89,6 +97,8 @@ export const ProductFormModal = ({
           description: '',
           thumbnailUrl: '',
           isActive: true,
+          isFeaturedDeal: false,
+          dealSortOrder: '0',
         });
       }
     }
@@ -102,6 +112,8 @@ export const ProductFormModal = ({
       description: data.description || undefined,
       thumbnailUrl: data.thumbnailUrl || undefined,
       isActive: data.isActive,
+      isFeaturedDeal: data.isFeaturedDeal,
+      dealSortOrder: data.dealSortOrder ? Number(data.dealSortOrder) : undefined,
     });
     onClose();
   };
@@ -193,6 +205,24 @@ export const ProductFormModal = ({
           />
           Đang bán (hiển thị cho khách hàng)
         </label>
+
+        <div className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+          <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 dark:border-slate-700"
+              {...register('isFeaturedDeal')}
+            />
+            Hiển thị ở mục "Deal Nổi Bật" (Grab the best deal) trang chủ
+          </label>
+          <Input
+            label="Thứ tự hiển thị Deal"
+            type="number"
+            placeholder="0"
+            helperText="Số nhỏ hơn hiển thị trước"
+            {...register('dealSortOrder')}
+          />
+        </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           <Button variant="outline" onClick={onClose} type="button">

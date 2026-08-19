@@ -18,6 +18,7 @@ export const CategoriesPage = () => {
   const [search, setSearch] = useState('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [needsReassignTarget, setNeedsReassignTarget] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<FlatCategory | null>(null);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
@@ -43,6 +44,7 @@ export const CategoriesPage = () => {
 
   const handleOpenDelete = (category: FlatCategory) => {
     setSelectedCategory(category);
+    setNeedsReassignTarget(false);
     setIsDeleteOpen(true);
   };
 
@@ -70,20 +72,30 @@ export const CategoriesPage = () => {
     }
   };
 
-  const handleDeleteConfirm = async () => {
+  const handleDeleteConfirm = async (targetCategoryId?: number) => {
     if (!selectedCategory) return;
     setFeedback(null);
     try {
-      await deleteMutation.mutateAsync(selectedCategory.id);
+      await deleteMutation.mutateAsync({ id: selectedCategory.id, targetCategoryId });
       setFeedback({
         type: 'success',
         message: `Đã xóa danh mục "${selectedCategory.name}" thành công.`,
       });
+      setIsDeleteOpen(false);
+      setNeedsReassignTarget(false);
     } catch (err) {
+      const errorCode = (
+        err as { response?: { data?: { error?: { code?: string } } } }
+      )?.response?.data?.error?.code;
+      if (errorCode === 'CategoryHasProductsException') {
+        setNeedsReassignTarget(true);
+        return;
+      }
       setFeedback({
         type: 'error',
         message: getApiErrorMessage(err, 'Có lỗi xảy ra khi xóa danh mục.'),
       });
+      setIsDeleteOpen(false);
     }
   };
 
@@ -200,9 +212,14 @@ export const CategoriesPage = () => {
 
       <CategoryDeleteModal
         isOpen={isDeleteOpen}
-        onClose={() => setIsDeleteOpen(false)}
+        onClose={() => {
+          setIsDeleteOpen(false);
+          setNeedsReassignTarget(false);
+        }}
         onConfirm={handleDeleteConfirm}
         categoryToDelete={selectedCategory}
+        categoryOptions={allCategories}
+        needsReassignTarget={needsReassignTarget}
         isLoading={deleteMutation.isPending}
       />
     </div>

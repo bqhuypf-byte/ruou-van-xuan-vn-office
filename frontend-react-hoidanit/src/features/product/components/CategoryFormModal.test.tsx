@@ -5,8 +5,32 @@ import { CategoryFormModal } from './CategoryFormModal';
 import type { FlatCategory } from '../hooks/useCategories';
 
 const parentOptions: FlatCategory[] = [
-  { id: 1, parentId: null, name: 'Electronics', slug: 'electronics', depth: 0, parentName: null },
-  { id: 2, parentId: 1, name: 'Phones', slug: 'phones', depth: 1, parentName: 'Electronics' },
+  {
+    id: 1,
+    parentId: null,
+    name: 'Electronics',
+    slug: 'electronics',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 0,
+    parentName: null,
+  },
+  {
+    id: 2,
+    parentId: 1,
+    name: 'Phones',
+    slug: 'phones',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 1,
+    parentName: 'Electronics',
+  },
 ];
 
 describe('CategoryFormModal', () => {
@@ -92,7 +116,14 @@ describe('CategoryFormModal', () => {
     await user.click(screen.getByRole('button', { name: 'Tạo Mới' }));
 
     await waitFor(() =>
-      expect(onSubmit).toHaveBeenCalledWith({ name: 'Laptops', slug: 'laptops', parentId: 1 }),
+      expect(onSubmit).toHaveBeenCalledWith({
+        name: 'Laptops',
+        slug: 'laptops',
+        parentId: 1,
+        showInTopCategories: false,
+        showInDailyEssentials: false,
+        homeSortOrder: 0,
+      }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });

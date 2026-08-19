@@ -10,6 +10,10 @@ import {
   UserCheck,
   LogOut,
   FolderTree,
+  Sparkles,
+  GalleryHorizontal,
+  Tags,
+  Settings,
 } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
 import { ROUTES } from '@/routes/routes';
@@ -41,6 +45,26 @@ export const AdminLayout = () => {
       label: 'Danh Mục',
       path: ROUTES.ADMIN_CATEGORIES,
       icon: FolderTree,
+    },
+    {
+      label: 'Nội Dung Trang Chủ',
+      path: ROUTES.ADMIN_SITE_CONTENT,
+      icon: Sparkles,
+    },
+    {
+      label: 'Banner Trang Chủ',
+      path: ROUTES.ADMIN_BANNERS,
+      icon: GalleryHorizontal,
+    },
+    {
+      label: 'Thương Hiệu Nổi Bật',
+      path: ROUTES.ADMIN_BRANDS,
+      icon: Tags,
+    },
+    {
+      label: 'Cấu Hình Thương Hiệu',
+      path: ROUTES.ADMIN_SITE_SETTINGS,
+      icon: Settings,
     },
     {
       label: 'Sản Phẩm',

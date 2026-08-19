@@ -6,6 +6,8 @@ export interface Product {
   description: string | null;
   thumbnailUrl: string | null;
   isActive: boolean;
+  isFeaturedDeal: boolean;
+  dealSortOrder: number;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -17,6 +19,8 @@ export interface CreateProductInput {
   description?: string;
   thumbnailUrl?: string;
   isActive?: boolean;
+  isFeaturedDeal?: boolean;
+  dealSortOrder?: number;
 }
 
 export interface UpdateProductInput {
@@ -26,11 +30,15 @@ export interface UpdateProductInput {
   description?: string;
   thumbnailUrl?: string;
   isActive?: boolean;
+  isFeaturedDeal?: boolean;
+  dealSortOrder?: number;
 }
 
 export interface ProductFilterParams {
   search?: string;
   categoryId?: number;
+  isActive?: boolean;
+  isFeaturedDeal?: boolean;
   page?: number;
   limit?: number;
 }

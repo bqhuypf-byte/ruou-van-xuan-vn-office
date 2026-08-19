@@ -22,6 +22,8 @@ const mockProduct: Product = {
   description: null,
   thumbnailUrl: null,
   isActive: true,
+  isFeaturedDeal: false,
+  dealSortOrder: 0,
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {

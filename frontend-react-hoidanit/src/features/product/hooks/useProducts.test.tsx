@@ -13,8 +13,8 @@ vi.mock('../services/product.service', () => ({
 }));
 
 const mockProducts: Product[] = [
-  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, thumbnailUrl: null, isActive: true },
-  { id: 2, categoryId: 3, name: 'MacBook Pro', slug: 'macbook-pro', description: null, thumbnailUrl: null, isActive: true },
+  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, thumbnailUrl: null, isActive: true, isFeaturedDeal: false, dealSortOrder: 0 },
+  { id: 2, categoryId: 3, name: 'MacBook Pro', slug: 'macbook-pro', description: null, thumbnailUrl: null, isActive: true, isFeaturedDeal: false, dealSortOrder: 0 },
 ];
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
@@ -45,20 +45,22 @@ describe('useProducts', () => {
 
     await waitFor(() =>
       expect(productService.getProducts).toHaveBeenCalledWith({
+        search: undefined,
         categoryId: 3,
+        isActive: undefined,
         page: 2,
         limit: 5,
       }),
     );
   });
 
-  it('filters loaded products client-side by search term', async () => {
-    const { result } = renderHook(() => useProducts({ search: 'macbook' }), { wrapper });
+  it('passes the search term to the server', async () => {
+    renderHook(() => useProducts({ search: 'macbook' }), { wrapper });
 
-    await waitFor(() => expect(result.current.isLoading).toBe(false));
-
-    expect(result.current.products).toHaveLength(1);
-    expect(result.current.products[0].name).toBe('MacBook Pro');
-    expect(result.current.allProducts).toHaveLength(2);
+    await waitFor(() =>
+      expect(productService.getProducts).toHaveBeenCalledWith(
+        expect.objectContaining({ search: 'macbook' }),
+      ),
+    );
   });
 });

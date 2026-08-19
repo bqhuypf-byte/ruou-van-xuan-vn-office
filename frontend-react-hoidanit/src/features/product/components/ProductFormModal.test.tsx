@@ -6,8 +6,32 @@ import type { FlatCategory } from '../hooks/useCategories';
 import type { Product } from '../types/product.types';
 
 const categoryOptions: FlatCategory[] = [
-  { id: 1, parentId: null, name: 'Electronics', slug: 'electronics', depth: 0, parentName: null },
-  { id: 2, parentId: 1, name: 'Phones', slug: 'phones', depth: 1, parentName: 'Electronics' },
+  {
+    id: 1,
+    parentId: null,
+    name: 'Electronics',
+    slug: 'electronics',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 0,
+    parentName: null,
+  },
+  {
+    id: 2,
+    parentId: 1,
+    name: 'Phones',
+    slug: 'phones',
+    description: null,
+    thumbnailUrl: null,
+    showInTopCategories: false,
+    showInDailyEssentials: false,
+    homeSortOrder: 0,
+    depth: 1,
+    parentName: 'Electronics',
+  },
 ];
 
 const mockProduct: Product = {
@@ -18,6 +42,8 @@ const mockProduct: Product = {
   description: 'A great phone',
   thumbnailUrl: 'https://example.com/iphone15.jpg',
   isActive: true,
+  isFeaturedDeal: false,
+  dealSortOrder: 0,
 };
 
 describe('ProductFormModal', () => {
@@ -82,6 +108,8 @@ describe('ProductFormModal', () => {
         description: undefined,
         thumbnailUrl: undefined,
         isActive: true,
+        isFeaturedDeal: false,
+        dealSortOrder: 0,
       }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());

@@ -14,7 +14,18 @@ vi.mock('../services/category.service', () => ({
   },
 }));
 
-const mockCategory: Category = { id: 1, parentId: null, name: 'Electronics', slug: 'electronics', children: [] };
+const mockCategory: Category = {
+  id: 1,
+  parentId: null,
+  name: 'Electronics',
+  slug: 'electronics',
+  description: null,
+  thumbnailUrl: null,
+  showInTopCategories: false,
+  showInDailyEssentials: false,
+  homeSortOrder: 0,
+  children: [],
+};
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
   const queryClient = createTestQueryClient();
@@ -68,9 +79,19 @@ describe('useDeleteCategory', () => {
     vi.mocked(categoryService.deleteCategory).mockResolvedValue(undefined);
     const { result } = renderHook(() => useDeleteCategory(), { wrapper });
 
-    result.current.mutate(1);
+    result.current.mutate({ id: 1 });
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
-    expect(categoryService.deleteCategory).toHaveBeenCalledWith(1);
+    expect(categoryService.deleteCategory).toHaveBeenCalledWith(1, undefined);
+  });
+
+  it('calls categoryService.deleteCategory with a reassignment target', async () => {
+    vi.mocked(categoryService.deleteCategory).mockResolvedValue(undefined);
+    const { result } = renderHook(() => useDeleteCategory(), { wrapper });
+
+    result.current.mutate({ id: 1, targetCategoryId: 2 });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(categoryService.deleteCategory).toHaveBeenCalledWith(1, 2);
   });
 });

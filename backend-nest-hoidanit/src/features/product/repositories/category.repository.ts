@@ -26,6 +26,22 @@ export class CategoryRepository {
     return this.repository.find({ where: { parentId } });
   }
 
+  async findDescendantIds(categoryId: number): Promise<number[]> {
+    const all = await this.repository.find();
+    const ids = [categoryId];
+    let frontier = [categoryId];
+    while (frontier.length > 0) {
+      const children = all.filter(
+        (category) =>
+          category.parentId !== null && frontier.includes(category.parentId),
+      );
+      const childIds = children.map((category) => category.id);
+      ids.push(...childIds);
+      frontier = childIds;
+    }
+    return ids;
+  }
+
   create(data: Partial<Category>): Category {
     return this.repository.create(data);
   }

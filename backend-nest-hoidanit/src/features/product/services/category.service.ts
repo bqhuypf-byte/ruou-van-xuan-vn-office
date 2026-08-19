@@ -5,14 +5,20 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { CategoryRepository } from '../repositories/category.repository';
+import { ProductRepository } from '../repositories/product.repository';
 import { CreateCategoryDto } from '../dto/create-category.dto';
 import { UpdateCategoryDto } from '../dto/update-category.dto';
 import { Category } from '../entities/category.entity';
+import { Product } from '../entities/product.entity';
 import { CategoryTreeNode } from '../types/product.types';
+import { CategoryHasProductsException } from '../exceptions/category-has-products.exception';
 
 @Injectable()
 export class CategoryService {
-  constructor(private readonly categoryRepository: CategoryRepository) {}
+  constructor(
+    private readonly categoryRepository: CategoryRepository,
+    private readonly productRepository: ProductRepository,
+  ) {}
 
   private buildTree(
     categories: Category[],
@@ -31,13 +37,20 @@ export class CategoryService {
     return this.buildTree(categories);
   }
 
-  async findBySlug(slug: string): Promise<Category & { children: Category[] }> {
+  async findBySlug(
+    slug: string,
+  ): Promise<Category & { children: Category[]; products: Product[] }> {
     const category = await this.categoryRepository.findBySlug(slug);
     if (!category) {
       throw new NotFoundException(`Category "${slug}" not found`);
     }
-    const children = await this.categoryRepository.findChildren(category.id);
-    return { ...category, children };
+    const [children, descendantIds] = await Promise.all([
+      this.categoryRepository.findChildren(category.id),
+      this.categoryRepository.findDescendantIds(category.id),
+    ]);
+    const products =
+      await this.productRepository.findActiveByCategoryIds(descendantIds);
+    return { ...category, children, products };
   }
 
   async create(dto: CreateCategoryDto): Promise<Category> {
@@ -78,13 +91,30 @@ export class CategoryService {
       if (!parent) {
         throw new NotFoundException(`Category #${dto.parentId} not found`);
       }
+      await this.assertNoCycle(id, dto.parentId);
     }
 
     Object.assign(category, dto);
     return this.categoryRepository.save(category);
   }
 
-  async remove(id: number): Promise<void> {
+  private async assertNoCycle(
+    categoryId: number,
+    newParentId: number,
+  ): Promise<void> {
+    let current: Category | null =
+      await this.categoryRepository.findById(newParentId);
+    while (current?.parentId != null) {
+      if (current.parentId === categoryId) {
+        throw new BadRequestException(
+          'Cannot set a descendant category as parent',
+        );
+      }
+      current = await this.categoryRepository.findById(current.parentId);
+    }
+  }
+
+  async remove(id: number, targetCategoryId?: number): Promise<void> {
     const category = await this.categoryRepository.findById(id);
     if (!category) {
       throw new NotFoundException(`Category #${id} not found`);
@@ -95,6 +125,25 @@ export class CategoryService {
       throw new BadRequestException(
         'Cannot delete a category that has child categories',
       );
+    }
+
+    const productCount = await this.productRepository.countByCategoryId(id);
+    if (productCount > 0) {
+      if (targetCategoryId === undefined) {
+        throw new CategoryHasProductsException(
+          `Category still has ${productCount} product(s) assigned to it`,
+        );
+      }
+      if (targetCategoryId === id) {
+        throw new BadRequestException(
+          'Target category must be different from the category being deleted',
+        );
+      }
+      const target = await this.categoryRepository.findById(targetCategoryId);
+      if (!target) {
+        throw new NotFoundException(`Category #${targetCategoryId} not found`);
+      }
+      await this.productRepository.reassignCategory(id, targetCategoryId);
     }
 
     await this.categoryRepository.remove(category);

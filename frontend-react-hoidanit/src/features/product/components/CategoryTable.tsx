@@ -83,9 +83,17 @@ export const CategoryTable = ({
                     className="flex items-center gap-3"
                     style={{ paddingLeft: `${category.depth * 20}px` }}
                   >
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 shrink-0">
-                      <Layers className="w-4 h-4" />
-                    </div>
+                    {category.thumbnailUrl ? (
+                      <img
+                        src={category.thumbnailUrl}
+                        alt=""
+                        className="w-9 h-9 rounded-xl object-cover shrink-0"
+                      />
+                    ) : (
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 shrink-0">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                    )}
                     <span className="font-semibold text-slate-900 dark:text-white">
                       {category.name}
                     </span>

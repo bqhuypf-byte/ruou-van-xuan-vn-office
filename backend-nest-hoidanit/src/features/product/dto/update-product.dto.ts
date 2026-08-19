@@ -36,4 +36,12 @@ export class UpdateProductDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  isFeaturedDeal?: boolean;
+
+  @IsOptional()
+  @IsInt()
+  dealSortOrder?: number;
 }
