@@ -73,7 +73,7 @@ export const CategoryDeleteModal = ({
             <select
               value={targetCategoryId}
               onChange={(e) => setTargetCategoryId(e.target.value)}
-              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
             >
               <option value="">-- Chọn danh mục --</option>
               {reassignOptions.map((category) => (

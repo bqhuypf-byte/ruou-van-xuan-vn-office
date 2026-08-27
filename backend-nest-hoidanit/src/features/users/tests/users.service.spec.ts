@@ -150,7 +150,10 @@ describe('UsersService', () => {
     it('should update user fields successfully when email is unchanged', async () => {
       const dto = { fullName: 'Jane Updated' };
       repository.findById.mockResolvedValue({ ...mockUser });
-      repository.save.mockResolvedValue({ ...mockUser, fullName: 'Jane Updated' });
+      repository.save.mockResolvedValue({
+        ...mockUser,
+        fullName: 'Jane Updated',
+      });
 
       const result = await service.update(1, dto);
 
@@ -164,17 +167,26 @@ describe('UsersService', () => {
       const dto = { email: 'changed@example.com' };
       repository.findById.mockResolvedValue({ ...mockUser });
       repository.findByEmail.mockResolvedValue(null);
-      repository.save.mockResolvedValue({ ...mockUser, email: 'changed@example.com' });
+      repository.save.mockResolvedValue({
+        ...mockUser,
+        email: 'changed@example.com',
+      });
 
       const result = await service.update(1, dto);
 
-      expect(repository.findByEmail).toHaveBeenCalledWith('changed@example.com');
+      expect(repository.findByEmail).toHaveBeenCalledWith(
+        'changed@example.com',
+      );
       expect(result.email).toBe('changed@example.com');
     });
 
     it('should throw ConflictException if updated email belongs to another user', async () => {
       const dto = { email: 'taken@example.com' };
-      const otherUser: User = { ...mockUser, id: 2, email: 'taken@example.com' };
+      const otherUser: User = {
+        ...mockUser,
+        id: 2,
+        email: 'taken@example.com',
+      };
       repository.findById.mockResolvedValue({ ...mockUser });
       repository.findByEmail.mockResolvedValue(otherUser);
 

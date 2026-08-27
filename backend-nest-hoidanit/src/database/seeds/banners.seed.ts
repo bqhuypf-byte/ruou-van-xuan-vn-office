@@ -3,23 +3,21 @@ import { Banner } from '../../features/banner/entities/banner.entity';
 
 const BANNERS = [
   {
-    title: 'SMART WEARABLE.',
-    subtitle: 'Best Deal Online on smart watches',
-    badgeText: 'UP to 80% OFF',
-    imageUrl:
-      'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=600',
+    title: 'Rượu Vang Việt Nam',
+    subtitle: 'Bộ Sưu Tập Mới',
+    badgeText: 'Giảm Đến 30%',
+    imageUrl: null,
     ctaLink: '/products',
-    bgColor: '#212844',
+    bgColor: '#2b1626',
     sortOrder: 0,
   },
   {
-    title: 'SUMMER SALE.',
-    subtitle: 'Best Deal Online on fashion',
-    badgeText: 'UP to 50% OFF',
-    imageUrl:
-      'https://images.unsplash.com/photo-1441984904996-e0b6ba687e04?w=600',
+    title: 'Rượu Ngâm Truyền Thống',
+    subtitle: 'Ưu Đãi Đặc Biệt',
+    badgeText: 'Giảm Đến 20%',
+    imageUrl: null,
     ctaLink: '/products',
-    bgColor: '#008ECC',
+    bgColor: '#3a1c33',
     sortOrder: 1,
   },
 ];

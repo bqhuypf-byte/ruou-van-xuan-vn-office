@@ -1,28 +1,56 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
-import { ArrowLeft, Plus, AlertCircle, ImageOff } from 'lucide-react';
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { ArrowLeft, Plus, AlertCircle, Save } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { Spinner } from '@/shared/components/ui';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { VariantTable } from '../components/VariantTable';
+import { VariantMatrixTable } from '../components/VariantMatrixTable';
+import type { VariantMatrixSaveRow } from '../components/VariantMatrixTable';
 import { VariantFormModal } from '../components/VariantFormModal';
 import type { VariantFormSubmitData } from '../components/VariantFormModal';
+import {
+  productSchema,
+  emptyProductFormValues,
+  productFormValuesFrom,
+  buildProductSubmitPayload,
+  ProductBasicInfoFields,
+  ProductDescriptionField,
+  ProductClassificationFields,
+  type ProductFormData,
+} from '../components/ProductFormFields';
 import { ImageGallery } from '../components/ImageGallery';
 import { ImageAddModal } from '../components/ImageAddModal';
 import { useProductDetail } from '../hooks/useProductDetail';
+import { useCategories } from '../hooks/useCategories';
+import { useUpdateProduct } from '../hooks/useProductMutations';
 import { useCreateVariant, useUpdateVariant } from '../hooks/useVariantMutations';
 import { useAddImages, useDeleteImage } from '../hooks/useImageMutations';
 import type { ProductVariant } from '../types/variant.types';
 import type { ProductImage } from '../types/image.types';
 import { ROUTES } from '@/routes/routes';
 
+type TabKey = 'info' | 'description' | 'images' | 'variants';
+
+const TABS: { key: TabKey; label: string }[] = [
+  { key: 'info', label: 'Thông Tin Sản Phẩm' },
+  { key: 'description', label: 'Mô Tả Chi Tiết' },
+  { key: 'images', label: 'Hình Ảnh' },
+  { key: 'variants', label: 'Biến Thể Sản Phẩm' },
+];
+
 export const ProductDetailPage = () => {
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, isError, error, refetch } = useProductDetail(slug);
+  const { allCategories } = useCategories();
 
+  const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [isVariantFormOpen, setIsVariantFormOpen] = useState(false);
   const [isImageAddOpen, setIsImageAddOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
+  const [isSavingMatrix, setIsSavingMatrix] = useState(false);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
@@ -31,8 +59,43 @@ export const ProductDetailPage = () => {
 
   const createVariant = useCreateVariant();
   const updateVariant = useUpdateVariant();
+  const updateProduct = useUpdateProduct();
   const addImages = useAddImages();
   const deleteImage = useDeleteImage();
+
+  const {
+    register: registerProduct,
+    control: productControl,
+    handleSubmit: handleProductSubmit,
+    reset: resetProductForm,
+    setValue: setProductValue,
+    watch: watchProduct,
+    formState: { errors: productErrors },
+  } = useForm<ProductFormData>({
+    resolver: zodResolver(productSchema),
+    defaultValues: emptyProductFormValues(),
+  });
+  const hasGroup2 = watchProduct('hasGroup2');
+
+  useEffect(() => {
+    if (product) {
+      resetProductForm(productFormValuesFrom(product));
+    }
+  }, [product, resetProductForm]);
+
+  const handleSaveProductInfo = async (data: ProductFormData) => {
+    if (!product) return;
+    setFeedback(null);
+    try {
+      await updateProduct.mutateAsync({ id: product.id, input: buildProductSubmitPayload(data) });
+      setFeedback({ type: 'success', message: 'Đã cập nhật thông tin sản phẩm.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi lưu sản phẩm.'),
+      });
+    }
+  };
 
   const handleOpenCreateVariant = () => {
     setSelectedVariant(null);
@@ -42,6 +105,52 @@ export const ProductDetailPage = () => {
   const handleOpenEditVariant = (variant: ProductVariant) => {
     setSelectedVariant(variant);
     setIsVariantFormOpen(true);
+  };
+
+  const handleSaveMatrix = async (rows: VariantMatrixSaveRow[]) => {
+    if (!product) return;
+    setFeedback(null);
+    setIsSavingMatrix(true);
+    try {
+      const results = await Promise.allSettled(
+        rows.map((row) =>
+          row.variantId
+            ? updateVariant.mutateAsync({
+                id: row.variantId,
+                input: {
+                  sku: row.sku,
+                  price: row.price,
+                  salePrice: row.salePrice,
+                  stockQuantity: row.stockQuantity,
+                  imageUrl: row.imageUrl,
+                },
+              })
+            : createVariant.mutateAsync({
+                productId: product.id,
+                input: {
+                  sku: row.sku,
+                  attributes: row.attributes,
+                  price: row.price,
+                  salePrice: row.salePrice,
+                  stockQuantity: row.stockQuantity,
+                  imageUrl: row.imageUrl,
+                },
+              }),
+        ),
+      );
+      const failedCount = results.filter((r) => r.status === 'rejected').length;
+      const succeededCount = rows.length - failedCount;
+      if (failedCount === 0) {
+        setFeedback({ type: 'success', message: `Đã lưu ${succeededCount} biến thể thành công.` });
+      } else {
+        setFeedback({
+          type: 'error',
+          message: `Đã lưu ${succeededCount} biến thể, ${failedCount} biến thể thất bại.`,
+        });
+      }
+    } finally {
+      setIsSavingMatrix(false);
+    }
   };
 
   const handleSaveVariant = async (data: VariantFormSubmitData) => {
@@ -63,15 +172,21 @@ export const ProductDetailPage = () => {
     }
   };
 
-  const handleAddImage = async (imageUrl: string) => {
+  const handleAddImage = async (imageUrls: string[]) => {
     if (!product) return;
     setFeedback(null);
     try {
       await addImages.mutateAsync({
         productId: product.id,
-        input: { images: [{ imageUrl }] },
+        input: { images: imageUrls.map((imageUrl) => ({ imageUrl })) },
       });
-      setFeedback({ type: 'success', message: 'Đã thêm hình ảnh thành công.' });
+      setFeedback({
+        type: 'success',
+        message:
+          imageUrls.length > 1
+            ? `Đã thêm ${imageUrls.length} hình ảnh thành công.`
+            : 'Đã thêm hình ảnh thành công.',
+      });
     } catch (err) {
       setFeedback({
         type: 'error',
@@ -122,35 +237,17 @@ export const ProductDetailPage = () => {
     );
   }
 
+  const hasVariantGroups = Boolean(product.variantAttributes && product.variantAttributes.length > 0);
+
   return (
     <div className="space-y-6 max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
       <Link
         to={ROUTES.ADMIN_PRODUCTS}
-        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400"
+        className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400"
       >
         <ArrowLeft className="w-4 h-4" />
         Quay lại danh sách sản phẩm
       </Link>
-
-      <div className="flex items-center gap-4">
-        {product.thumbnailUrl ? (
-          <img
-            src={product.thumbnailUrl}
-            alt={product.name}
-            className="w-16 h-16 rounded-xl object-cover border border-slate-200 dark:border-slate-800"
-          />
-        ) : (
-          <div className="w-16 h-16 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
-            <ImageOff className="w-6 h-6" />
-          </div>
-        )}
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-            {product.name}
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 font-mono">{product.slug}</p>
-        </div>
-      </div>
 
       {feedback && (
         <div
@@ -170,40 +267,111 @@ export const ProductDetailPage = () => {
         </div>
       )}
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Biến Thể (Variants)</h2>
-          <Button size="sm" onClick={handleOpenCreateVariant} leftIcon={<Plus className="w-4 h-4" />}>
-            Thêm Biến Thể
-          </Button>
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
+        <div className="flex items-center gap-1 px-3 sm:px-5 border-b border-slate-200 dark:border-slate-800 overflow-x-auto">
+          {TABS.map((tab) => (
+            <button
+              key={tab.key}
+              type="button"
+              onClick={() => setActiveTab(tab.key)}
+              className={`px-3 sm:px-4 py-3.5 text-sm font-medium border-b-2 -mb-px whitespace-nowrap transition-colors ${
+                activeTab === tab.key
+                  ? 'border-brand-600 text-brand-600 dark:text-brand-400'
+                  : 'border-transparent text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
         </div>
-        <VariantTable
-          variants={product.variants}
-          isLoading={false}
-          onEdit={handleOpenEditVariant}
-        />
-      </section>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Hình Ảnh (Images)</h2>
-          <Button size="sm" onClick={() => setIsImageAddOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
-            Thêm Ảnh
-          </Button>
-        </div>
-        <ImageGallery
-          images={product.images}
-          isLoading={false}
-          onDelete={handleDeleteImage}
-          deletingId={deletingImageId}
-        />
-      </section>
+        <form onSubmit={handleProductSubmit(handleSaveProductInfo)}>
+          <div className="p-4 sm:p-6">
+            {activeTab === 'info' && (
+              <div className="space-y-5">
+                <ProductBasicInfoFields
+                  register={registerProduct}
+                  control={productControl}
+                  errors={productErrors}
+                  categoryOptions={allCategories}
+                />
+              </div>
+            )}
+
+            {activeTab === 'description' && (
+              <div className="space-y-5">
+                <ProductDescriptionField control={productControl} errors={productErrors} />
+              </div>
+            )}
+
+            {activeTab === 'images' && (
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Hình Ảnh Sản Phẩm</h2>
+                  <Button size="sm" onClick={() => setIsImageAddOpen(true)} leftIcon={<Plus className="w-4 h-4" />}>
+                    Thêm Ảnh
+                  </Button>
+                </div>
+                <ImageGallery
+                  images={product.images}
+                  isLoading={false}
+                  onDelete={handleDeleteImage}
+                  deletingId={deletingImageId}
+                />
+              </div>
+            )}
+
+            {activeTab === 'variants' && (
+              <div className="space-y-6">
+                <ProductClassificationFields
+                  register={registerProduct}
+                  control={productControl}
+                  errors={productErrors}
+                  setValue={setProductValue}
+                  hasGroup2={hasGroup2}
+                />
+
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Giá & Tồn Kho</h2>
+                    {!hasVariantGroups && (
+                      <Button size="sm" onClick={handleOpenCreateVariant} leftIcon={<Plus className="w-4 h-4" />}>
+                        Thêm Biến Thể
+                      </Button>
+                    )}
+                  </div>
+                  {hasVariantGroups ? (
+                    <VariantMatrixTable
+                      productName={product.name}
+                      productSlug={product.slug}
+                      groups={product.variantAttributes ?? []}
+                      variants={product.variants}
+                      isSaving={isSavingMatrix}
+                      onSaveAll={handleSaveMatrix}
+                    />
+                  ) : (
+                    <VariantTable variants={product.variants} isLoading={false} onEdit={handleOpenEditVariant} />
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="flex justify-end px-4 sm:px-6 py-4 border-t border-slate-100 dark:border-slate-800">
+            <Button type="submit" isLoading={updateProduct.isPending} leftIcon={<Save className="w-4 h-4" />}>
+              Lưu Chỉnh Sửa
+            </Button>
+          </div>
+        </form>
+      </div>
 
       <VariantFormModal
         isOpen={isVariantFormOpen}
         onClose={() => setIsVariantFormOpen(false)}
         onSubmit={handleSaveVariant}
         variantToEdit={selectedVariant}
+        productSlug={product.slug}
+        attributeNames={[]}
         isLoading={createVariant.isPending || updateVariant.isPending}
       />
 

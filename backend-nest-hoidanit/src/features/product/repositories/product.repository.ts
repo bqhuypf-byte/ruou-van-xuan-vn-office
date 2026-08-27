@@ -27,10 +27,9 @@ export class ProductRepository {
       .leftJoin('product.variants', 'variant');
 
     if (query.search) {
-      qb.andWhere(
-        '(product.name LIKE :search OR product.slug LIKE :search)',
-        { search: `%${query.search}%` },
-      );
+      qb.andWhere('(product.name LIKE :search OR product.slug LIKE :search)', {
+        search: `%${query.search}%`,
+      });
     }
     if (categoryIds !== undefined) {
       qb.andWhere('product.categoryId IN (:...categoryIds)', { categoryIds });
@@ -93,6 +92,11 @@ export class ProductRepository {
 
   findById(id: number): Promise<Product | null> {
     return this.repository.findOne({ where: { id } });
+  }
+
+  findByIds(ids: number[]): Promise<Product[]> {
+    if (ids.length === 0) return Promise.resolve([]);
+    return this.repository.find({ where: { id: In(ids) } });
   }
 
   create(data: Partial<Product>): Product {

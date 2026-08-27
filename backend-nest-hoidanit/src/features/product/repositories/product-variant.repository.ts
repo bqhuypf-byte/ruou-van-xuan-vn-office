@@ -14,6 +14,15 @@ export class ProductVariantRepository {
     return this.repository.find({ where: { productId } });
   }
 
+  findByProductIds(productIds: number[]): Promise<ProductVariant[]> {
+    if (productIds.length === 0) return Promise.resolve([]);
+    return this.repository
+      .createQueryBuilder('variant')
+      .where('variant.productId IN (:...productIds)', { productIds })
+      .orderBy('variant.price', 'ASC')
+      .getMany();
+  }
+
   findById(id: number): Promise<ProductVariant | null> {
     return this.repository.findOne({ where: { id } });
   }

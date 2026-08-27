@@ -7,7 +7,9 @@ import { UpdateHomepageContentDto } from './dto/update-homepage-content.dto';
 
 @Controller()
 export class HomepageContentController {
-  constructor(private readonly homepageContentService: HomepageContentService) {}
+  constructor(
+    private readonly homepageContentService: HomepageContentService,
+  ) {}
 
   @Get('homepage-content')
   get() {

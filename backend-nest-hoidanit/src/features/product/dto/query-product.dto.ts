@@ -19,12 +19,16 @@ export class QueryProductDto {
   categoryId?: number;
 
   @IsOptional()
-  @Transform(({ value }) => (value === undefined ? value : value === true || value === 'true'))
+  @Transform(({ value }) =>
+    value === undefined ? value : value === true || value === 'true',
+  )
   @IsBoolean()
   isActive?: boolean;
 
   @IsOptional()
-  @Transform(({ value }) => (value === undefined ? value : value === true || value === 'true'))
+  @Transform(({ value }) =>
+    value === undefined ? value : value === true || value === 'true',
+  )
   @IsBoolean()
   isFeaturedDeal?: boolean;
 

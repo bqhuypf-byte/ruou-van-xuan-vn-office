@@ -173,7 +173,11 @@ describe('Users (E2E Integration)', () => {
     it('should return 400 BAD REQUEST for an invalid email', async () => {
       await request(app.getHttpServer())
         .post('/users')
-        .send({ email: 'not-an-email', password: 'plainPassword1', fullName: 'X' })
+        .send({
+          email: 'not-an-email',
+          password: 'plainPassword1',
+          fullName: 'X',
+        })
         .expect(400);
     });
 

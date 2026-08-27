@@ -46,7 +46,7 @@ export const UserTable = ({
   if (users.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-sm">
-        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <UserCircle className="w-8 h-8" />
         </div>
         <h3 className="text-base font-semibold text-slate-900 dark:text-white">
@@ -83,7 +83,7 @@ export const UserTable = ({
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400">
+                    <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400">
                       <UserCircle className="w-4 h-4" />
                     </div>
                     <div>

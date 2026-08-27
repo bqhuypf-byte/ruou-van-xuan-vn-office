@@ -1,5 +1,6 @@
 import {
   IsBoolean,
+  IsIn,
   IsInt,
   IsNotEmpty,
   IsOptional,
@@ -34,14 +35,19 @@ export class UpdateCategoryDto {
   thumbnailUrl?: string;
 
   @IsOptional()
-  @IsBoolean()
-  showInTopCategories?: boolean;
-
-  @IsOptional()
-  @IsBoolean()
-  showInDailyEssentials?: boolean;
-
-  @IsOptional()
   @IsInt()
   homeSortOrder?: number;
+
+  @IsOptional()
+  @IsBoolean()
+  showInProductSections?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(100)
+  homeSectionTitle?: string;
+
+  @IsOptional()
+  @IsIn(['grid', 'carousel'])
+  homeDisplayStyle?: 'grid' | 'carousel';
 }

@@ -4,12 +4,18 @@ import { seedUsers } from './seeds/users.seed';
 import { seedAddresses } from './seeds/addresses.seed';
 import { seedCategories } from './seeds/categories.seed';
 import { seedProducts } from './seeds/products.seed';
+import { seedVanXuanProducts } from './seeds/van-xuan-products.seed';
+import { seedVanXuanProductImages } from './seeds/van-xuan-product-images.seed';
 import { seedCarts } from './seeds/carts.seed';
 import { seedOrders } from './seeds/orders.seed';
 import { seedReviews } from './seeds/reviews.seed';
 import { seedBanners } from './seeds/banners.seed';
 import { seedBrands } from './seeds/brands.seed';
 import { seedSiteSettings } from './seeds/site-settings.seed';
+import { seedFaqs } from './seeds/faqs.seed';
+import { seedPages } from './seeds/pages.seed';
+import { seedVouchers } from './seeds/vouchers.seed';
+import { seedHomepageSections } from './seeds/homepage-sections.seed';
 
 const seeders: Record<
   string,
@@ -20,12 +26,18 @@ const seeders: Record<
   addresses: seedAddresses,
   categories: seedCategories,
   products: seedProducts,
+  'van-xuan-products': seedVanXuanProducts,
+  'van-xuan-product-images': seedVanXuanProductImages,
   carts: seedCarts,
   orders: seedOrders,
   reviews: seedReviews,
   banners: seedBanners,
   brands: seedBrands,
   'site-settings': seedSiteSettings,
+  faqs: seedFaqs,
+  pages: seedPages,
+  vouchers: seedVouchers,
+  'homepage-sections': seedHomepageSections,
 };
 
 async function seedAll(count?: number) {
@@ -34,12 +46,18 @@ async function seedAll(count?: number) {
   await seedAddresses(AppDataSource);
   await seedCategories(AppDataSource);
   await seedProducts(AppDataSource);
+  await seedVanXuanProducts(AppDataSource);
+  await seedVanXuanProductImages(AppDataSource);
   await seedCarts(AppDataSource);
   await seedOrders(AppDataSource);
   await seedReviews(AppDataSource);
   await seedBanners(AppDataSource);
   await seedBrands(AppDataSource);
   await seedSiteSettings(AppDataSource);
+  await seedFaqs(AppDataSource);
+  await seedPages(AppDataSource);
+  await seedVouchers(AppDataSource);
+  await seedHomepageSections(AppDataSource);
 }
 
 async function main() {

@@ -66,6 +66,15 @@ export class ProductController {
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('admin')
+  @Delete('admin/products/:id/permanent')
+  @HttpCode(HttpStatus.OK)
+  async removePermanently(@Param('id', ParseIntPipe) id: number) {
+    await this.productService.hardDelete(id);
+    return { success: true };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
   @Post('admin/products/:id/images')
   addImages(@Param('id', ParseIntPipe) id: number, @Body() dto: AddImagesDto) {
     return this.productService.addImages(id, dto.images);

@@ -1,4 +1,27 @@
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@theme {
+  --font-sans: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+  --font-heading: "Be Vietnam Pro", ui-sans-serif, system-ui, sans-serif;
+
+  --color-brand-50: #eaf7f0;
+  --color-brand-100: #d0eee1;
+  --color-brand-200: #a3ddc4;
+  --color-brand-300: #71c7a3;
+  --color-brand-400: #45a87f;
+  --color-brand-500: #237f5c;
+  --color-brand-600: #003d29;
+  --color-brand-700: #013322;
+  --color-brand-800: #04291b;
+  --color-brand-900: #062015;
+  --color-brand-950: #021109;
+
+  --color-accent-beige: #f2e4d9;
+  --color-accent-pink: #f9dcdc;
+  --color-accent-mint: #d2f7ec;
+  --color-accent-peach: #ffe6cc;
+}
 
 :root {
   color-scheme: light dark;
@@ -10,4 +33,60 @@
 
 body {
   margin: 0;
+  font-family: var(--font-sans);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-heading);
+}
+
+@keyframes contact-widget-shake {
+  0%,
+  88%,
+  100% {
+    transform: rotate(0deg);
+  }
+  89% {
+    transform: rotate(-14deg);
+  }
+  90% {
+    transform: rotate(12deg);
+  }
+  91% {
+    transform: rotate(-10deg);
+  }
+  92% {
+    transform: rotate(8deg);
+  }
+  93% {
+    transform: rotate(-6deg);
+  }
+  94% {
+    transform: rotate(4deg);
+  }
+  95% {
+    transform: rotate(-2deg);
+  }
+}
+
+@keyframes contact-widget-ping {
+  0% {
+    transform: scale(1);
+    opacity: 0.55;
+  }
+  100% {
+    transform: scale(1.9);
+    opacity: 0;
+  }
+}
+
+.contact-widget-shake {
+  animation: contact-widget-shake 3.2s ease-in-out infinite;
+  transform-origin: 50% 90%;
+}
+
+.contact-widget-ping {
+  animation: contact-widget-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
 }

@@ -1,4 +1,4 @@
-import { Boxes, Edit2, PackageX } from 'lucide-react';
+import { Boxes, Edit2, ImageOff, PackageX } from 'lucide-react';
 import { Badge, Button } from '@/shared/components/ui';
 import { formatPrice } from '@/shared/utils/formatPrice';
 import type { ProductVariant } from '../types/variant.types';
@@ -24,14 +24,14 @@ export const VariantTable = ({ variants, isLoading, onEdit }: VariantTableProps)
   if (variants.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center shadow-sm">
-        <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <div className="w-14 h-14 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <PackageX className="w-7 h-7" />
         </div>
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">
           Chưa có biến thể nào
         </h3>
         <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-          Thêm biến thể (màu sắc, kích cỡ, giá) cho sản phẩm này.
+          Thêm biến thể (thuộc tính, giá) cho sản phẩm này.
         </p>
       </div>
     );
@@ -43,8 +43,9 @@ export const VariantTable = ({ variants, isLoading, onEdit }: VariantTableProps)
         <table className="w-full text-left text-sm border-collapse">
           <thead>
             <tr className="bg-slate-50/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+              <th className="py-3 px-5 w-14"></th>
               <th className="py-3 px-5">SKU</th>
-              <th className="py-3 px-5">Màu / Kích Cỡ</th>
+              <th className="py-3 px-5">Thuộc Tính</th>
               <th className="py-3 px-5">Giá</th>
               <th className="py-3 px-5">Tồn Kho</th>
               <th className="py-3 px-5 text-right">Thao Tác</th>
@@ -53,14 +54,33 @@ export const VariantTable = ({ variants, isLoading, onEdit }: VariantTableProps)
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
             {variants.map((variant) => (
               <tr key={variant.id} className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors">
+                <td className="py-3.5 px-5">
+                  {variant.imageUrl ? (
+                    <img
+                      src={variant.imageUrl}
+                      alt={variant.sku}
+                      className="w-9 h-9 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
+                    />
+                  ) : (
+                    <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                      <ImageOff className="w-4 h-4" />
+                    </div>
+                  )}
+                </td>
                 <td className="py-3.5 px-5 font-mono text-xs text-slate-700 dark:text-slate-300">
                   {variant.sku}
                 </td>
                 <td className="py-3.5 px-5">
-                  <div className="flex gap-1.5">
-                    {variant.color && <Badge size="sm">{variant.color}</Badge>}
-                    {variant.size && <Badge size="sm">{variant.size}</Badge>}
-                    {!variant.color && !variant.size && (
+                  <div className="flex flex-wrap gap-1.5">
+                    {variant.attributes && Object.keys(variant.attributes).length > 0 ? (
+                      Object.entries(variant.attributes)
+                        .filter(([, value]) => value)
+                        .map(([name, value]) => (
+                          <Badge key={name} size="sm" title={name}>
+                            {value}
+                          </Badge>
+                        ))
+                    ) : (
                       <span className="text-xs text-slate-400">—</span>
                     )}
                   </div>

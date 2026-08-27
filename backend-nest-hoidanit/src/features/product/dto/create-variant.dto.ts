@@ -2,6 +2,7 @@ import {
   IsInt,
   IsNotEmpty,
   IsNumber,
+  IsObject,
   IsOptional,
   IsPositive,
   IsString,
@@ -16,14 +17,8 @@ export class CreateVariantDto {
   sku: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(50)
-  color?: string;
-
-  @IsOptional()
-  @IsString()
-  @MaxLength(20)
-  size?: string;
+  @IsObject()
+  attributes?: Record<string, string>;
 
   @IsNumber()
   @IsPositive()
@@ -38,4 +33,9 @@ export class CreateVariantDto {
   @IsInt()
   @Min(0)
   stockQuantity?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  imageUrl?: string;
 }

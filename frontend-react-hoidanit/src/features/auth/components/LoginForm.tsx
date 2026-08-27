@@ -1,15 +1,17 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock } from 'lucide-react';
 import { Button, Input } from '@/shared/components/ui';
 
-const loginSchema = z.object({
-  email: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
-  password: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự'),
-});
+const buildLoginSchema = (t: (key: string) => string) =>
+  z.object({
+    email: z.string().min(1, t('auth.form.emailRequired')).email(t('auth.form.emailInvalid')),
+    password: z.string().min(8, t('auth.form.passwordMin')),
+  });
 
-export type LoginFormData = z.infer<typeof loginSchema>;
+export type LoginFormData = z.infer<ReturnType<typeof buildLoginSchema>>;
 
 export interface LoginFormProps {
   onSubmit: (data: LoginFormData) => Promise<void> | void;
@@ -18,12 +20,13 @@ export interface LoginFormProps {
 }
 
 export const LoginForm = ({ onSubmit, isLoading = false, errorMessage }: LoginFormProps) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
+    resolver: zodResolver(buildLoginSchema(t)),
     defaultValues: { email: '', password: '' },
   });
 
@@ -36,7 +39,7 @@ export const LoginForm = ({ onSubmit, isLoading = false, errorMessage }: LoginFo
       )}
 
       <Input
-        label="Email"
+        label={t('auth.form.email')}
         type="email"
         placeholder="you@example.com"
         leftIcon={<Mail className="w-4 h-4" />}
@@ -45,7 +48,7 @@ export const LoginForm = ({ onSubmit, isLoading = false, errorMessage }: LoginFo
       />
 
       <Input
-        label="Mật khẩu"
+        label={t('auth.form.password')}
         type="password"
         placeholder="••••••••"
         leftIcon={<Lock className="w-4 h-4" />}
@@ -54,7 +57,7 @@ export const LoginForm = ({ onSubmit, isLoading = false, errorMessage }: LoginFo
       />
 
       <Button type="submit" isLoading={isLoading} className="w-full">
-        Đăng Nhập
+        {t('auth.login.submit')}
       </Button>
     </form>
   );

@@ -3,32 +3,29 @@ import { Brand } from '../../features/brand/entities/brand.entity';
 
 const BRANDS = [
   {
-    name: 'IPHONE',
-    badgeText: 'UP to 80% OFF',
-    imageUrl:
-      'https://images.unsplash.com/photo-1592286927505-1def25115481?w=400',
-    bgColor: '#313131',
-    tagPillColor: '#494949',
+    name: 'Chivas Regal',
+    badgeText: 'Giảm Đến 20%',
+    imageUrl: null,
+    bgColor: '#2e2a1f',
+    tagPillColor: '#4a4530',
     ctaLink: '/products',
     sortOrder: 0,
   },
   {
-    name: 'REALME',
-    badgeText: 'UP to 80% OFF',
-    imageUrl:
-      'https://images.unsplash.com/photo-1598965675045-45c5e72c7d05?w=400',
-    bgColor: '#FFF3CC',
-    tagPillColor: '#F6DE8D',
+    name: 'Johnnie Walker',
+    badgeText: 'Giảm Đến 15%',
+    imageUrl: null,
+    bgColor: '#1f1f1f',
+    tagPillColor: '#3a3a3a',
     ctaLink: '/products',
     sortOrder: 1,
   },
   {
-    name: 'XIAOMI',
-    badgeText: 'UP to 80% OFF',
-    imageUrl:
-      'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=400',
-    bgColor: '#FFECDF',
-    tagPillColor: '#FFD1B0',
+    name: 'Hennessy',
+    badgeText: 'Hàng Chính Hãng',
+    imageUrl: null,
+    bgColor: '#5b2333',
+    tagPillColor: '#7a3347',
     ctaLink: '/products',
     sortOrder: 2,
   },
@@ -43,7 +40,9 @@ export async function seedBrands(dataSource: DataSource) {
     return;
   }
 
-  const brands = BRANDS.map((brand) => repo.create({ ...brand, isActive: true }));
+  const brands = BRANDS.map((brand) =>
+    repo.create({ ...brand, isActive: true }),
+  );
   await repo.save(brands);
 
   console.log(`✓ Seeded ${brands.length} brands`);

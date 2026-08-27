@@ -17,3 +17,8 @@ pnpm-debug.log*
 # Env (root-level, subprojects have their own)
 .env
 .env.local
+
+# misplaced root-level install (dompurify belongs in frontend-react-hoidanit)
+/node_modules
+/package.json
+/package-lock.json

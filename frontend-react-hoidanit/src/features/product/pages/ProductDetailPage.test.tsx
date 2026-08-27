@@ -4,12 +4,16 @@ import userEvent from '@testing-library/user-event';
 import { MemoryRouter, Routes, Route } from 'react-router';
 import { ProductDetailPage } from './ProductDetailPage';
 import { useProductDetail } from '../hooks/useProductDetail';
+import { useCategories } from '../hooks/useCategories';
 import { useCreateVariant, useUpdateVariant } from '../hooks/useVariantMutations';
+import { useUpdateProduct } from '../hooks/useProductMutations';
 import { useAddImages, useDeleteImage } from '../hooks/useImageMutations';
 import type { ProductDetail } from '../services/product.service';
 
 vi.mock('../hooks/useProductDetail');
+vi.mock('../hooks/useCategories');
 vi.mock('../hooks/useVariantMutations');
+vi.mock('../hooks/useProductMutations');
 vi.mock('../hooks/useImageMutations');
 
 const mockDetail: ProductDetail = {
@@ -22,8 +26,18 @@ const mockDetail: ProductDetail = {
   isActive: true,
   isFeaturedDeal: false,
   dealSortOrder: 0,
+  variantAttributes: null,
   variants: [
-    { id: 10, productId: 1, sku: 'IP15-BLK-128', color: 'Black', size: '128GB', price: '999.99', salePrice: null, stockQuantity: 50 },
+    {
+      id: 10,
+      productId: 1,
+      sku: 'IP15-BLK-128',
+      attributes: { 'Màu Sắc': 'Black', 'Kích Cỡ': '128GB' },
+      price: '999.99',
+      salePrice: null,
+      stockQuantity: 50,
+      imageUrl: null,
+    },
   ],
   images: [{ id: 20, productId: 1, imageUrl: 'https://example.com/a.jpg', sortOrder: 0 }],
 };
@@ -52,11 +66,18 @@ describe('ProductDetailPage', () => {
       refetch: vi.fn(),
     } as unknown as ReturnType<typeof useProductDetail>);
 
+    vi.mocked(useCategories).mockReturnValue({
+      allCategories: [],
+    } as unknown as ReturnType<typeof useCategories>);
+
     vi.mocked(useCreateVariant).mockReturnValue(
       baseMutation() as unknown as ReturnType<typeof useCreateVariant>,
     );
     vi.mocked(useUpdateVariant).mockReturnValue(
       baseMutation() as unknown as ReturnType<typeof useUpdateVariant>,
+    );
+    vi.mocked(useUpdateProduct).mockReturnValue(
+      baseMutation() as unknown as ReturnType<typeof useUpdateProduct>,
     );
     vi.mocked(useAddImages).mockReturnValue(
       baseMutation() as unknown as ReturnType<typeof useAddImages>,
@@ -66,11 +87,16 @@ describe('ProductDetailPage', () => {
     );
   });
 
-  it('renders the product name, variants, and images', () => {
+  it('renders the product name, variants, and images', async () => {
+    const user = userEvent.setup();
     renderPage();
 
-    expect(screen.getByRole('heading', { name: 'iPhone 15' })).toBeInTheDocument();
+    expect(screen.getByLabelText(/Tên sản phẩm/i)).toHaveValue('iPhone 15');
+
+    await user.click(screen.getByRole('button', { name: 'Biến Thể Sản Phẩm' }));
     expect(screen.getByText('IP15-BLK-128')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Hình Ảnh' }));
     expect(screen.getByRole('img', { name: 'Hình ảnh sản phẩm #20' })).toHaveAttribute(
       'src',
       'https://example.com/a.jpg',
@@ -105,7 +131,9 @@ describe('ProductDetailPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    await user.click(screen.getByRole('button', { name: 'Biến Thể Sản Phẩm' }));
     await user.click(screen.getByRole('button', { name: /Thêm Biến Thể/i }));
+    await user.clear(screen.getByLabelText(/SKU/i));
     await user.type(screen.getByLabelText(/SKU/i), 'IP15-WHT-256');
     await user.type(screen.getByLabelText(/Giá Gốc/i), '1099');
     await user.click(screen.getByRole('button', { name: 'Thêm Mới' }));
@@ -113,7 +141,7 @@ describe('ProductDetailPage', () => {
     await waitFor(() =>
       expect(mutateAsync).toHaveBeenCalledWith({
         productId: 1,
-        input: { sku: 'IP15-WHT-256', color: undefined, size: undefined, price: 1099, salePrice: undefined, stockQuantity: 0 },
+        input: { sku: 'IP15-WHT-256', attributes: undefined, price: 1099, salePrice: undefined, stockQuantity: 0 },
       }),
     );
     expect(await screen.findByText('Đã thêm biến thể "IP15-WHT-256".')).toBeInTheDocument();
@@ -129,6 +157,7 @@ describe('ProductDetailPage', () => {
     const user = userEvent.setup();
     renderPage();
 
+    await user.click(screen.getByRole('button', { name: 'Hình Ảnh' }));
     await user.click(screen.getByRole('button', { name: /Thêm Ảnh/i }));
     await user.type(screen.getByLabelText(/URL Hình Ảnh/i), 'https://example.com/b.jpg');
     const submitButtons = screen.getAllByRole('button', { name: 'Thêm Ảnh' });

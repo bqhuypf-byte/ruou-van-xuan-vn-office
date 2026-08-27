@@ -21,10 +21,10 @@ const mockCategories: FlatCategory[] = [
     slug: 'electronics',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 0,
+    homeDisplayStyle: 'grid' as const,    depth: 0,
     parentName: null,
   },
   {
@@ -34,10 +34,10 @@ const mockCategories: FlatCategory[] = [
     slug: 'phones',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 1,
+    homeDisplayStyle: 'grid' as const,    depth: 1,
     parentName: 'Electronics',
   },
 ];
@@ -119,10 +119,10 @@ describe('CategoriesPage', () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         name: 'Laptops',
         slug: 'laptops',
-        showInTopCategories: false,
-        showInDailyEssentials: false,
+        showInProductSections: true,
+        homeSectionTitle: undefined,
         homeSortOrder: 0,
-      }),
+        homeDisplayStyle: 'grid' as const,      }),
     );
     expect(
       await screen.findByText('Đã tạo danh mục "Laptops" thành công.'),

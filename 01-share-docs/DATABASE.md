@@ -86,6 +86,7 @@
 | description | TEXT | NULLABLE |
 | thumbnail_url | VARCHAR(500) | NULLABLE |
 | is_active | BOOLEAN | DEFAULT TRUE |
+| variant_attributes | JSON | NULLABLE — up to 2 Shopee-style "Phân loại" groups, each `{name, values: string[], images?: Record<string,string>}` (e.g. `[{"name":"Dung Tích","values":["500ml","1000ml"],"images":{"500ml":"https://..."}}]`); the FE auto-generates the variant combination matrix (group 1 × group 2) from these values, using the first group's `images` as each row's thumbnail |
 | created_at | DATETIME | AUTO |
 | updated_at | DATETIME | AUTO |
 
@@ -95,8 +96,7 @@
 | id | BIGINT | PK, AUTO_INCREMENT |
 | product_id | BIGINT | FK → products |
 | sku | VARCHAR(50) | NOT NULL, UNIQUE |
-| color | VARCHAR(50) | NULLABLE |
-| size | VARCHAR(20) | NULLABLE |
+| attributes | JSON | NULLABLE — key-value map, e.g. `{"Dung Tích": "750ml"}`; keys correspond to the owning product's `variant_attribute_names` |
 | price | DECIMAL(12,2) | NOT NULL |
 | sale_price | DECIMAL(12,2) | NULLABLE |
 | stock_quantity | INT | DEFAULT 0 |

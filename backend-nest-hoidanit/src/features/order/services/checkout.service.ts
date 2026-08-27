@@ -3,6 +3,7 @@ import { DataSource } from 'typeorm';
 import { CartService } from '../../cart/cart.service';
 import { CartIdentity } from '../../cart/types/cart.types';
 import { UserProfileService } from '../../user-profile/user-profile.service';
+import { SiteSettingsService } from '../../site-settings/site-settings.service';
 import { CheckoutDto } from '../dto/checkout.dto';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
@@ -13,6 +14,7 @@ export class CheckoutService {
     private readonly dataSource: DataSource,
     private readonly userProfileService: UserProfileService,
     private readonly cartService: CartService,
+    private readonly siteSettingsService: SiteSettingsService,
   ) {}
 
   async execute(
@@ -23,13 +25,25 @@ export class CheckoutService {
       dto.addressId,
       userId,
     );
+    const settings = await this.siteSettingsService.get();
 
-    const shippingFee = 0;
     const itemsTotal = dto.items.reduce(
       (sum, item) => sum + item.price * item.quantity,
       0,
     );
+    const freeShippingThreshold = Number(settings.freeShippingThreshold);
+    const isFreeShipping =
+      dto.paymentMethod === 'store_pickup' ||
+      itemsTotal >= freeShippingThreshold;
+    const shippingFee = isFreeShipping ? 0 : Number(settings.shippingFee);
     const totalAmount = itemsTotal + shippingFee;
+
+    const pickupStore =
+      dto.paymentMethod === 'store_pickup'
+        ? (settings.contactAddresses?.[dto.pickupStoreIndex ?? 0] ??
+          settings.contactAddresses?.[0] ??
+          null)
+        : null;
 
     const queryRunner = this.dataSource.createQueryRunner();
     await queryRunner.connect();
@@ -49,6 +63,8 @@ export class CheckoutService {
           addressLine: address.addressLine,
           city: address.city,
         },
+        pickupStoreLabel: pickupStore?.label ?? null,
+        pickupStoreAddress: pickupStore?.address ?? null,
       });
       const savedOrder = await queryRunner.manager.save(order);
 

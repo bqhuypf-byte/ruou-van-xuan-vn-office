@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Param,
   ParseIntPipe,
@@ -20,6 +21,7 @@ import { CheckoutDto } from './dto/checkout.dto';
 import { QueryOrderDto } from './dto/query-order.dto';
 import { UpdateOrderStatusDto } from './dto/update-order-status.dto';
 import { UpdateOrderPaymentDto } from './dto/update-order-payment.dto';
+import { BulkDeleteOrdersDto } from './dto/bulk-delete-orders.dto';
 
 @Controller()
 export class OrderController {
@@ -83,5 +85,19 @@ export class OrderController {
     @Body() dto: UpdateOrderPaymentDto,
   ) {
     return this.orderService.updatePayment(id, dto.paymentStatus);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Post('admin/orders/bulk-delete')
+  bulkDelete(@Body() dto: BulkDeleteOrdersDto) {
+    return this.orderService.removeManyAdmin(dto.ids);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Delete('admin/orders/:id')
+  remove(@Param('id', ParseIntPipe) id: number) {
+    return this.orderService.removeManyAdmin([id]);
   }
 }

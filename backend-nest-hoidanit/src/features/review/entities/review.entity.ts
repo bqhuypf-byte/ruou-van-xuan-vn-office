@@ -1,22 +1,26 @@
-import {
-  Column,
-  CreateDateColumn,
-  Entity,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 
 @Entity('reviews')
 export class Review {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryColumn({
+    type: 'bigint',
+    generated: 'increment',
+    transformer: bigintTransformer,
+  })
   id: number;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ type: 'bigint', name: 'user_id', transformer: bigintTransformer })
   userId: number;
 
-  @Column({ type: 'bigint', name: 'product_id' })
+  @Column({
+    type: 'bigint',
+    name: 'product_id',
+    transformer: bigintTransformer,
+  })
   productId: number;
 
-  @Column({ type: 'bigint', name: 'order_id' })
+  @Column({ type: 'bigint', name: 'order_id', transformer: bigintTransformer })
   orderId: number;
 
   @Column({ type: 'tinyint' })

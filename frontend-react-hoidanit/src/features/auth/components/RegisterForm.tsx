@@ -1,17 +1,25 @@
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
+import { useTranslation } from 'react-i18next';
 import { Mail, Lock, User, Phone } from 'lucide-react';
 import { Button, Input } from '@/shared/components/ui';
 
-const registerSchema = z.object({
-  fullName: z.string().min(1, 'Họ tên không được để trống').max(100, 'Họ tên tối đa 100 ký tự'),
-  email: z.string().min(1, 'Email không được để trống').email('Email không hợp lệ'),
-  phone: z.string().max(20, 'Số điện thoại tối đa 20 ký tự').optional().or(z.literal('')),
-  password: z.string().min(8, 'Mật khẩu tối thiểu 8 ký tự').max(100, 'Mật khẩu tối đa 100 ký tự'),
-});
+const buildRegisterSchema = (t: (key: string) => string) =>
+  z.object({
+    fullName: z
+      .string()
+      .min(1, t('auth.form.fullNameRequired'))
+      .max(100, t('auth.form.fullNameMax')),
+    email: z.string().min(1, t('auth.form.emailRequired')).email(t('auth.form.emailInvalid')),
+    phone: z.string().max(20, t('auth.form.phoneMax')).optional().or(z.literal('')),
+    password: z
+      .string()
+      .min(8, t('auth.form.passwordMin'))
+      .max(100, t('auth.form.passwordMax')),
+  });
 
-export type RegisterFormData = z.infer<typeof registerSchema>;
+export type RegisterFormData = z.infer<ReturnType<typeof buildRegisterSchema>>;
 
 export interface RegisterFormProps {
   onSubmit: (data: RegisterFormData) => Promise<void> | void;
@@ -24,12 +32,13 @@ export const RegisterForm = ({
   isLoading = false,
   errorMessage,
 }: RegisterFormProps) => {
+  const { t } = useTranslation();
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<RegisterFormData>({
-    resolver: zodResolver(registerSchema),
+    resolver: zodResolver(buildRegisterSchema(t)),
     defaultValues: { fullName: '', email: '', phone: '', password: '' },
   });
 
@@ -42,15 +51,15 @@ export const RegisterForm = ({
       )}
 
       <Input
-        label="Họ và tên"
-        placeholder="Nguyễn Văn A"
+        label={t('auth.form.fullName')}
+        placeholder={t('auth.form.fullNamePlaceholder')}
         leftIcon={<User className="w-4 h-4" />}
         error={errors.fullName?.message}
         {...register('fullName')}
       />
 
       <Input
-        label="Email"
+        label={t('auth.form.email')}
         type="email"
         placeholder="you@example.com"
         leftIcon={<Mail className="w-4 h-4" />}
@@ -59,7 +68,7 @@ export const RegisterForm = ({
       />
 
       <Input
-        label="Số điện thoại (tùy chọn)"
+        label={t('auth.form.phone')}
         placeholder="0901234567"
         leftIcon={<Phone className="w-4 h-4" />}
         error={errors.phone?.message}
@@ -67,7 +76,7 @@ export const RegisterForm = ({
       />
 
       <Input
-        label="Mật khẩu"
+        label={t('auth.form.password')}
         type="password"
         placeholder="••••••••"
         leftIcon={<Lock className="w-4 h-4" />}
@@ -76,7 +85,7 @@ export const RegisterForm = ({
       />
 
       <Button type="submit" isLoading={isLoading} className="w-full">
-        Đăng Ký
+        {t('auth.register.submit')}
       </Button>
     </form>
   );

@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { MessageSquareOff, User } from 'lucide-react';
 import { StarRating } from './StarRating';
 import type { Review } from '../types/review.types';
@@ -8,6 +9,8 @@ export interface ReviewListProps {
 }
 
 export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
+  const { t, i18n } = useTranslation();
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -21,12 +24,12 @@ export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
   if (reviews.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center">
-        <div className="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <div className="w-12 h-12 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <MessageSquareOff className="w-6 h-6" />
         </div>
-        <p className="text-sm font-medium text-slate-900 dark:text-white">Chưa có đánh giá nào</p>
+        <p className="text-sm font-medium text-slate-900 dark:text-white">{t('review.empty')}</p>
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-          Hãy là người đầu tiên đánh giá sản phẩm này.
+          {t('review.emptySubtitle')}
         </p>
       </div>
     );
@@ -49,7 +52,7 @@ export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
                   {review.user.fullName}
                 </p>
                 <span className="text-xs text-slate-400">
-                  {new Date(review.createdAt).toLocaleDateString('vi-VN')}
+                  {new Date(review.createdAt).toLocaleDateString(i18n.language)}
                 </span>
               </div>
               <StarRating rating={review.rating} />

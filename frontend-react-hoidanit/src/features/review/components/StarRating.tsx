@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { Star } from 'lucide-react';
 
 export interface StarRatingProps {
@@ -6,11 +7,16 @@ export interface StarRatingProps {
 }
 
 export const StarRating = ({ rating, size = 'sm' }: StarRatingProps) => {
+  const { t } = useTranslation();
   const starSize = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
   const rounded = Math.round(rating);
 
   return (
-    <div className="flex items-center gap-0.5" role="img" aria-label={`${rating.toFixed(1)} trên 5 sao`}>
+    <div
+      className="flex items-center gap-0.5"
+      role="img"
+      aria-label={t('review.starsOf5', { rating: rating.toFixed(1) })}
+    >
       {Array.from({ length: 5 }, (_, i) => (
         <Star
           key={i}

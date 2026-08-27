@@ -49,7 +49,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
             } ${rightIcon ? 'pr-10' : ''} ${
               error
                 ? 'border-rose-400 text-rose-900 placeholder-rose-300 focus:border-rose-500 focus:ring-rose-500/20'
-                : 'border-slate-300 text-slate-900 placeholder-slate-400 focus:border-indigo-500 focus:ring-indigo-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500'
+                : 'border-slate-300 text-slate-900 placeholder-slate-400 focus:border-brand-500 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white dark:placeholder-slate-500'
             } ${className}`}
             {...props}
           />

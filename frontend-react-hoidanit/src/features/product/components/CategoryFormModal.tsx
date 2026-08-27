@@ -1,9 +1,10 @@
-import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useRef } from 'react';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Layers, Link2, Image as ImageIcon } from 'lucide-react';
-import { Button, Input, Modal } from '@/shared/components/ui';
+import { Layers, Link2 } from 'lucide-react';
+import { Button, ImageDropzone, Input, Modal } from '@/shared/components/ui';
+import { slugify } from '@/shared/utils/slugify';
 import type { FlatCategory } from '../hooks/useCategories';
 
 const categorySchema = z.object({
@@ -19,9 +20,10 @@ const categorySchema = z.object({
   parentId: z.string().optional(),
   description: z.string().optional(),
   thumbnailUrl: z.string().optional(),
-  showInTopCategories: z.boolean(),
-  showInDailyEssentials: z.boolean(),
+  showInProductSections: z.boolean(),
+  homeSectionTitle: z.string().max(100, 'Tối đa 100 ký tự').optional(),
   homeSortOrder: z.string().optional(),
+  homeDisplayStyle: z.enum(['grid', 'carousel']),
 });
 
 type CategoryFormData = z.infer<typeof categorySchema>;
@@ -32,9 +34,10 @@ export interface CategoryFormSubmitData {
   parentId?: number;
   description?: string;
   thumbnailUrl?: string;
-  showInTopCategories: boolean;
-  showInDailyEssentials: boolean;
+  showInProductSections: boolean;
+  homeSectionTitle?: string;
   homeSortOrder?: number;
+  homeDisplayStyle: 'grid' | 'carousel';
 }
 
 export interface CategoryFormModalProps {
@@ -42,6 +45,7 @@ export interface CategoryFormModalProps {
   onClose: () => void;
   onSubmit: (data: CategoryFormSubmitData) => Promise<void>;
   categoryToEdit?: FlatCategory | null;
+  defaultParentId?: number | null;
   parentOptions: FlatCategory[];
   isLoading?: boolean;
 }
@@ -51,15 +55,21 @@ export const CategoryFormModal = ({
   onClose,
   onSubmit,
   categoryToEdit,
+  defaultParentId,
   parentOptions,
   isLoading = false,
 }: CategoryFormModalProps) => {
   const isEditing = Boolean(categoryToEdit);
 
+  const isSlugManuallyEditedRef = useRef(false);
+
   const {
     register,
+    control,
     handleSubmit,
     reset,
+    watch,
+    setValue,
     formState: { errors },
   } = useForm<CategoryFormData>({
     resolver: zodResolver(categorySchema),
@@ -69,14 +79,26 @@ export const CategoryFormModal = ({
       parentId: '',
       description: '',
       thumbnailUrl: '',
-      showInTopCategories: false,
-      showInDailyEssentials: false,
+      showInProductSections: true,
+      homeSectionTitle: '',
       homeSortOrder: '0',
+      homeDisplayStyle: 'grid',
     },
   });
 
+  const isRootCategory = !watch('parentId');
+  const nameValue = watch('name');
+
+  useEffect(() => {
+    if (isSlugManuallyEditedRef.current) return;
+    const generatedSlug = slugify(nameValue || '');
+    if (!generatedSlug) return;
+    setValue('slug', generatedSlug);
+  }, [nameValue, setValue]);
+
   useEffect(() => {
     if (isOpen) {
+      isSlugManuallyEditedRef.current = Boolean(categoryToEdit);
       if (categoryToEdit) {
         reset({
           name: categoryToEdit.name,
@@ -84,24 +106,26 @@ export const CategoryFormModal = ({
           parentId: categoryToEdit.parentId ? String(categoryToEdit.parentId) : '',
           description: categoryToEdit.description ?? '',
           thumbnailUrl: categoryToEdit.thumbnailUrl ?? '',
-          showInTopCategories: categoryToEdit.showInTopCategories,
-          showInDailyEssentials: categoryToEdit.showInDailyEssentials,
+          showInProductSections: categoryToEdit.showInProductSections,
+          homeSectionTitle: categoryToEdit.homeSectionTitle ?? '',
           homeSortOrder: String(categoryToEdit.homeSortOrder ?? 0),
+          homeDisplayStyle: categoryToEdit.homeDisplayStyle ?? 'grid',
         });
       } else {
         reset({
           name: '',
           slug: '',
-          parentId: '',
+          parentId: defaultParentId ? String(defaultParentId) : '',
           description: '',
           thumbnailUrl: '',
-          showInTopCategories: false,
-          showInDailyEssentials: false,
+          showInProductSections: true,
+          homeSectionTitle: '',
           homeSortOrder: '0',
+          homeDisplayStyle: 'grid',
         });
       }
     }
-  }, [isOpen, categoryToEdit, reset]);
+  }, [isOpen, categoryToEdit, defaultParentId, reset]);
 
   const handleFormSubmit = async (data: CategoryFormData) => {
     await onSubmit({
@@ -110,9 +134,10 @@ export const CategoryFormModal = ({
       parentId: data.parentId ? Number(data.parentId) : undefined,
       description: data.description || undefined,
       thumbnailUrl: data.thumbnailUrl || undefined,
-      showInTopCategories: data.showInTopCategories,
-      showInDailyEssentials: data.showInDailyEssentials,
+      showInProductSections: data.showInProductSections,
+      homeSectionTitle: data.homeSectionTitle || undefined,
       homeSortOrder: data.homeSortOrder ? Number(data.homeSortOrder) : undefined,
+      homeDisplayStyle: data.homeDisplayStyle,
     });
     onClose();
   };
@@ -123,11 +148,19 @@ export const CategoryFormModal = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title={isEditing ? 'Chỉnh Sửa Danh Mục' : 'Tạo Danh Mục Mới'}
+      title={
+        isEditing
+          ? 'Chỉnh Sửa Danh Mục'
+          : defaultParentId
+            ? 'Thêm Phân Loại Nhỏ'
+            : 'Tạo Danh Mục Mới'
+      }
       description={
         isEditing
           ? `Cập nhật thông tin danh mục #${categoryToEdit?.id}`
-          : 'Nhập thông tin để tạo danh mục sản phẩm mới'
+          : defaultParentId
+            ? 'Tạo danh mục con thuộc danh mục gốc đã chọn'
+            : 'Nhập thông tin để tạo danh mục sản phẩm mới'
       }
       size="lg"
     >
@@ -145,8 +178,12 @@ export const CategoryFormModal = ({
           placeholder="vi-du: dien-thoai"
           leftIcon={<Link2 className="w-4 h-4" />}
           error={errors.slug?.message}
-          helperText="Chữ thường, không dấu, cách nhau bằng dấu gạch ngang — quyết định đường link /categories/slug"
-          {...register('slug')}
+          helperText="Chữ thường, không dấu, cách nhau bằng dấu gạch ngang — quyết định đường link /categories/slug. Tự động sinh theo tên, có thể sửa tay."
+          {...register('slug', {
+            onChange: () => {
+              isSlugManuallyEditedRef.current = true;
+            },
+          })}
         />
 
         <div className="w-full space-y-1.5">
@@ -158,7 +195,7 @@ export const CategoryFormModal = ({
           </label>
           <select
             id="parentId"
-            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
             {...register('parentId')}
           >
             <option value="">-- Không có (Danh mục gốc) --</option>
@@ -170,13 +207,18 @@ export const CategoryFormModal = ({
           </select>
         </div>
 
-        <Input
-          label="Ảnh Đại Diện (URL)"
-          placeholder="https://..."
-          leftIcon={<ImageIcon className="w-4 h-4" />}
-          error={errors.thumbnailUrl?.message}
-          helperText="Hiển thị ở lưới danh mục trang chủ và banner trang danh mục"
-          {...register('thumbnailUrl')}
+        <Controller
+          name="thumbnailUrl"
+          control={control}
+          render={({ field }) => (
+            <ImageDropzone
+              label="Ảnh Đại Diện"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.thumbnailUrl?.message}
+              helperText="Hiển thị ở lưới danh mục trang chủ và banner trang danh mục"
+            />
+          )}
         />
 
         <div className="w-full space-y-1.5">
@@ -190,7 +232,7 @@ export const CategoryFormModal = ({
             id="description"
             rows={3}
             placeholder="Mô tả ngắn về danh mục..."
-            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
             {...register('description')}
           />
         </div>
@@ -199,22 +241,25 @@ export const CategoryFormModal = ({
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
             Hiển thị trên trang chủ
           </p>
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-            <input
-              type="checkbox"
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 dark:border-slate-700"
-              {...register('showInTopCategories')}
-            />
-            Hiện trong "Danh Mục Nổi Bật" (Shop From Top Categories)
-          </label>
-          <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-            <input
-              type="checkbox"
-              className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 dark:border-slate-700"
-              {...register('showInDailyEssentials')}
-            />
-            Hiện trong "Nhu Yếu Phẩm Hàng Ngày" (Daily Essentials)
-          </label>
+          {isRootCategory && (
+            <>
+              <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+                  {...register('showInProductSections')}
+                />
+                Hiện thành khối sản phẩm riêng ở trang chủ (kèm nút "Xem Tất Cả")
+              </label>
+              <Input
+                label="Tiêu đề khối trên trang chủ"
+                placeholder={`Để trống sẽ dùng tên danh mục`}
+                helperText='Tên hiển thị ở tiêu đề khối trên trang chủ, khác với "Tên danh mục" nếu cần'
+                error={errors.homeSectionTitle?.message}
+                {...register('homeSectionTitle')}
+              />
+            </>
+          )}
           <Input
             label="Thứ tự hiển thị"
             type="number"
@@ -222,6 +267,22 @@ export const CategoryFormModal = ({
             helperText="Số nhỏ hơn hiển thị trước"
             {...register('homeSortOrder')}
           />
+          <div className="w-full space-y-1.5">
+            <label
+              htmlFor="homeDisplayStyle"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              Kiểu hiển thị sản phẩm
+            </label>
+            <select
+              id="homeDisplayStyle"
+              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
+              {...register('homeDisplayStyle')}
+            >
+              <option value="grid">Lưới (Grid)</option>
+              <option value="carousel">Cuộn ngang (Carousel)</option>
+            </select>
+          </div>
         </div>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">

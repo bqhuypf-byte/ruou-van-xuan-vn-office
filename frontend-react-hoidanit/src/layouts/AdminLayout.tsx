@@ -14,8 +14,14 @@ import {
   GalleryHorizontal,
   Tags,
   Settings,
+  HelpCircle,
+  FileText,
+  LayoutList,
+  CreditCard,
+  Ticket,
 } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
+import { ScrollToTop } from '@/shared/components/layout';
 import { ROUTES } from '@/routes/routes';
 
 export const AdminLayout = () => {
@@ -57,14 +63,39 @@ export const AdminLayout = () => {
       icon: GalleryHorizontal,
     },
     {
+      label: 'Mục Trang Chủ',
+      path: ROUTES.ADMIN_HOMEPAGE_SECTIONS,
+      icon: LayoutList,
+    },
+    {
       label: 'Thương Hiệu Nổi Bật',
       path: ROUTES.ADMIN_BRANDS,
       icon: Tags,
     },
     {
+      label: 'Câu Hỏi Thường Gặp',
+      path: ROUTES.ADMIN_FAQS,
+      icon: HelpCircle,
+    },
+    {
+      label: 'Trang Nội Dung',
+      path: ROUTES.ADMIN_PAGES,
+      icon: FileText,
+    },
+    {
+      label: 'Voucher / Ưu Đãi',
+      path: ROUTES.ADMIN_VOUCHERS,
+      icon: Ticket,
+    },
+    {
       label: 'Cấu Hình Thương Hiệu',
       path: ROUTES.ADMIN_SITE_SETTINGS,
       icon: Settings,
+    },
+    {
+      label: 'Cấu Hình Thanh Toán',
+      path: ROUTES.ADMIN_CHECKOUT_SETTINGS,
+      icon: CreditCard,
     },
     {
       label: 'Sản Phẩm',
@@ -80,6 +111,7 @@ export const AdminLayout = () => {
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col md:flex-row">
+      <ScrollToTop />
       {/* Mobile Sidebar Overlay */}
       {isSidebarOpen && (
         <div
@@ -90,14 +122,13 @@ export const AdminLayout = () => {
 
       {/* Sidebar Navigation */}
       <aside
-        className={`fixed md:sticky top-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 ease-in-out shrink-0 ${
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
-        }`}
+        className={`fixed md:sticky top-0 z-50 h-screen w-64 bg-slate-900 text-white flex flex-col transition-transform duration-300 ease-in-out shrink-0 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'
+          }`}
       >
         {/* Sidebar Brand Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-slate-800">
           <Link to={ROUTES.HOME} className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-600/30">
+            <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center font-bold text-white shadow-lg shadow-brand-600/30">
               AX
             </div>
             <span className="font-bold text-lg tracking-wide text-white">
@@ -125,11 +156,10 @@ export const AdminLayout = () => {
                 key={item.path}
                 to={item.path}
                 onClick={() => setIsSidebarOpen(false)}
-                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
-                  isActive
-                    ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/20'
-                    : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-                }`}
+                className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${isActive
+                  ? 'bg-brand-600 text-white shadow-md shadow-brand-600/20'
+                  : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  }`}
               >
                 <Icon className="w-4 h-4 shrink-0" />
                 <span>{item.label}</span>
@@ -141,7 +171,7 @@ export const AdminLayout = () => {
         {/* Sidebar Footer User Info */}
         <div className="p-4 border-t border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-indigo-400 shrink-0">
+            <div className="w-8 h-8 rounded-full bg-slate-800 flex items-center justify-center text-brand-400 shrink-0">
               <UserCheck className="w-4 h-4" />
             </div>
             <div className="text-xs min-w-0">
@@ -172,7 +202,7 @@ export const AdminLayout = () => {
             >
               <Menu className="w-5 h-5" />
             </button>
-            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-indigo-50 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800">
+            <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-brand-50 text-brand-700 dark:bg-brand-950/60 dark:text-brand-300 border border-brand-200 dark:border-brand-800">
               Admin Environment
             </span>
           </div>
@@ -180,7 +210,7 @@ export const AdminLayout = () => {
           <div className="flex items-center gap-3">
             <Link
               to={ROUTES.HOME}
-              className="text-xs font-medium text-slate-600 hover:text-indigo-600 dark:text-slate-400 dark:hover:text-indigo-400 flex items-center gap-1.5 transition-colors"
+              className="text-xs font-medium text-slate-600 hover:text-brand-600 dark:text-slate-400 dark:hover:text-brand-400 flex items-center gap-1.5 transition-colors"
             >
               <LogOut className="w-3.5 h-3.5" />
               <span>Về Trang Chủ</span>

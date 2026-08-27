@@ -1,3 +1,5 @@
+export type CategoryHomeDisplayStyle = 'grid' | 'carousel';
+
 export interface Category {
   id: number;
   parentId: number | null;
@@ -5,9 +7,10 @@ export interface Category {
   slug: string;
   description: string | null;
   thumbnailUrl: string | null;
-  showInTopCategories: boolean;
-  showInDailyEssentials: boolean;
   homeSortOrder: number;
+  showInProductSections: boolean;
+  homeSectionTitle: string | null;
+  homeDisplayStyle: CategoryHomeDisplayStyle;
   children: Category[];
 }
 
@@ -17,9 +20,10 @@ export interface CreateCategoryInput {
   parentId?: number;
   description?: string;
   thumbnailUrl?: string;
-  showInTopCategories?: boolean;
-  showInDailyEssentials?: boolean;
   homeSortOrder?: number;
+  showInProductSections?: boolean;
+  homeSectionTitle?: string;
+  homeDisplayStyle?: CategoryHomeDisplayStyle;
 }
 
 export interface UpdateCategoryInput {
@@ -28,9 +32,10 @@ export interface UpdateCategoryInput {
   parentId?: number;
   description?: string;
   thumbnailUrl?: string;
-  showInTopCategories?: boolean;
-  showInDailyEssentials?: boolean;
   homeSortOrder?: number;
+  showInProductSections?: boolean;
+  homeSectionTitle?: string;
+  homeDisplayStyle?: CategoryHomeDisplayStyle;
 }
 
 export interface CategoryFilterParams {

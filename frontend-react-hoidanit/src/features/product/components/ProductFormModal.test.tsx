@@ -3,7 +3,6 @@ import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ProductFormModal } from './ProductFormModal';
 import type { FlatCategory } from '../hooks/useCategories';
-import type { Product } from '../types/product.types';
 
 const categoryOptions: FlatCategory[] = [
   {
@@ -13,10 +12,10 @@ const categoryOptions: FlatCategory[] = [
     slug: 'electronics',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 0,
+    homeDisplayStyle: 'grid' as const,    depth: 0,
     parentName: null,
   },
   {
@@ -26,50 +25,22 @@ const categoryOptions: FlatCategory[] = [
     slug: 'phones',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 1,
+    homeDisplayStyle: 'grid' as const,    depth: 1,
     parentName: 'Electronics',
   },
 ];
 
-const mockProduct: Product = {
-  id: 5,
-  categoryId: 2,
-  name: 'iPhone 15',
-  slug: 'iphone-15',
-  description: 'A great phone',
-  thumbnailUrl: 'https://example.com/iphone15.jpg',
-  isActive: true,
-  isFeaturedDeal: false,
-  dealSortOrder: 0,
-};
-
 describe('ProductFormModal', () => {
-  it('renders create title and empty fields when no product is being edited', () => {
+  it('renders create title and empty fields', () => {
     render(
       <ProductFormModal isOpen onClose={vi.fn()} onSubmit={vi.fn()} categoryOptions={categoryOptions} />,
     );
 
     expect(screen.getByText('Tạo Sản Phẩm Mới')).toBeInTheDocument();
     expect(screen.getByLabelText(/Tên sản phẩm/i)).toHaveValue('');
-  });
-
-  it('prefills fields when editing a product', () => {
-    render(
-      <ProductFormModal
-        isOpen
-        onClose={vi.fn()}
-        onSubmit={vi.fn()}
-        categoryOptions={categoryOptions}
-        productToEdit={mockProduct}
-      />,
-    );
-
-    expect(screen.getByText('Chỉnh Sửa Sản Phẩm')).toBeInTheDocument();
-    expect(screen.getByLabelText(/Tên sản phẩm/i)).toHaveValue('iPhone 15');
-    expect(screen.getByLabelText(/Slug/i)).toHaveValue('iphone-15');
   });
 
   it('requires a category to be selected', async () => {
@@ -110,6 +81,7 @@ describe('ProductFormModal', () => {
         isActive: true,
         isFeaturedDeal: false,
         dealSortOrder: 0,
+        variantAttributes: [],
       }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());

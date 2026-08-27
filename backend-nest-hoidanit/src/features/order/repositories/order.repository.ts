@@ -40,4 +40,9 @@ export class OrderRepository {
   save(order: Order): Promise<Order> {
     return this.repository.save(order);
   }
+
+  async removeByIds(ids: number[]): Promise<void> {
+    if (ids.length === 0) return;
+    await this.repository.delete({ id: In(ids) });
+  }
 }

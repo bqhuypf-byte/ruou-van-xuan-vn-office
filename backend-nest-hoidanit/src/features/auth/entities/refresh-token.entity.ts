@@ -1,11 +1,16 @@
-import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, CreateDateColumn, Entity, PrimaryColumn } from 'typeorm';
+import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 
 @Entity('refresh_tokens')
 export class RefreshToken {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryColumn({
+    type: 'bigint',
+    generated: 'increment',
+    transformer: bigintTransformer,
+  })
   id: number;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ type: 'bigint', name: 'user_id', transformer: bigintTransformer })
   userId: number;
 
   @Column({ type: 'varchar', length: 255, unique: true, name: 'token_hash' })

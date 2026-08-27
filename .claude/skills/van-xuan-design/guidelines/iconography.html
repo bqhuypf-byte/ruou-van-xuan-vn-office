@@ -1,0 +1,13 @@
+<!-- @dsCard group="Brand" viewport="700x180" name="Iconography" subtitle="Lucide icon set, 1.5-1.75 stroke, no emoji" -->
+<link rel="stylesheet" href="../styles.css">
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<div style="font-family:var(--font-sans);padding:16px;display:flex;flex-direction:column;gap:12px">
+<div id="icon-row" style="display:flex;gap:16px;color:var(--slate-700)"></div>
+<p style="margin:0;font-size:12px;color:var(--muted);max-width:520px">Lucide (MIT), stroke-width 1.5–2, 16–20px inline / 24px standalone. No emoji, no icon font, no filled glyphs in the source app.</p>
+</div>
+<script>
+const names=['search','shopping-cart','heart','star','map-pin','truck','package','user','settings','log-out','plus','trash-2','chevron-right','image-off','loader-2'];
+const row=document.getElementById('icon-row');
+names.forEach(n=>{const el=document.createElement('i');el.setAttribute('data-lucide',n);row.appendChild(el);});
+lucide.createIcons();
+</script>

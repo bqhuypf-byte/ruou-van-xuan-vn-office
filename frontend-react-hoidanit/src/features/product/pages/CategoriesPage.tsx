@@ -20,6 +20,7 @@ export const CategoriesPage = () => {
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [needsReassignTarget, setNeedsReassignTarget] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<FlatCategory | null>(null);
+  const [defaultParentId, setDefaultParentId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -34,11 +35,19 @@ export const CategoriesPage = () => {
 
   const handleOpenCreate = () => {
     setSelectedCategory(null);
+    setDefaultParentId(null);
+    setIsFormOpen(true);
+  };
+
+  const handleOpenCreateChild = (parent: FlatCategory) => {
+    setSelectedCategory(null);
+    setDefaultParentId(parent.id);
     setIsFormOpen(true);
   };
 
   const handleOpenEdit = (category: FlatCategory) => {
     setSelectedCategory(category);
+    setDefaultParentId(null);
     setIsFormOpen(true);
   };
 
@@ -121,7 +130,7 @@ export const CategoriesPage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center">
             <FolderTree className="w-6 h-6" />
           </div>
           <div>
@@ -199,6 +208,7 @@ export const CategoriesPage = () => {
         isLoading={isLoading}
         onEdit={handleOpenEdit}
         onDelete={handleOpenDelete}
+        onAddChild={handleOpenCreateChild}
       />
 
       <CategoryFormModal
@@ -206,6 +216,7 @@ export const CategoriesPage = () => {
         onClose={() => setIsFormOpen(false)}
         onSubmit={handleSaveForm}
         categoryToEdit={selectedCategory}
+        defaultParentId={defaultParentId}
         parentOptions={allCategories}
         isLoading={createMutation.isPending || updateMutation.isPending}
       />

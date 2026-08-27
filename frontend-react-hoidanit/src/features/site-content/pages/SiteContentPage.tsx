@@ -86,7 +86,7 @@ export const SiteContentPage = () => {
     <div className="space-y-6 max-w-4xl mx-auto p-4 sm:p-6 lg:p-8">
       <div>
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white flex items-center gap-2">
-          <Sparkles className="w-6 h-6 text-indigo-600" />
+          <Sparkles className="w-6 h-6 text-brand-600" />
           Nội Dung Trang Chủ
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
@@ -142,7 +142,7 @@ export const SiteContentPage = () => {
               </label>
               <textarea
                 rows={2}
-                className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
                 {...register('headline')}
               />
               {errors.headline && (
@@ -156,7 +156,7 @@ export const SiteContentPage = () => {
               </label>
               <textarea
                 rows={3}
-                className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+                className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
                 {...register('subtitle')}
               />
               {errors.subtitle && (

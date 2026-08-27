@@ -15,7 +15,7 @@ export const Spinner = ({ size = 'md', className = '' }: SpinnerProps) => {
 
   return (
     <Loader2
-      className={`animate-spin text-indigo-600 dark:text-indigo-400 ${sizeMap[size]} ${className}`}
+      className={`animate-spin text-brand-600 dark:text-brand-400 ${sizeMap[size]} ${className}`}
     />
   );
 };

@@ -1,17 +1,14 @@
 import { DataSource } from 'typeorm';
-import { faker } from '@faker-js/faker';
 import { Category } from '../../features/product/entities/category.entity';
+import { slugifyVi } from './slugify-vi.util';
 
 const TREE: Record<string, string[]> = {
-  Electronics: ['Phones', 'Laptops', 'Accessories'],
-  Fashion: ["Men's Clothing", "Women's Clothing", 'Shoes'],
-  'Home & Living': ['Furniture', 'Kitchenware'],
-  'Sports & Outdoors': ['Fitness Equipment', 'Camping Gear'],
+  'Rượu Vang': ['Vang Đỏ', 'Vang Trắng'],
+  'Rượu Ngâm': ['Rượu Trái Cây', 'Rượu Thuốc'],
+  'Rượu Đế': ['Rượu Nếp'],
+  'Rượu Nhập Khẩu': ['Whisky', 'Vang Nhập Khẩu'],
+  'Quà Tặng': ['Set Quà Tặng', 'Hộp Quà Cao Cấp'],
 };
-
-function slugify(name: string): string {
-  return faker.helpers.slugify(name).toLowerCase();
-}
 
 export async function seedCategories(dataSource: DataSource) {
   const repo = dataSource.getRepository(Category);
@@ -22,17 +19,21 @@ export async function seedCategories(dataSource: DataSource) {
     return;
   }
 
+  const CAROUSEL_PARENTS = new Set(['Rượu Nhập Khẩu', 'Quà Tặng']);
+
   let total = 0;
   let sortOrder = 0;
   for (const [parentName, childNames] of Object.entries(TREE)) {
     const parent = await repo.save(
       repo.create({
         name: parentName,
-        slug: slugify(parentName),
+        slug: slugifyVi(parentName),
         parentId: null,
-        thumbnailUrl: faker.image.urlPicsumPhotos(),
-        showInTopCategories: true,
+        thumbnailUrl: null,
         homeSortOrder: sortOrder++,
+        homeDisplayStyle: CAROUSEL_PARENTS.has(parentName)
+          ? 'carousel'
+          : 'grid',
       }),
     );
     total += 1;
@@ -40,10 +41,9 @@ export async function seedCategories(dataSource: DataSource) {
     const children = childNames.map((childName, idx) =>
       repo.create({
         name: childName,
-        slug: slugify(childName),
+        slug: slugifyVi(childName),
         parentId: parent.id,
-        thumbnailUrl: faker.image.urlPicsumPhotos(),
-        showInDailyEssentials: idx === 0,
+        thumbnailUrl: null,
         homeSortOrder: idx,
       }),
     );

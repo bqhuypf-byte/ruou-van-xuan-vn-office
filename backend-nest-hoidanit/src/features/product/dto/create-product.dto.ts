@@ -1,11 +1,16 @@
+import { Type } from 'class-transformer';
 import {
+  ArrayMaxSize,
+  IsArray,
   IsBoolean,
   IsInt,
   IsNotEmpty,
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
+import { VariantAttributeGroupDto } from './variant-attribute-group.dto';
 
 export class CreateProductDto {
   @IsInt()
@@ -41,4 +46,11 @@ export class CreateProductDto {
   @IsOptional()
   @IsInt()
   dealSortOrder?: number;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(2)
+  @ValidateNested({ each: true })
+  @Type(() => VariantAttributeGroupDto)
+  variantAttributes?: VariantAttributeGroupDto[];
 }

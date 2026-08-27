@@ -40,7 +40,7 @@ export const RoleTable = ({
   if (roles.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-sm">
-        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Shield className="w-8 h-8" />
         </div>
         <h3 className="text-base font-semibold text-slate-900 dark:text-white">
@@ -82,7 +82,7 @@ export const RoleTable = ({
                         className={`w-9 h-9 rounded-xl flex items-center justify-center ${
                           isAdmin
                             ? 'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400'
-                            : 'bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400'
+                            : 'bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400'
                         }`}
                       >
                         {isAdmin ? (

@@ -8,16 +8,28 @@ import { UsersPage } from '@/features/users';
 import {
   CategoriesPage,
   ProductsPage,
+  ProductListPage,
   ProductDetailPage,
   HomePage,
   ProductViewPage,
   CategoryPage,
+  HomepageSectionsPage,
 } from '@/features/product';
 import { CartPage } from '@/features/cart';
-import { OrdersPage, OrderDetailPage } from '@/features/order';
+import { CheckoutPage } from '@/features/checkout';
+import { OrdersPage, OrderDetailPage, AdminOrdersPage } from '@/features/order';
 import { AddressesPage } from '@/features/user-profile';
 import { SiteContentPage } from '@/features/site-content';
-import { BannersPage, BrandsPage, SiteSettingsPage } from '@/features/home';
+import {
+  BannersPage,
+  BrandsPage,
+  SiteSettingsPage,
+  CheckoutSettingsPage,
+  FaqsPage,
+  PagesPage,
+  StaticPage,
+  VouchersPage,
+} from '@/features/home';
 import { AdminRoute } from './AdminRoute';
 import { ProtectedRoute } from './ProtectedRoute';
 import { ROUTES } from './routes';
@@ -28,9 +40,11 @@ export const router = createBrowserRouter([
     element: <MainLayout />,
     children: [
       { index: true, element: <HomePage /> },
+      { path: 'products', element: <ProductListPage /> },
       { path: 'products/:slug', element: <ProductViewPage /> },
       { path: 'categories/:slug', element: <CategoryPage /> },
       { path: 'cart', element: <CartPage /> },
+      { path: ':slug', element: <StaticPage /> },
     ],
   },
   {
@@ -39,6 +53,7 @@ export const router = createBrowserRouter([
       {
         element: <MainLayout />,
         children: [
+          { path: 'checkout', element: <CheckoutPage /> },
           { path: 'orders', element: <OrdersPage /> },
           { path: 'orders/:id', element: <OrderDetailPage /> },
           { path: 'profile', element: <AddressesPage /> },
@@ -65,11 +80,17 @@ export const router = createBrowserRouter([
           { path: 'users', element: <UsersPage /> },
           { path: 'categories', element: <CategoriesPage /> },
           { path: 'site-content', element: <SiteContentPage /> },
+          { path: 'homepage-sections', element: <HomepageSectionsPage /> },
           { path: 'banners', element: <BannersPage /> },
           { path: 'brands', element: <BrandsPage /> },
+          { path: 'faqs', element: <FaqsPage /> },
+          { path: 'pages', element: <PagesPage /> },
+          { path: 'vouchers', element: <VouchersPage /> },
           { path: 'site-settings', element: <SiteSettingsPage /> },
+          { path: 'checkout-settings', element: <CheckoutSettingsPage /> },
           { path: 'products', element: <ProductsPage /> },
           { path: 'products/:slug', element: <ProductDetailPage /> },
+          { path: 'orders', element: <AdminOrdersPage /> },
         ],
       },
     ],

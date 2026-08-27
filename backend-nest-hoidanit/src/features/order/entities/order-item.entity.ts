@@ -1,14 +1,23 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 
 @Entity('order_items')
 export class OrderItem {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryColumn({
+    type: 'bigint',
+    generated: 'increment',
+    transformer: bigintTransformer,
+  })
   id: number;
 
-  @Column({ type: 'bigint', name: 'order_id' })
+  @Column({ type: 'bigint', name: 'order_id', transformer: bigintTransformer })
   orderId: number;
 
-  @Column({ type: 'bigint', name: 'product_variant_id' })
+  @Column({
+    type: 'bigint',
+    name: 'product_variant_id',
+    transformer: bigintTransformer,
+  })
   productVariantId: number;
 
   @Column({ type: 'varchar', length: 255, name: 'product_name' })

@@ -170,7 +170,7 @@ export const UserFormModal = ({
           </label>
           <select
             id="roleId"
-            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
             {...register('roleId')}
           >
             <option value="">-- Chưa gán vai trò --</option>
@@ -185,7 +185,7 @@ export const UserFormModal = ({
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
           <input
             type="checkbox"
-            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 dark:border-slate-700"
+            className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
             {...register('isActive')}
           />
           Kích hoạt tài khoản

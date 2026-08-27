@@ -42,22 +42,31 @@ export class Category {
   })
   thumbnailUrl: string | null;
 
-  @Column({
-    type: 'boolean',
-    name: 'show_in_top_categories',
-    default: false,
-  })
-  showInTopCategories: boolean;
-
-  @Column({
-    type: 'boolean',
-    name: 'show_in_daily_essentials',
-    default: false,
-  })
-  showInDailyEssentials: boolean;
-
   @Column({ type: 'int', name: 'home_sort_order', default: 0 })
   homeSortOrder: number;
+
+  @Column({
+    type: 'boolean',
+    name: 'show_in_product_sections',
+    default: true,
+  })
+  showInProductSections: boolean;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'home_section_title',
+    nullable: true,
+  })
+  homeSectionTitle: string | null;
+
+  @Column({
+    type: 'enum',
+    enum: ['grid', 'carousel'],
+    name: 'home_display_style',
+    default: 'grid',
+  })
+  homeDisplayStyle: 'grid' | 'carousel';
 
   @ManyToOne(() => Category, (category) => category.children)
   @JoinColumn({ name: 'parent_id' })

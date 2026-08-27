@@ -1,4 +1,5 @@
 import { useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { Button } from '@/shared/components/ui';
 import { ROUTES } from '@/routes/routes';
 
@@ -8,25 +9,22 @@ export interface PromoBandProps {
   ctaLink?: string;
 }
 
-export const PromoBand = ({
-  title = 'Đừng bỏ lỡ các ưu đãi rượu vang mới nhất',
-  ctaText = 'Xem Ưu Đãi',
-  ctaLink = ROUTES.PRODUCTS,
-}: PromoBandProps) => {
+export const PromoBand = ({ title, ctaText, ctaLink = ROUTES.PRODUCTS }: PromoBandProps) => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   return (
     <section className="bg-slate-900">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 flex flex-col sm:flex-row items-center justify-between gap-5">
         <h2 className="text-lg sm:text-xl font-bold text-white text-center sm:text-left">
-          {title}
+          {title ?? t('promo.title')}
         </h2>
         <Button
           size="lg"
           className="rounded-full px-8 shrink-0"
           onClick={() => navigate(ctaLink)}
         >
-          {ctaText}
+          {ctaText ?? t('promo.cta')}
         </Button>
       </div>
     </section>

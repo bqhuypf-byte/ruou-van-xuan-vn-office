@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { CartModule } from '../cart/cart.module';
 import { UserProfileModule } from '../user-profile/user-profile.module';
+import { SiteSettingsModule } from '../site-settings/site-settings.module';
 import { OrderController } from './order.controller';
 import { OrderService } from './services/order.service';
 import { CheckoutService } from './services/checkout.service';
@@ -15,6 +16,7 @@ import { OrderItem } from './entities/order-item.entity';
     TypeOrmModule.forFeature([Order, OrderItem]),
     UserProfileModule,
     CartModule,
+    SiteSettingsModule,
   ],
   controllers: [OrderController],
   providers: [

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Plus,
   Search,
@@ -8,6 +8,8 @@ import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
+  Trash2,
+  XOctagon,
 } from 'lucide-react';
 import { Button, Input } from '@/shared/components/ui';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
@@ -15,11 +17,15 @@ import { ProductTable } from '../components/ProductTable';
 import { ProductFormModal } from '../components/ProductFormModal';
 import type { ProductFormSubmitData } from '../components/ProductFormModal';
 import { ProductDeleteModal } from '../components/ProductDeleteModal';
+import { ProductHardDeleteModal } from '../components/ProductHardDeleteModal';
+import { ProductBulkDeleteModal } from '../components/ProductBulkDeleteModal';
+import { ProductBulkHardDeleteModal } from '../components/ProductBulkHardDeleteModal';
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
 import {
   useCreateProduct,
   useDeleteProduct,
+  useHardDeleteProduct,
   useUpdateProduct,
 } from '../hooks/useProductMutations';
 import type { Product } from '../types/product.types';
@@ -31,7 +37,11 @@ export const ProductsPage = () => {
   const [statusFilter, setStatusFilter] = useState<'' | 'active' | 'inactive'>('');
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  const [isHardDeleteOpen, setIsHardDeleteOpen] = useState(false);
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isBulkHardDeleteOpen, setIsBulkHardDeleteOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -48,14 +58,33 @@ export const ProductsPage = () => {
   const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
+  const hardDeleteMutation = useHardDeleteProduct();
 
-  const handleOpenCreate = () => {
-    setSelectedProduct(null);
-    setIsFormOpen(true);
+  useEffect(() => {
+    setSelectedIds(new Set());
+  }, [search, page, categoryFilter, statusFilter]);
+
+  const handleToggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
   };
 
-  const handleOpenEdit = (product: Product) => {
-    setSelectedProduct(product);
+  const handleToggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      const allSelected = products.length > 0 && products.every((p) => prev.has(p.id));
+      if (allSelected) return new Set();
+      return new Set(products.map((p) => p.id));
+    });
+  };
+
+  const handleOpenCreate = () => {
     setIsFormOpen(true);
   };
 
@@ -64,22 +93,19 @@ export const ProductsPage = () => {
     setIsDeleteOpen(true);
   };
 
+  const handleOpenHardDelete = (product: Product) => {
+    setSelectedProduct(product);
+    setIsHardDeleteOpen(true);
+  };
+
   const handleSaveForm = async (data: ProductFormSubmitData) => {
     setFeedback(null);
     try {
-      if (selectedProduct) {
-        await updateMutation.mutateAsync({ id: selectedProduct.id, input: data });
-        setFeedback({
-          type: 'success',
-          message: `Đã cập nhật sản phẩm "${data.name}" thành công.`,
-        });
-      } else {
-        await createMutation.mutateAsync(data);
-        setFeedback({
-          type: 'success',
-          message: `Đã tạo sản phẩm "${data.name}" thành công.`,
-        });
-      }
+      await createMutation.mutateAsync(data);
+      setFeedback({
+        type: 'success',
+        message: `Đã tạo sản phẩm "${data.name}" thành công.`,
+      });
     } catch (err) {
       setFeedback({
         type: 'error',
@@ -105,9 +131,87 @@ export const ProductsPage = () => {
     }
   };
 
+  const handleHardDeleteConfirm = async () => {
+    if (!selectedProduct) return;
+    setFeedback(null);
+    try {
+      await hardDeleteMutation.mutateAsync(selectedProduct.id);
+      setFeedback({
+        type: 'success',
+        message: `Đã xóa vĩnh viễn sản phẩm "${selectedProduct.name}".`,
+      });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi xóa vĩnh viễn sản phẩm.'),
+      });
+    }
+  };
+
+  const handleChangeCategory = async (product: Product, newCategoryId: number) => {
+    setFeedback(null);
+    try {
+      await updateMutation.mutateAsync({ id: product.id, input: { categoryId: newCategoryId } });
+      setFeedback({
+        type: 'success',
+        message: `Đã chuyển "${product.name}" sang danh mục khác.`,
+      });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi đổi danh mục.'),
+      });
+    }
+  };
+
+  const handleBulkDeleteConfirm = async () => {
+    const ids = Array.from(selectedIds);
+    setFeedback(null);
+    const results = await Promise.allSettled(ids.map((id) => deleteMutation.mutateAsync(id)));
+    const failedCount = results.filter((r) => r.status === 'rejected').length;
+    const succeededCount = ids.length - failedCount;
+
+    if (failedCount === 0) {
+      setFeedback({
+        type: 'success',
+        message: `Đã ngừng bán ${succeededCount} sản phẩm thành công.`,
+      });
+    } else {
+      setFeedback({
+        type: 'error',
+        message: `Đã ngừng bán ${succeededCount} sản phẩm, ${failedCount} sản phẩm thất bại.`,
+      });
+    }
+    setSelectedIds(new Set());
+  };
+
+  const handleBulkHardDeleteConfirm = async () => {
+    const ids = products.filter((p) => selectedIds.has(p.id) && !p.isActive).map((p) => p.id);
+    setFeedback(null);
+    const results = await Promise.allSettled(ids.map((id) => hardDeleteMutation.mutateAsync(id)));
+    const failedCount = results.filter((r) => r.status === 'rejected').length;
+    const succeededCount = ids.length - failedCount;
+
+    if (failedCount === 0) {
+      setFeedback({
+        type: 'success',
+        message: `Đã xóa vĩnh viễn ${succeededCount} sản phẩm thành công.`,
+      });
+    } else {
+      setFeedback({
+        type: 'error',
+        message: `Đã xóa vĩnh viễn ${succeededCount} sản phẩm, ${failedCount} sản phẩm thất bại.`,
+      });
+    }
+    setSelectedIds(new Set());
+  };
+
   const totalCount = meta?.total ?? 0;
   const activeCount = products.filter((p) => p.isActive).length;
   const inactiveCount = products.filter((p) => !p.isActive).length;
+  const selectedInactiveCount = products.filter(
+    (p) => selectedIds.has(p.id) && !p.isActive,
+  ).length;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -127,7 +231,7 @@ export const ProductsPage = () => {
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm flex items-center gap-4">
-          <div className="w-12 h-12 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center">
+          <div className="w-12 h-12 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center">
             <Package className="w-6 h-6" />
           </div>
           <div>
@@ -199,7 +303,7 @@ export const ProductsPage = () => {
           />
         </div>
         <select
-          className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+          className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
           value={categoryFilter}
           onChange={(e) => {
             setCategoryFilter(e.target.value);
@@ -214,7 +318,7 @@ export const ProductsPage = () => {
           ))}
         </select>
         <select
-          className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-indigo-500 focus:ring-indigo-500/20"
+          className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
           value={statusFilter}
           onChange={(e) => {
             setStatusFilter(e.target.value as '' | 'active' | 'inactive');
@@ -227,12 +331,49 @@ export const ProductsPage = () => {
         </select>
       </div>
 
+      {selectedIds.size > 0 && (
+        <div className="bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 rounded-xl p-3 flex items-center justify-between">
+          <p className="text-sm font-medium text-brand-800 dark:text-brand-300">
+            Đã chọn {selectedIds.size} sản phẩm
+            {selectedInactiveCount > 0 && ` (${selectedInactiveCount} đã ngừng bán)`}
+          </p>
+          <div className="flex items-center gap-2">
+            <Button variant="outline" size="sm" onClick={() => setSelectedIds(new Set())}>
+              Bỏ Chọn
+            </Button>
+            {selectedInactiveCount > 0 && (
+              <Button
+                variant="danger"
+                size="sm"
+                leftIcon={<XOctagon className="w-4 h-4" />}
+                onClick={() => setIsBulkHardDeleteOpen(true)}
+              >
+                Xóa Vĩnh Viễn ({selectedInactiveCount})
+              </Button>
+            )}
+            <Button
+              variant="danger"
+              size="sm"
+              leftIcon={<Trash2 className="w-4 h-4" />}
+              onClick={() => setIsBulkDeleteOpen(true)}
+            >
+              Xóa Đã Chọn
+            </Button>
+          </div>
+        </div>
+      )}
+
       <ProductTable
         products={products}
         categories={allCategories}
         isLoading={isLoading}
-        onEdit={handleOpenEdit}
         onDelete={handleOpenDelete}
+        onHardDelete={handleOpenHardDelete}
+        onChangeCategory={handleChangeCategory}
+        selectedIds={selectedIds}
+        onToggleSelect={handleToggleSelect}
+        onToggleSelectAll={handleToggleSelectAll}
+        startIndex={((meta?.page ?? page) - 1) * (meta?.limit ?? 10)}
       />
 
       {meta && meta.totalPages > 1 && (
@@ -267,9 +408,8 @@ export const ProductsPage = () => {
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSubmit={handleSaveForm}
-        productToEdit={selectedProduct}
         categoryOptions={allCategories}
-        isLoading={createMutation.isPending || updateMutation.isPending}
+        isLoading={createMutation.isPending}
       />
 
       <ProductDeleteModal
@@ -278,6 +418,30 @@ export const ProductsPage = () => {
         onConfirm={handleDeleteConfirm}
         productToDelete={selectedProduct}
         isLoading={deleteMutation.isPending}
+      />
+
+      <ProductHardDeleteModal
+        isOpen={isHardDeleteOpen}
+        onClose={() => setIsHardDeleteOpen(false)}
+        onConfirm={handleHardDeleteConfirm}
+        productToDelete={selectedProduct}
+        isLoading={hardDeleteMutation.isPending}
+      />
+
+      <ProductBulkDeleteModal
+        isOpen={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={handleBulkDeleteConfirm}
+        selectedCount={selectedIds.size}
+        isLoading={deleteMutation.isPending}
+      />
+
+      <ProductBulkHardDeleteModal
+        isOpen={isBulkHardDeleteOpen}
+        onClose={() => setIsBulkHardDeleteOpen(false)}
+        onConfirm={handleBulkHardDeleteConfirm}
+        selectedCount={selectedInactiveCount}
+        isLoading={hardDeleteMutation.isPending}
       />
     </div>
   );

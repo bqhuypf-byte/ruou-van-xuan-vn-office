@@ -1,9 +1,9 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { ImageIcon, Link2, Tag, Type } from 'lucide-react';
-import { Button, Input, Modal } from '@/shared/components/ui';
+import { Link2, Tag, Type } from 'lucide-react';
+import { Button, ImageDropzone, Input, Modal } from '@/shared/components/ui';
 import type { Banner } from '../types/home.types';
 
 const bannerSchema = z.object({
@@ -60,6 +60,7 @@ export const BannerFormModal = ({
 
   const {
     register,
+    control,
     handleSubmit,
     reset,
     formState: { errors },
@@ -130,12 +131,17 @@ export const BannerFormModal = ({
           error={errors.badgeText?.message}
           {...register('badgeText')}
         />
-        <Input
-          label="Ảnh (URL)"
-          placeholder="https://..."
-          leftIcon={<ImageIcon className="w-4 h-4" />}
-          error={errors.imageUrl?.message}
-          {...register('imageUrl')}
+        <Controller
+          name="imageUrl"
+          control={control}
+          render={({ field }) => (
+            <ImageDropzone
+              label="Ảnh"
+              value={field.value}
+              onChange={field.onChange}
+              error={errors.imageUrl?.message}
+            />
+          )}
         />
         <Input
           label="Liên kết CTA"
@@ -162,7 +168,7 @@ export const BannerFormModal = ({
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
           <input
             type="checkbox"
-            className="rounded border-slate-300 text-indigo-600 focus:ring-indigo-500/20 dark:border-slate-700"
+            className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
             {...register('isActive')}
           />
           Hiển thị trên trang chủ

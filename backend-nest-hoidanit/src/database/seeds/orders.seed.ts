@@ -6,9 +6,13 @@ import { ORDER_STATUSES } from '../../features/order/types/order-status.type';
 import { PAYMENT_STATUSES } from '../../features/order/types/payment-status.type';
 import { Address } from '../../features/user-profile/entities/address.entity';
 import { User } from '../../features/users/entities/user.entity';
+import {
+  SITE_SETTINGS_ID,
+  SiteSettings,
+} from '../../features/site-settings/entities/site-settings.entity';
 import { seedAddresses } from './addresses.seed';
 
-const PAYMENT_METHODS = ['cod', 'bank_transfer'];
+const PAYMENT_METHODS = ['cod', 'bank_transfer', 'store_pickup'];
 
 export async function seedOrders(dataSource: DataSource, userCount = 10) {
   await seedAddresses(dataSource);
@@ -21,10 +25,14 @@ export async function seedOrders(dataSource: DataSource, userCount = 10) {
   const existingCount = await orderRepo.count();
   if (existingCount > 0) {
     console.log('⏭ Orders already seeded');
+    await backfillStorePickupOrders(dataSource);
     return;
   }
 
   const users = await userRepo.find({ take: userCount });
+  const settingsRepo = dataSource.getRepository(SiteSettings);
+  const settings = await settingsRepo.findOne({ where: { id: SITE_SETTINGS_ID } });
+  const contactAddresses = settings?.contactAddresses ?? [];
 
   let orderTotal = 0;
   let itemTotal = 0;
@@ -50,13 +58,18 @@ export async function seedOrders(dataSource: DataSource, userCount = 10) {
         (sum, item) => sum + item.price * item.quantity,
         0,
       );
-      const shippingFee = 30000;
+      const paymentMethod = faker.helpers.arrayElement(PAYMENT_METHODS);
+      const isPickup = paymentMethod === 'store_pickup';
+      const pickupStore = isPickup
+        ? faker.helpers.arrayElement(contactAddresses.length ? contactAddresses : [null])
+        : null;
+      const shippingFee = isPickup ? 0 : 30000;
 
       const order = await orderRepo.save(
         orderRepo.create({
           userId: user.id,
           status: faker.helpers.arrayElement(ORDER_STATUSES),
-          paymentMethod: faker.helpers.arrayElement(PAYMENT_METHODS),
+          paymentMethod,
           paymentStatus: faker.helpers.arrayElement(PAYMENT_STATUSES),
           shippingFee: shippingFee.toFixed(2),
           totalAmount: (itemsTotal + shippingFee).toFixed(2),
@@ -66,6 +79,8 @@ export async function seedOrders(dataSource: DataSource, userCount = 10) {
             addressLine: address.addressLine,
             city: address.city,
           },
+          pickupStoreLabel: pickupStore?.label ?? null,
+          pickupStoreAddress: pickupStore?.address ?? null,
         }),
       );
       orderTotal += 1;
@@ -87,4 +102,88 @@ export async function seedOrders(dataSource: DataSource, userCount = 10) {
   }
 
   console.log(`✓ Seeded ${orderTotal} orders with ${itemTotal} items`);
+  await backfillStorePickupOrders(dataSource);
+}
+
+async function backfillStorePickupOrders(dataSource: DataSource) {
+  const orderRepo = dataSource.getRepository(Order);
+  const orderItemRepo = dataSource.getRepository(OrderItem);
+  const userRepo = dataSource.getRepository(User);
+  const addressRepo = dataSource.getRepository(Address);
+  const settingsRepo = dataSource.getRepository(SiteSettings);
+
+  const pickupCount = await orderRepo.count({
+    where: { paymentMethod: 'store_pickup' },
+  });
+  if (pickupCount > 0) {
+    return;
+  }
+
+  const settings = await settingsRepo.findOne({ where: { id: SITE_SETTINGS_ID } });
+  const contactAddresses = settings?.contactAddresses ?? [];
+  if (contactAddresses.length === 0) {
+    console.log('⏭ Skipped store_pickup demo orders (no contact addresses configured)');
+    return;
+  }
+
+  const users = await userRepo.find({ take: 3 });
+  let created = 0;
+
+  for (const [index, user] of users.entries()) {
+    const address = await addressRepo.findOne({ where: { userId: user.id } });
+    if (!address) continue;
+
+    const pickupStore = contactAddresses[index % contactAddresses.length];
+    const itemDrafts = Array.from(
+      { length: faker.number.int({ min: 1, max: 2 }) },
+      () => ({
+        productVariantId: faker.number.int({ min: 1, max: 100 }),
+        productName: faker.commerce.productName(),
+        sku: faker.string.alphanumeric(8).toUpperCase(),
+        price: Number(faker.commerce.price({ min: 10, max: 500 })),
+        quantity: faker.number.int({ min: 1, max: 3 }),
+        thumbnailUrl: faker.image.urlPicsumPhotos(),
+      }),
+    );
+    const itemsTotal = itemDrafts.reduce(
+      (sum, item) => sum + item.price * item.quantity,
+      0,
+    );
+
+    const order = await orderRepo.save(
+      orderRepo.create({
+        userId: user.id,
+        status: index === 0 ? 'pending' : 'confirmed',
+        paymentMethod: 'store_pickup',
+        paymentStatus: 'unpaid',
+        shippingFee: '0.00',
+        totalAmount: itemsTotal.toFixed(2),
+        shippingAddress: {
+          fullName: address.fullName,
+          phone: address.phone,
+          addressLine: address.addressLine,
+          city: address.city,
+        },
+        pickupStoreLabel: pickupStore.label,
+        pickupStoreAddress: pickupStore.address,
+      }),
+    );
+
+    await orderItemRepo.save(
+      itemDrafts.map((item) =>
+        orderItemRepo.create({
+          orderId: order.id,
+          productVariantId: item.productVariantId,
+          productName: item.productName,
+          sku: item.sku,
+          price: item.price.toFixed(2),
+          quantity: item.quantity,
+          thumbnailUrl: item.thumbnailUrl,
+        }),
+      ),
+    );
+    created += 1;
+  }
+
+  console.log(`✓ Backfilled ${created} store_pickup demo orders`);
 }

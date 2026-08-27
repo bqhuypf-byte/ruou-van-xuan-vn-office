@@ -12,10 +12,10 @@ const parentOptions: FlatCategory[] = [
     slug: 'electronics',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 0,
+    homeDisplayStyle: 'grid' as const,    depth: 0,
     parentName: null,
   },
   {
@@ -25,10 +25,10 @@ const parentOptions: FlatCategory[] = [
     slug: 'phones',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 1,
+    homeDisplayStyle: 'grid' as const,    depth: 1,
     parentName: 'Electronics',
   },
 ];
@@ -120,10 +120,10 @@ describe('CategoryFormModal', () => {
         name: 'Laptops',
         slug: 'laptops',
         parentId: 1,
-        showInTopCategories: false,
-        showInDailyEssentials: false,
+        showInProductSections: true,
+        homeSectionTitle: undefined,
         homeSortOrder: 0,
-      }),
+        homeDisplayStyle: 'grid' as const,      }),
     );
     await waitFor(() => expect(onClose).toHaveBeenCalled());
   });

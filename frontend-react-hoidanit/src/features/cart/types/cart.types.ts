@@ -21,8 +21,7 @@ export interface UpdateCartItemInput {
 
 export interface EnrichedCartItem extends CartItem {
   sku: string;
-  color: string | null;
-  size: string | null;
+  attributes: Record<string, string> | null;
   price: string;
   salePrice: string | null;
   stockQuantity: number;

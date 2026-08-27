@@ -12,6 +12,7 @@ import { Category } from './category.entity';
 import { ProductImage } from './product-image.entity';
 import { ProductVariant } from './product-variant.entity';
 import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
+import { VariantAttributeGroup } from '../types/variant-attribute-group.type';
 
 @Entity('products')
 export class Product {
@@ -54,6 +55,10 @@ export class Product {
 
   @Column({ type: 'int', name: 'deal_sort_order', default: 0 })
   dealSortOrder: number;
+
+  /** Up to 2 classification groups (Shopee-style "Phân loại"), each with an ordered list of value options used to auto-generate the variant combination matrix. */
+  @Column({ type: 'json', name: 'variant_attributes', nullable: true })
+  variantAttributes: VariantAttributeGroup[] | null;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;

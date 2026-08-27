@@ -1,5 +1,8 @@
-export type OrderStatus = 'pending' | 'confirmed' | 'shipping' | 'delivered' | 'cancelled';
-export type PaymentStatus = 'unpaid' | 'paid';
+export const ORDER_STATUSES = ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled'] as const;
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export const PAYMENT_STATUSES = ['unpaid', 'paid'] as const;
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 export interface ShippingAddressSnapshot {
   fullName: string;
@@ -28,6 +31,8 @@ export interface Order {
   shippingFee: string;
   totalAmount: string;
   shippingAddress: ShippingAddressSnapshot;
+  pickupStoreLabel: string | null;
+  pickupStoreAddress: string | null;
   createdAt: string;
   items: OrderItem[];
 }

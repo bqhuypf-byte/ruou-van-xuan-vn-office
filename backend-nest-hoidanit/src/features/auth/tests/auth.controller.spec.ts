@@ -60,8 +60,17 @@ describe('AuthController', () => {
 
   describe('POST /auth/register', () => {
     it('should delegate to authService.register', async () => {
-      const dto = { email: 'jane@example.com', password: 'password123', fullName: 'Jane Doe' };
-      const expected = { id: 1, email: dto.email, fullName: dto.fullName, role: 'customer' };
+      const dto = {
+        email: 'jane@example.com',
+        password: 'password123',
+        fullName: 'Jane Doe',
+      };
+      const expected = {
+        id: 1,
+        email: dto.email,
+        fullName: dto.fullName,
+        role: 'customer',
+      };
       service.register.mockResolvedValue(expected);
 
       const result = await controller.register(dto);
@@ -79,7 +88,12 @@ describe('AuthController', () => {
       service.login.mockResolvedValue({
         accessToken: 'access-token',
         refreshToken: 'raw-refresh-token',
-        user: { id: 1, email: dto.email, fullName: 'Jane Doe', role: 'customer' },
+        user: {
+          id: 1,
+          email: dto.email,
+          fullName: 'Jane Doe',
+          role: 'customer',
+        },
       });
 
       const result = await controller.login(dto, req, res);
@@ -95,7 +109,12 @@ describe('AuthController', () => {
       );
       expect(result).toEqual({
         accessToken: 'access-token',
-        user: { id: 1, email: dto.email, fullName: 'Jane Doe', role: 'customer' },
+        user: {
+          id: 1,
+          email: dto.email,
+          fullName: 'Jane Doe',
+          role: 'customer',
+        },
       });
     });
   });
@@ -132,7 +151,9 @@ describe('AuthController', () => {
       const result = await controller.logout(req, res);
 
       expect(service.logout).toHaveBeenCalledWith('raw-token');
-      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken', { path: '/api/v1/auth' });
+      expect(res.clearCookie).toHaveBeenCalledWith('refreshToken', {
+        path: '/api/v1/auth',
+      });
       expect(result).toEqual({ success: true });
     });
   });
@@ -140,7 +161,12 @@ describe('AuthController', () => {
   describe('GET /auth/me', () => {
     it('should return the current user', async () => {
       const user = { id: 1, email: 'jane@example.com', role: 'customer' };
-      const expected = { id: 1, email: user.email, fullName: 'Jane Doe', role: 'customer' };
+      const expected = {
+        id: 1,
+        email: user.email,
+        fullName: 'Jane Doe',
+        role: 'customer',
+      };
       service.me.mockResolvedValue(expected);
 
       const result = await controller.me(user);
@@ -154,7 +180,12 @@ describe('AuthController', () => {
     it('should delegate to authService.updateProfile', async () => {
       const user = { id: 1, email: 'jane@example.com', role: 'customer' };
       const dto = { fullName: 'Jane Updated' };
-      const expected = { id: 1, email: user.email, fullName: 'Jane Updated', role: 'customer' };
+      const expected = {
+        id: 1,
+        email: user.email,
+        fullName: 'Jane Updated',
+        role: 'customer',
+      };
       service.updateProfile.mockResolvedValue(expected);
 
       const result = await controller.updateProfile(user, dto);
@@ -167,7 +198,10 @@ describe('AuthController', () => {
   describe('PATCH /auth/change-password', () => {
     it('should delegate to authService.changePassword', async () => {
       const user = { id: 1, email: 'jane@example.com', role: 'customer' };
-      const dto = { currentPassword: 'old-password', newPassword: 'new-password123' };
+      const dto = {
+        currentPassword: 'old-password',
+        newPassword: 'new-password123',
+      };
 
       const result = await controller.changePassword(user, dto);
 

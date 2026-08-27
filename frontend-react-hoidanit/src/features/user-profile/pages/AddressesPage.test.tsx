@@ -88,8 +88,16 @@ describe('AddressesPage', () => {
     await user.click(screen.getByRole('button', { name: /Thêm Địa Chỉ/i }));
     await user.type(screen.getByLabelText(/Họ Tên Người Nhận/i), 'Pham Van D');
     await user.type(screen.getByLabelText(/Số Điện Thoại/i), '0911222333');
-    await user.type(screen.getByLabelText(/^Địa Chỉ$/i), '99 Tran Phu');
-    await user.type(screen.getByLabelText(/Tỉnh \/ Thành Phố/i), 'Can Tho');
+    await user.type(screen.getByLabelText(/Số Nhà, Tên Đường/i), '99 Tran Phu');
+
+    await user.selectOptions(screen.getByLabelText(/Tỉnh \/ Thành Phố/i), 'Thành phố Cần Thơ');
+    const districtSelect = screen.getByLabelText(/Quận \/ Huyện/i);
+    await waitFor(() => expect(districtSelect).not.toBeDisabled());
+    await user.selectOptions(districtSelect, 'Quận Ninh Kiều');
+    const wardSelect = screen.getByLabelText(/Phường \/ Xã/i);
+    await waitFor(() => expect(wardSelect).not.toBeDisabled(), { timeout: 3000 });
+    await user.selectOptions(wardSelect, 'Phường Cái Khế');
+
     const submitButtons = screen.getAllByRole('button', { name: 'Thêm Địa Chỉ' });
     await user.click(submitButtons[submitButtons.length - 1]);
 
@@ -97,8 +105,8 @@ describe('AddressesPage', () => {
       expect(mutateAsync).toHaveBeenCalledWith({
         fullName: 'Pham Van D',
         phone: '0911222333',
-        addressLine: '99 Tran Phu',
-        city: 'Can Tho',
+        addressLine: '99 Tran Phu, Phường Cái Khế, Quận Ninh Kiều',
+        city: 'Thành phố Cần Thơ',
         isDefault: false,
       }),
     );

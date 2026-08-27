@@ -18,6 +18,11 @@ import { SiteContentModule } from './features/site-content/site-content.module';
 import { BannerModule } from './features/banner/banner.module';
 import { BrandModule } from './features/brand/brand.module';
 import { SiteSettingsModule } from './features/site-settings/site-settings.module';
+import { FaqModule } from './features/faq/faq.module';
+import { PageModule } from './features/page/page.module';
+import { VoucherModule } from './features/voucher/voucher.module';
+import { HomepageSectionModule } from './features/homepage-sections/homepage-section.module';
+import { UploadModule } from './shared/upload/upload.module';
 
 @Module({
   imports: [
@@ -38,6 +43,11 @@ import { SiteSettingsModule } from './features/site-settings/site-settings.modul
     BannerModule,
     BrandModule,
     SiteSettingsModule,
+    FaqModule,
+    PageModule,
+    VoucherModule,
+    HomepageSectionModule,
+    UploadModule,
   ],
   controllers: [AppController],
   providers: [AppService],

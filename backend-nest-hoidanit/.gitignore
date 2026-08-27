@@ -3,6 +3,11 @@
 /node_modules
 /build
 
+# uploaded files (runtime, not tracked) — except fixed brand assets the seed script references
+/uploads/*
+!/uploads/.gitkeep
+!/uploads/vanxuan-rice-wine-*.webp
+
 # Logs
 logs
 *.log

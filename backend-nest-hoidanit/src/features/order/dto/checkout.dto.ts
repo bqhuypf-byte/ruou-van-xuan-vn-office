@@ -4,7 +4,9 @@ import {
   IsArray,
   IsInt,
   IsNotEmpty,
+  IsOptional,
   IsString,
+  Min,
   MaxLength,
   ValidateNested,
 } from 'class-validator';
@@ -18,6 +20,11 @@ export class CheckoutDto {
   @IsNotEmpty()
   @MaxLength(50)
   paymentMethod: string;
+
+  @IsOptional()
+  @IsInt()
+  @Min(0)
+  pickupStoreIndex?: number;
 
   @IsArray()
   @ArrayMinSize(1)

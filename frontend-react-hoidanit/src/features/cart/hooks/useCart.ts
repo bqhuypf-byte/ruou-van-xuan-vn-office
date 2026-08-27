@@ -13,25 +13,29 @@ export const useCart = () => {
     queryKey: CART_QUERY_KEY,
     queryFn: async (): Promise<EnrichedCartItem[]> => {
       const cart = await cartService.getCart();
-      const variants = await Promise.all(
+      const variants = await Promise.allSettled(
         cart.items.map((item) => variantService.getVariantById(item.productVariantId)),
       );
 
-      return cart.items.map((item, index) => {
-        const variant = variants[index];
+      return cart.items.flatMap((item, index) => {
+        const result = variants[index];
+        // Variant may have been deleted after being added to the cart — skip rather than fail the whole cart.
+        if (result.status === 'rejected') return [];
+        const variant = result.value;
         const cached = cacheByVariantId[item.productVariantId];
-        return {
-          ...item,
-          sku: variant.sku,
-          color: variant.color,
-          size: variant.size,
-          price: variant.price,
-          salePrice: variant.salePrice,
-          stockQuantity: variant.stockQuantity,
-          productName: cached?.productName ?? null,
-          productSlug: cached?.productSlug ?? null,
-          thumbnailUrl: cached?.thumbnailUrl ?? null,
-        };
+        return [
+          {
+            ...item,
+            sku: variant.sku,
+            attributes: variant.attributes,
+            price: variant.price,
+            salePrice: variant.salePrice,
+            stockQuantity: variant.stockQuantity,
+            productName: cached?.productName ?? null,
+            productSlug: cached?.productSlug ?? null,
+            thumbnailUrl: cached?.thumbnailUrl ?? null,
+          },
+        ];
       });
     },
   });

@@ -1,4 +1,5 @@
 import { Link } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { AlertCircle, PackageSearch, ArrowRight } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { ROUTES } from '@/routes/routes';
@@ -6,13 +7,14 @@ import { OrderListItem } from '../components/OrderListItem';
 import { useOrders } from '../hooks/useOrders';
 
 export const OrdersPage = () => {
+  const { t } = useTranslation();
   const { orders, isLoading, isError, error, refetch } = useOrders();
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
         <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Đơn Hàng Của Tôi
+          {t('order.myOrders')}
         </h1>
 
         {isError && (
@@ -20,11 +22,13 @@ export const OrdersPage = () => {
             <div className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5" />
               <span>
-                Không thể tải danh sách đơn hàng ({error instanceof Error ? error.message : 'Lỗi kết nối'}).
+                {t('order.loadError', {
+                  reason: error instanceof Error ? error.message : t('common.connectionError'),
+                })}
               </span>
             </div>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Thử Lại
+              {t('common.tryAgain')}
             </Button>
           </div>
         )}
@@ -37,17 +41,17 @@ export const OrdersPage = () => {
           </div>
         ) : orders.length === 0 ? (
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-16 text-center shadow-sm">
-            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <PackageSearch className="w-8 h-8" />
             </div>
             <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-              Bạn chưa có đơn hàng nào
+              {t('order.emptyTitle')}
             </h3>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Hãy khám phá sản phẩm và đặt hàng ngay.
+              {t('order.emptySubtitle')}
             </p>
             <Link to={ROUTES.HOME}>
-              <Button rightIcon={<ArrowRight className="w-4 h-4" />}>Tiếp Tục Mua Sắm</Button>
+              <Button rightIcon={<ArrowRight className="w-4 h-4" />}>{t('common.continueShopping')}</Button>
             </Link>
           </div>
         ) : (

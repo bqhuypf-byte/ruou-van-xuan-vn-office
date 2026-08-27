@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
@@ -61,16 +65,25 @@ export class AuthService {
     return { id: user.id, email: user.email, fullName: user.fullName, role };
   }
 
-  private signAccessToken(user: Pick<User, 'id' | 'email'>, role: string): string {
+  private signAccessToken(
+    user: Pick<User, 'id' | 'email'>,
+    role: string,
+  ): string {
     const payload: JwtPayload = { sub: user.id, email: user.email, role };
     return this.jwtService.sign(payload);
   }
 
-  private async issueRefreshToken(userId: number, meta: RequestMeta): Promise<string> {
+  private async issueRefreshToken(
+    userId: number,
+    meta: RequestMeta,
+  ): Promise<string> {
     const rawToken = randomBytes(48).toString('hex');
     const tokenHash = createHash('sha256').update(rawToken).digest('hex');
-    const refreshExpiresIn = this.configService.get<string>('jwt.refreshExpiresIn') ?? '7d';
-    const expiresAt = new Date(Date.now() + parseDurationToMs(refreshExpiresIn));
+    const refreshExpiresIn =
+      this.configService.get<string>('jwt.refreshExpiresIn') ?? '7d';
+    const expiresAt = new Date(
+      Date.now() + parseDurationToMs(refreshExpiresIn),
+    );
 
     const token = this.refreshTokenRepository.create({
       userId,
@@ -115,7 +128,10 @@ export class AuthService {
     return { accessToken, refreshToken, user: this.toAuthUser(user, roleName) };
   }
 
-  async refresh(rawToken: string | undefined, meta: RequestMeta): Promise<RefreshResult> {
+  async refresh(
+    rawToken: string | undefined,
+    meta: RequestMeta,
+  ): Promise<RefreshResult> {
     if (!rawToken) {
       throw new UnauthorizedException('Refresh token missing');
     }
@@ -156,7 +172,10 @@ export class AuthService {
     return this.toAuthUser(user, roleName);
   }
 
-  async updateProfile(userId: number, dto: UpdateProfileDto): Promise<AuthUserResponse> {
+  async updateProfile(
+    userId: number,
+    dto: UpdateProfileDto,
+  ): Promise<AuthUserResponse> {
     const updated = await this.usersService.update(userId, dto);
     const roleName = await this.resolveRoleName(updated.roleId);
     return {
@@ -172,7 +191,10 @@ export class AuthService {
     if (!user) {
       throw new NotFoundException(`User #${userId} not found`);
     }
-    const matches = await bcrypt.compare(dto.currentPassword, user.passwordHash);
+    const matches = await bcrypt.compare(
+      dto.currentPassword,
+      user.passwordHash,
+    );
     if (!matches) {
       throw new UnauthorizedException('Current password is incorrect');
     }

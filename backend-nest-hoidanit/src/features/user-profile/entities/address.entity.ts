@@ -1,11 +1,16 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryColumn } from 'typeorm';
+import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 
 @Entity('addresses')
 export class Address {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryColumn({
+    type: 'bigint',
+    generated: 'increment',
+    transformer: bigintTransformer,
+  })
   id: number;
 
-  @Column({ type: 'bigint', name: 'user_id' })
+  @Column({ type: 'bigint', name: 'user_id', transformer: bigintTransformer })
   userId: number;
 
   @Column({ type: 'varchar', length: 100, name: 'full_name' })

@@ -88,7 +88,10 @@ describe('Auth (E2E Integration)', () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [
         PassportModule.register({ defaultStrategy: 'jwt' }),
-        JwtModule.register({ secret: 'test-secret', signOptions: { expiresIn: '15m' } }),
+        JwtModule.register({
+          secret: 'test-secret',
+          signOptions: { expiresIn: '15m' },
+        }),
       ],
       controllers: [AuthController],
       providers: [
@@ -98,14 +101,19 @@ describe('Auth (E2E Integration)', () => {
         JwtStrategy,
         { provide: UserRepository, useValue: mockUserRepoProvider },
         { provide: RoleRepository, useValue: mockRoleRepoProvider },
-        { provide: RefreshTokenRepository, useValue: mockRefreshTokenRepoProvider },
+        {
+          provide: RefreshTokenRepository,
+          useValue: mockRefreshTokenRepoProvider,
+        },
         { provide: ConfigService, useValue: mockConfigService },
       ],
     }).compile();
 
     app = moduleFixture.createNestApplication();
     app.use(cookieParser());
-    app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
+    app.useGlobalPipes(
+      new ValidationPipe({ transform: true, whitelist: true }),
+    );
     await app.init();
 
     mockUserRepository = moduleFixture.get(UserRepository);
@@ -120,7 +128,9 @@ describe('Auth (E2E Integration)', () => {
   beforeEach(() => {
     jest.clearAllMocks();
     (bcrypt.hash as jest.Mock).mockResolvedValue('hashed-password');
-    mockRefreshTokenRepository.create.mockImplementation((data: unknown) => data as RefreshToken);
+    mockRefreshTokenRepository.create.mockImplementation(
+      (data: unknown) => data as RefreshToken,
+    );
     mockRefreshTokenRepository.save.mockImplementation((data: RefreshToken) =>
       Promise.resolve({ ...data, id: data.id ?? 99 }),
     );
@@ -145,7 +155,11 @@ describe('Auth (E2E Integration)', () => {
 
       const response = await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: 'new@example.com', password: 'password123', fullName: 'New User' })
+        .send({
+          email: 'new@example.com',
+          password: 'password123',
+          fullName: 'New User',
+        })
         .expect(201);
 
       expect(response.body).toEqual({
@@ -162,12 +176,19 @@ describe('Auth (E2E Integration)', () => {
 
       await request(app.getHttpServer())
         .post('/auth/register')
-        .send({ email: existingUser.email, password: 'password123', fullName: 'Jane Doe' })
+        .send({
+          email: existingUser.email,
+          password: 'password123',
+          fullName: 'Jane Doe',
+        })
         .expect(409);
     });
 
     it('should return 400 BAD REQUEST for an invalid payload', async () => {
-      await request(app.getHttpServer()).post('/auth/register').send({}).expect(400);
+      await request(app.getHttpServer())
+        .post('/auth/register')
+        .send({})
+        .expect(400);
     });
   });
 

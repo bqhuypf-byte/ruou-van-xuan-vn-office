@@ -23,7 +23,7 @@ export const ImageGallery = ({ images, isLoading, onDelete, deletingId }: ImageG
   if (images.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-10 text-center shadow-sm">
-        <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
+        <div className="w-14 h-14 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-3">
           <ImageOff className="w-7 h-7" />
         </div>
         <h3 className="text-sm font-semibold text-slate-900 dark:text-white">Chưa có hình ảnh nào</h3>

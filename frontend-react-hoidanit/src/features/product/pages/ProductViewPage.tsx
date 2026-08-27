@@ -1,17 +1,21 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams, Link } from 'react-router';
+import { useParams, Link, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
   ChevronRight,
-  ImageOff,
   Minus,
   Plus,
+  RotateCcw,
   ShoppingCart,
+  Truck,
 } from 'lucide-react';
-import { Badge, Button, Spinner } from '@/shared/components/ui';
+import { Badge, Button, RichTextContent, Spinner } from '@/shared/components/ui';
+import { BottleIcon } from '@/shared/components/icons';
 import { PromoBand } from '@/shared/components/layout';
 import { formatPrice } from '@/shared/utils/formatPrice';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
+import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { useAddCartItem } from '@/features/cart';
 import { ReviewList, StarRating, useProductReviews } from '@/features/review';
 import { ROUTES } from '@/routes/routes';
@@ -25,6 +29,7 @@ import type { ProductDetail } from '../services/product.service';
 import type { FlatCategory } from '../hooks/useCategories';
 
 export const ProductViewPage = () => {
+  const { t } = useTranslation();
   const { slug } = useParams<{ slug: string }>();
   const { data: product, isLoading, isError, error, refetch } = useProductDetail(slug);
   const cacheProductDetail = useProductCacheStore((state) => state.cacheProductDetail);
@@ -50,11 +55,13 @@ export const ProductViewPage = () => {
           <div className="flex items-center gap-2">
             <AlertCircle className="w-5 h-5" />
             <span>
-              Không thể tải sản phẩm ({error instanceof Error ? error.message : 'Không tìm thấy'}).
+              {t('product.loadError', {
+                reason: error instanceof Error ? error.message : t('common.notFound'),
+              })}
             </span>
           </div>
           <Button variant="outline" size="sm" onClick={() => refetch()}>
-            Thử Lại
+            {t('common.tryAgain')}
           </Button>
         </div>
       </div>
@@ -79,19 +86,25 @@ const buildBreadcrumb = (
 };
 
 const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
+  const { t } = useTranslation();
+  const navigate = useNavigate();
   const { allCategories } = useCategories();
 
-  const colors = useMemo(
-    () => [...new Set(product.variants.map((v) => v.color).filter((c): c is string => !!c))],
-    [product.variants],
-  );
-  const sizes = useMemo(
-    () => [...new Set(product.variants.map((v) => v.size).filter((s): s is string => !!s))],
-    [product.variants],
+  const attributeNames = useMemo(() => (product.variantAttributes ?? []).map((g) => g.name), [product.variantAttributes]);
+  const attributeOptions = useMemo(
+    () =>
+      Object.fromEntries(
+        attributeNames.map((name) => [
+          name,
+          [...new Set(product.variants.map((v) => v.attributes?.[name]).filter((v): v is string => !!v))],
+        ]),
+      ),
+    [attributeNames, product.variants],
   );
 
-  const [selectedColor, setSelectedColor] = useState<string | null>(colors[0] ?? null);
-  const [selectedSize, setSelectedSize] = useState<string | null>(sizes[0] ?? null);
+  const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string | null>>(() =>
+    Object.fromEntries(attributeNames.map((name) => [name, attributeOptions[name]?.[0] ?? null])),
+  );
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string | null>(
     product.thumbnailUrl ?? product.images[0]?.imageUrl ?? null,
@@ -110,10 +123,11 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
   });
 
   const selectedVariant: ProductVariant | null =
-    product.variants.find(
-      (v) =>
-        (colors.length === 0 || v.color === selectedColor) &&
-        (sizes.length === 0 || v.size === selectedSize),
+    product.variants.find((v) =>
+      attributeNames.every(
+        (name) =>
+          (attributeOptions[name]?.length ?? 0) === 0 || v.attributes?.[name] === selectedAttributes[name],
+      ),
     ) ??
     product.variants[0] ??
     null;
@@ -123,9 +137,20 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
     setFeedback(null);
     try {
       await addCartItem.mutateAsync({ productVariantId: selectedVariant.id, quantity });
-      setFeedback({ type: 'success', message: 'Đã thêm sản phẩm vào giỏ hàng.' });
+      setFeedback({ type: 'success', message: t('product.addedToCart') });
     } catch (err) {
-      setFeedback({ type: 'error', message: getApiErrorMessage(err, 'Không thể thêm vào giỏ hàng.') });
+      setFeedback({ type: 'error', message: getApiErrorMessage(err, t('product.addToCartError')) });
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!selectedVariant) return;
+    setFeedback(null);
+    try {
+      await addCartItem.mutateAsync({ productVariantId: selectedVariant.id, quantity });
+      navigate(ROUTES.CART);
+    } catch (err) {
+      setFeedback({ type: 'error', message: getApiErrorMessage(err, t('product.addToCartError')) });
     }
   };
 
@@ -146,15 +171,15 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Breadcrumb */}
         <nav className="flex items-center flex-wrap gap-1.5 text-sm text-slate-500 dark:text-slate-400">
-          <Link to={ROUTES.HOME} className="hover:text-indigo-600 dark:hover:text-indigo-400">
-            Trang chủ
+          <Link to={ROUTES.HOME} className="hover:text-brand-600 dark:hover:text-brand-400">
+            {t('product.home')}
           </Link>
           {breadcrumb.map((category) => (
             <span key={category.id} className="flex items-center gap-1.5">
               <ChevronRight className="w-3.5 h-3.5" />
               <Link
                 to={ROUTES.CATEGORY.replace(':slug', category.slug)}
-                className="hover:text-indigo-600 dark:hover:text-indigo-400"
+                className="hover:text-brand-600 dark:hover:text-brand-400"
               >
                 {category.name}
               </Link>
@@ -173,9 +198,9 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                   <button
                     key={url}
                     onClick={() => setActiveImage(url)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-colors ${
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-colors duration-200 ${
                       activeImage === url
-                        ? 'border-indigo-600'
+                        ? 'border-brand-600'
                         : 'border-transparent bg-slate-100 dark:bg-slate-800'
                     }`}
                   >
@@ -184,11 +209,16 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 ))}
               </div>
             )}
-            <div className="flex-1 aspect-square rounded-2xl bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center">
+            <div className="flex-1 aspect-square rounded-2xl overflow-hidden flex items-center justify-center">
               {activeImage ? (
                 <img src={activeImage} alt={product.name} className="w-full h-full object-cover" />
               ) : (
-                <ImageOff className="w-12 h-12 text-slate-400" />
+                <div
+                  className="w-full h-full flex items-center justify-center text-white/85"
+                  style={{ backgroundColor: getPlaceholderTint(product.id) }}
+                >
+                  <BottleIcon className="w-16 h-16" />
+                </div>
               )}
             </div>
           </div>
@@ -203,7 +233,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
               <div className="flex items-center gap-2">
                 <StarRating rating={averageRating} />
                 <span className="text-sm text-slate-500 dark:text-slate-400">
-                  {averageRating.toFixed(1)}/5 ({reviewCount} đánh giá)
+                  {t('product.reviewsCount', { rating: averageRating.toFixed(1), count: reviewCount })}
                 </span>
               </div>
             )}
@@ -226,61 +256,38 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
               </div>
             )}
 
-            {product.description && (
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed">
-                {product.description}
-              </p>
-            )}
-
-            {colors.length > 0 && (
-              <div className="space-y-2.5 pt-1">
-                <p className="text-sm text-slate-500 dark:text-slate-400">Chọn Màu</p>
-                <div className="flex flex-wrap gap-2.5">
-                  {colors.map((color) => (
-                    <button
-                      key={color}
-                      onClick={() => setSelectedColor(color)}
-                      title={color}
-                      className={`w-9 h-9 rounded-full border-2 transition-all ${
-                        selectedColor === color
-                          ? 'border-indigo-600 scale-110'
-                          : 'border-slate-200 dark:border-slate-700'
-                      }`}
-                      style={{ backgroundColor: color.toLowerCase() }}
-                    />
-                  ))}
+            {attributeNames
+              .filter((name) => (attributeOptions[name]?.length ?? 0) > 0)
+              .map((name) => (
+                <div key={name} className="space-y-2.5 pt-1">
+                  <p className="text-sm text-slate-500 dark:text-slate-400">{name}</p>
+                  <div className="flex flex-wrap gap-2.5">
+                    {attributeOptions[name].map((value) => (
+                      <button
+                        key={value}
+                        onClick={() => setSelectedAttributes((prev) => ({ ...prev, [name]: value }))}
+                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
+                          selectedAttributes[name] === value
+                            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
+                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
+                        }`}
+                      >
+                        {value}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            )}
-
-            {sizes.length > 0 && (
-              <div className="space-y-2.5">
-                <p className="text-sm text-slate-500 dark:text-slate-400">Chọn Kích Thước</p>
-                <div className="flex flex-wrap gap-2.5">
-                  {sizes.map((size) => (
-                    <button
-                      key={size}
-                      onClick={() => setSelectedSize(size)}
-                      className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                        selectedSize === size
-                          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-                      }`}
-                    >
-                      {size}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
+              ))}
 
             {selectedVariant && (
               <div className="flex items-center gap-3">
                 <Badge variant={outOfStock ? 'danger' : 'success'} size="md">
-                  {outOfStock ? 'Hết hàng' : `Còn ${selectedVariant.stockQuantity} sản phẩm`}
+                  {outOfStock
+                    ? t('product.outOfStock')
+                    : t('product.inStock', { count: selectedVariant.stockQuantity })}
                 </Badge>
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                  SKU: {selectedVariant.sku}
+                  {t('product.sku')}: {selectedVariant.sku}
                 </span>
               </div>
             )}
@@ -302,7 +309,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
                   disabled={quantity <= 1}
-                  aria-label="Giảm số lượng"
+                  aria-label={t('product.decreaseQty')}
                   className="text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-30"
                 >
                   <Minus className="w-4 h-4" />
@@ -313,23 +320,66 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 <button
                   onClick={() => setQuantity((q) => Math.min(selectedVariant?.stockQuantity ?? 1, q + 1))}
                   disabled={!selectedVariant || quantity >= selectedVariant.stockQuantity}
-                  aria-label="Tăng số lượng"
+                  aria-label={t('product.increaseQty')}
                   className="text-slate-500 hover:text-slate-900 dark:hover:text-white disabled:opacity-30"
                 >
                   <Plus className="w-4 h-4" />
                 </button>
               </div>
 
+              {selectedVariant && selectedVariant.stockQuantity > 0 && selectedVariant.stockQuantity <= 20 && (
+                <span className="text-xs font-medium text-amber-600 dark:text-amber-400">
+                  {t('product.onlyLeft', { count: selectedVariant.stockQuantity })}
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-3">
               <Button
                 size="lg"
+                onClick={handleBuyNow}
+                isLoading={addCartItem.isPending}
+                disabled={!selectedVariant || outOfStock}
+                className="rounded-full flex-1"
+              >
+                {t('product.buyNow')}
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
                 onClick={handleAddToCart}
                 isLoading={addCartItem.isPending}
                 disabled={!selectedVariant || outOfStock}
                 leftIcon={<ShoppingCart className="w-4 h-4" />}
                 className="rounded-full flex-1"
               >
-                Thêm Vào Giỏ Hàng
+                {t('product.addToCart')}
               </Button>
+            </div>
+
+            <div className="space-y-3 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex items-start gap-3 pt-4">
+                <Truck className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {t('product.freeDelivery')}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('product.freeDeliverySubtitle')}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <RotateCcw className="w-5 h-5 text-brand-600 shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-slate-900 dark:text-white">
+                    {t('product.returnDelivery')}
+                  </p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    {t('product.returnDeliverySubtitle')}
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -341,29 +391,33 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
               onClick={() => setActiveTab('details')}
               className={`py-4 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 activeTab === 'details'
-                  ? 'border-indigo-600 text-slate-900 dark:text-white'
+                  ? 'border-brand-600 text-slate-900 dark:text-white'
                   : 'border-transparent text-slate-500 dark:text-slate-400'
               }`}
             >
-              Mô Tả Sản Phẩm
+              {t('product.tabDetails')}
             </button>
             <button
               onClick={() => setActiveTab('reviews')}
               className={`py-4 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 activeTab === 'reviews'
-                  ? 'border-indigo-600 text-slate-900 dark:text-white'
+                  ? 'border-brand-600 text-slate-900 dark:text-white'
                   : 'border-transparent text-slate-500 dark:text-slate-400'
               }`}
             >
-              Đánh Giá &amp; Nhận Xét {reviewCount > 0 && `(${reviewCount})`}
+              {t('product.tabReviews')} {reviewCount > 0 && `(${reviewCount})`}
             </button>
           </div>
 
           <div className="py-8">
             {activeTab === 'details' ? (
-              <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
-                {product.description || 'Chưa có mô tả chi tiết cho sản phẩm này.'}
-              </p>
+              product.description ? (
+                <RichTextContent html={product.description} className="max-w-2xl" />
+              ) : (
+                <p className="text-sm text-slate-600 dark:text-slate-400 leading-relaxed max-w-2xl">
+                  {t('product.noDescription')}
+                </p>
+              )
             ) : (
               <ReviewList reviews={reviews} isLoading={reviewsLoading} />
             )}
@@ -374,7 +428,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
         {relatedProducts.filter((p) => p.id !== product.id).length > 0 && (
           <div className="space-y-8 pt-4">
             <h2 className="text-2xl sm:text-3xl font-extrabold uppercase text-center text-slate-900 dark:text-white">
-              Có Thể Bạn Cũng Thích
+              {t('product.relatedProducts')}
             </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
               {relatedProducts

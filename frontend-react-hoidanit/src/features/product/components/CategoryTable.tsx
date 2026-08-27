@@ -1,4 +1,4 @@
-import { Layers, Edit2, Trash2, FolderTree } from 'lucide-react';
+import { Layers, Edit2, Trash2, FolderTree, FolderPlus } from 'lucide-react';
 import { Badge, Button } from '@/shared/components/ui';
 import type { FlatCategory } from '../hooks/useCategories';
 
@@ -7,6 +7,7 @@ export interface CategoryTableProps {
   isLoading: boolean;
   onEdit: (category: FlatCategory) => void;
   onDelete: (category: FlatCategory) => void;
+  onAddChild: (category: FlatCategory) => void;
 }
 
 export const CategoryTable = ({
@@ -14,6 +15,7 @@ export const CategoryTable = ({
   isLoading,
   onEdit,
   onDelete,
+  onAddChild,
 }: CategoryTableProps) => {
   if (isLoading) {
     return (
@@ -43,7 +45,7 @@ export const CategoryTable = ({
   if (categories.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-sm">
-        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <FolderTree className="w-8 h-8" />
         </div>
         <h3 className="text-base font-semibold text-slate-900 dark:text-white">
@@ -90,7 +92,7 @@ export const CategoryTable = ({
                         className="w-9 h-9 rounded-xl object-cover shrink-0"
                       />
                     ) : (
-                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-indigo-50 text-indigo-600 dark:bg-indigo-950/50 dark:text-indigo-400 shrink-0">
+                      <div className="w-9 h-9 rounded-xl flex items-center justify-center bg-brand-50 text-brand-600 dark:bg-brand-950/50 dark:text-brand-400 shrink-0">
                         <Layers className="w-4 h-4" />
                       </div>
                     )}
@@ -115,6 +117,18 @@ export const CategoryTable = ({
                 </td>
                 <td className="py-4 px-6 text-right">
                   <div className="flex items-center justify-end gap-1.5">
+                    {!category.parentId && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onAddChild(category)}
+                        title="Thêm phân loại nhỏ"
+                        className="text-brand-600 hover:bg-brand-50 hover:text-brand-700 dark:text-brand-400 dark:hover:bg-brand-950/50"
+                        leftIcon={<FolderPlus className="w-4 h-4" />}
+                      >
+                        Thêm Con
+                      </Button>
+                    )}
                     <Button
                       variant="ghost"
                       size="sm"

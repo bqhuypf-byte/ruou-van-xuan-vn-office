@@ -1,0 +1,95 @@
+<!-- @dsCard group="Storefront" viewport="1280x760" name="Storefront" subtitle="Homepage, Product Detail, Cart — click-through" -->
+<!doctype html><html><head><meta charset="utf-8"><title>Rượu Vạn Xuân — Storefront</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0}</style>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" src="shared.jsx"></script>
+<script type="text/babel" src="HomePage.jsx"></script>
+<script type="text/babel" src="ProductViewPage.jsx"></script>
+<script type="text/babel" src="CartPage.jsx"></script>
+<script type="text/babel">
+function App() {
+  const { CartBadge, CategoryNavMenu, UserMenu, Input, Button } = window.VNXuNDesignSystem_8cbe37;
+  const [route, setRoute] = React.useState('home');
+  const [signedIn, setSignedIn] = React.useState(true);
+  const [cartCount] = React.useState(3);
+  React.useEffect(() => { lucide.createIcons(); }, [route]);
+
+  const tree = [{ id: 1, name: 'Rượu Vang', href: '#', children: [{ id: 2, name: 'Vang Đỏ', href: '#' }, { id: 3, name: 'Vang Trắng', href: '#' }] }, { id: 4, name: 'Rượu Ngâm', href: '#' }, { id: 5, name: 'Rượu Nhập Khẩu', href: '#' }];
+
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <div style={{ display: 'none' }} className="topbar-md">
+        <div style={{ background: 'var(--surface-alt)', fontSize: 'var(--text-xs)', color: 'var(--muted)' }}>
+          <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 var(--container-px)', height: 42, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+            <span>Chào mừng đến với Rượu Vạn Xuân!</span>
+            <div style={{ display: 'flex', gap: 20 }}><span>Giao đến 700000</span><span>Theo dõi đơn hàng</span></div>
+          </div>
+        </div>
+      </div>
+      <header style={{ position: 'sticky', top: 0, zIndex: 30, background: 'var(--surface)', borderBottom: '1px solid var(--border)', boxShadow: 'var(--shadow-xs)' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '0 var(--container-px)', height: 80, display: 'flex', alignItems: 'center', gap: 16 }}>
+          <a href="#" onClick={(e) => { e.preventDefault(); setRoute('home'); }} style={{ display: 'flex', alignItems: 'center', gap: 10, fontWeight: 800, fontSize: 'var(--text-lg)', color: 'var(--ink)', flexShrink: 0 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-xl)', background: 'var(--brand)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13 }}>VX</div>
+            Rượu Vạn Xuân
+          </a>
+          <div style={{ flex: 1, maxWidth: 480 }}>
+            <Input placeholder="Tìm rượu vang, rượu ngâm, quà tặng..." leftIcon={<i data-lucide="search" style={{ width: 16, height: 16 }}></i>} style={{ borderRadius: 'var(--radius-full)', background: 'var(--surface-alt)', border: '1px solid transparent' }} />
+          </div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto' }}>
+            <CartBadge itemCount={cartCount} icon={<i data-lucide="shopping-cart" style={{ width: 20, height: 20 }}></i>} href="#" linkComponent={({ children, ...p }) => <a {...p} onClick={(e) => { e.preventDefault(); setRoute('cart'); }}>{children}</a>} />
+            {signedIn ? (
+              <UserMenu user={{ fullName: 'Nguyễn Văn A', email: 'a@vanxuan.vn' }} isAdmin onLogout={() => setSignedIn(false)} />
+            ) : (
+              <Button size="md" style={{ marginLeft: 8 }} leftIcon={<i data-lucide="log-in" style={{ width: 16, height: 16 }}></i>} onClick={() => setSignedIn(true)}>Đăng Nhập</Button>
+            )}
+          </div>
+        </div>
+        <div style={{ borderTop: '1px solid var(--slate-100)' }}>
+          <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '8px var(--container-px)' }}>
+            <CategoryNavMenu tree={tree} icon={<i data-lucide="menu" style={{ width: 16, height: 16 }}></i>} />
+          </div>
+        </div>
+      </header>
+
+      <main style={{ flex: 1 }}>
+        {route === 'home' && <window.HomePage nav={setRoute} />}
+        {route === 'product' && <window.ProductViewPage />}
+        {route === 'cart' && <window.CartPage />}
+      </main>
+
+      <div style={{ display: 'flex', justifyContent: 'center', gap: 8, padding: '12px 0', background: 'var(--surface-alt)', borderTop: '1px solid var(--border)' }}>
+        {[['home', 'Trang Chủ'], ['product', 'Chi Tiết Sản Phẩm'], ['cart', 'Giỏ Hàng']].map(([k, l]) => (
+          <button key={k} onClick={() => setRoute(k)} style={{ padding: '6px 14px', borderRadius: 'var(--radius-full)', border: 'none', cursor: 'pointer', fontSize: 12, fontWeight: 600, background: route === k ? 'var(--brand)' : 'var(--surface)', color: route === k ? '#fff' : 'var(--muted)', boxShadow: 'var(--shadow-sm)' }}>{l}</button>
+        ))}
+      </div>
+
+      <div style={{ background: 'var(--surface-inverse)' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '32px var(--container-px)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 16 }}>
+          <h2 style={{ margin: 0, fontSize: 'var(--text-xl)', fontWeight: 700, color: '#fff' }}>Đừng bỏ lỡ các ưu đãi rượu vang mới nhất</h2>
+          <Button size="lg" style={{ borderRadius: 'var(--radius-full)', padding: '10px 32px' }}>Xem Ưu Đãi</Button>
+        </div>
+      </div>
+      <footer style={{ background: 'var(--surface-inverse)', color: '#fff', borderTop: '1px solid rgba(255,255,255,.1)' }}>
+        <div style={{ maxWidth: 'var(--container-max)', margin: '0 auto', padding: '48px var(--container-px)', display: 'grid', gridTemplateColumns: '2fr 1fr 1fr', gap: 40 }}>
+          <div>
+            <div style={{ fontWeight: 800, fontSize: 'var(--text-lg)' }}>Rượu Vạn Xuân</div>
+            <p style={{ fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,.7)', maxWidth: 320, marginTop: 12 }}>Chuyên rượu truyền thống Việt Nam, rượu ngâm và rượu vang nhập khẩu.</p>
+          </div>
+          <div><h3 style={{ fontSize: 'var(--text-sm)', margin: 0 }}>Danh Mục Phổ Biến</h3><ul style={{ listStyle: 'none', padding: 0, marginTop: 16, fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,.7)', display: 'flex', flexDirection: 'column', gap: 10 }}><li>Rượu Vang</li><li>Rượu Ngâm</li></ul></div>
+          <div><h3 style={{ fontSize: 'var(--text-sm)', margin: 0 }}>Chăm Sóc Khách Hàng</h3><ul style={{ listStyle: 'none', padding: 0, marginTop: 16, fontSize: 'var(--text-sm)', color: 'rgba(255,255,255,.7)', display: 'flex', flexDirection: 'column', gap: 10 }}><li>Chính Sách Đổi Trả</li><li>Hướng Dẫn Mua Hàng</li></ul></div>
+        </div>
+        <div style={{ borderTop: '1px solid rgba(255,255,255,.15)', textAlign: 'center', padding: 16, fontSize: 'var(--text-xs)', color: 'rgba(255,255,255,.7)' }}>© 2026 Rượu Vạn Xuân. All rights reserved.</div>
+      </footer>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body></html>

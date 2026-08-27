@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { AlertCircle, ShoppingCart, Trash2, ArrowRight } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
+import { AlertCircle, ShoppingCart, Trash2, ArrowRight, Truck } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { formatPrice } from '@/shared/utils/formatPrice';
+import { useSiteSettings } from '@/features/home';
 import { ROUTES } from '@/routes/routes';
 import { CartItemRow } from '../components/CartItemRow';
 import { useCart } from '../hooks/useCart';
@@ -14,12 +16,17 @@ import {
 } from '../hooks/useCartMutations';
 
 export const CartPage = () => {
+  const { t } = useTranslation();
   const { items, itemCount, subtotal, isLoading, isError, error, refetch } = useCart();
+  const { data: settings } = useSiteSettings();
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveCartItem();
   const clearCart = useClearCart();
   const [feedback, setFeedback] = useState<string | null>(null);
   const [busyItemId, setBusyItemId] = useState<number | null>(null);
+
+  const freeShippingThreshold = Number(settings?.freeShippingThreshold ?? 0);
+  const amountToFreeShipping = freeShippingThreshold - subtotal;
 
   const handleQuantityChange = async (itemId: number, quantity: number) => {
     setFeedback(null);
@@ -27,7 +34,7 @@ export const CartPage = () => {
     try {
       await updateItem.mutateAsync({ id: itemId, input: { quantity } });
     } catch (err) {
-      setFeedback(getApiErrorMessage(err, 'Không thể cập nhật số lượng.'));
+      setFeedback(getApiErrorMessage(err, t('cart.updateQtyError')));
     } finally {
       setBusyItemId(null);
     }
@@ -39,7 +46,7 @@ export const CartPage = () => {
     try {
       await removeItem.mutateAsync(itemId);
     } catch (err) {
-      setFeedback(getApiErrorMessage(err, 'Không thể xóa sản phẩm.'));
+      setFeedback(getApiErrorMessage(err, t('cart.removeError')));
     } finally {
       setBusyItemId(null);
     }
@@ -50,7 +57,7 @@ export const CartPage = () => {
     try {
       await clearCart.mutateAsync();
     } catch (err) {
-      setFeedback(getApiErrorMessage(err, 'Không thể xóa giỏ hàng.'));
+      setFeedback(getApiErrorMessage(err, t('cart.clearError')));
     }
   };
 
@@ -59,7 +66,7 @@ export const CartPage = () => {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Giỏ Hàng Của Bạn
+            {t('cart.title')}
           </h1>
           {items.length > 0 && (
             <Button
@@ -69,7 +76,7 @@ export const CartPage = () => {
               isLoading={clearCart.isPending}
               leftIcon={<Trash2 className="w-4 h-4" />}
             >
-              Xóa Tất Cả
+              {t('cart.clearAll')}
             </Button>
           )}
         </div>
@@ -86,11 +93,13 @@ export const CartPage = () => {
             <div className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5" />
               <span>
-                Không thể tải giỏ hàng ({error instanceof Error ? error.message : 'Lỗi kết nối'}).
+                {t('cart.loadError', {
+                  reason: error instanceof Error ? error.message : t('common.connectionError'),
+                })}
               </span>
             </div>
             <Button variant="outline" size="sm" onClick={() => refetch()}>
-              Thử Lại
+              {t('common.tryAgain')}
             </Button>
           </div>
         )}
@@ -102,17 +111,19 @@ export const CartPage = () => {
           </div>
         ) : items.length === 0 ? (
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-16 text-center shadow-sm">
-            <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
               <ShoppingCart className="w-8 h-8" />
             </div>
             <h3 className="text-base font-semibold text-slate-900 dark:text-white">
-              Giỏ hàng của bạn đang trống
+              {t('cart.emptyTitle')}
             </h3>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Hãy khám phá sản phẩm và thêm vào giỏ hàng.
+              {t('cart.emptySubtitle')}
             </p>
             <Link to={ROUTES.HOME}>
-              <Button rightIcon={<ArrowRight className="w-4 h-4" />}>Tiếp Tục Mua Sắm</Button>
+              <Button rightIcon={<ArrowRight className="w-4 h-4" />}>
+                {t('common.continueShopping')}
+              </Button>
             </Link>
           </div>
         ) : (
@@ -131,18 +142,28 @@ export const CartPage = () => {
             </div>
 
             <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm h-fit space-y-4">
-              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">Tóm Tắt Đơn Hàng</h2>
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-white">
+                {t('cart.orderSummary')}
+              </h2>
               <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
-                <span>Số lượng sản phẩm</span>
+                <span>{t('cart.itemCount')}</span>
                 <span>{itemCount}</span>
               </div>
               <div className="flex justify-between text-base font-semibold text-slate-900 dark:text-white pt-3 border-t border-slate-100 dark:border-slate-800">
-                <span>Tạm tính</span>
+                <span>{t('cart.subtotal')}</span>
                 <span>{formatPrice(subtotal)}</span>
               </div>
-              <Button className="w-full" disabled title="Chức năng thanh toán sẽ sớm ra mắt">
-                Thanh Toán (Sắp Ra Mắt)
-              </Button>
+              {freeShippingThreshold > 0 && amountToFreeShipping > 0 && (
+                <div className="flex items-start gap-2 text-xs text-brand-700 bg-brand-50 dark:bg-brand-950/30 dark:text-brand-300 rounded-lg p-3">
+                  <Truck className="w-4 h-4 shrink-0 mt-0.5" />
+                  <span>
+                    {t('cart.freeShippingNotice', { amount: formatPrice(amountToFreeShipping) })}
+                  </span>
+                </div>
+              )}
+              <Link to={ROUTES.CHECKOUT}>
+                <Button className="w-full">{t('cart.proceedToCheckout')}</Button>
+              </Link>
             </div>
           </div>
         )}

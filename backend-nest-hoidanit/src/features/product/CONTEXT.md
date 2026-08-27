@@ -2,8 +2,8 @@
 
 Full "Complex Feature" layout per BE-ARCHITECTURE.md — one `product.module.ts`, one controller/service/repository per entity:
 - `categories`: `id`, `parent_id` (self-ref, nullable), `name`, `slug` (unique)
-- `products`: `id`, `category_id` (FK), `name`, `slug` (unique), `description` (nullable), `thumbnail_url` (nullable), `is_active`, `created_at`, `updated_at`
-- `product_variants`: `id`, `product_id` (FK), `sku` (unique), `color`/`size` (nullable), `price`, `sale_price` (nullable), `stock_quantity`
+- `products`: `id`, `category_id` (FK), `name`, `slug` (unique), `description` (nullable), `thumbnail_url` (nullable), `is_active`, `variant_attributes` (JSON, nullable — up to 2 Shopee-style "Phân loại" groups, each `{ name: string; values: string[]; images?: Record<string,string> }`, e.g. `[{ name: "Dung Tích", values: ["500ml", "1000ml"], images: { "500ml": "https://..." } }]`; the admin picks the group name, enumerates every option value, and (for the first group) an optional per-value thumbnail — all set from the product edit form; the FE auto-generates the variant combination matrix and uses these thumbnails as each row's image), `created_at`, `updated_at`
+- `product_variants`: `id`, `product_id` (FK), `sku` (unique), `attributes` (JSON key-value, nullable — one entry per group, e.g. `{ "Dung Tích": "500ml" }`; keys match a name in the owning product's `variant_attributes`, values must be one of that group's `values`), `price`, `sale_price` (nullable), `stock_quantity`
 - `product_images`: `id`, `product_id` (FK), `image_url`, `sort_order`
 
 All per `01-share-docs/DATABASE.md`.

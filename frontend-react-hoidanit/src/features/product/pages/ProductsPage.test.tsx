@@ -9,6 +9,7 @@ import {
   useCreateProduct,
   useUpdateProduct,
   useDeleteProduct,
+  useHardDeleteProduct,
 } from '../hooks/useProductMutations';
 import type { Product } from '../types/product.types';
 import type { FlatCategory } from '../hooks/useCategories';
@@ -30,10 +31,10 @@ const mockCategories: FlatCategory[] = [
     slug: 'phones',
     description: null,
     thumbnailUrl: null,
-    showInTopCategories: false,
-    showInDailyEssentials: false,
+    showInProductSections: true,
+    homeSectionTitle: null,
     homeSortOrder: 0,
-    depth: 0,
+    homeDisplayStyle: 'grid' as const,    depth: 0,
     parentName: null,
   },
 ];
@@ -82,6 +83,9 @@ describe('ProductsPage', () => {
     vi.mocked(useDeleteProduct).mockReturnValue(
       baseMutation() as unknown as ReturnType<typeof useDeleteProduct>,
     );
+    vi.mocked(useHardDeleteProduct).mockReturnValue(
+      baseMutation() as unknown as ReturnType<typeof useHardDeleteProduct>,
+    );
   });
 
   it('renders the page title and product rows', () => {
@@ -122,7 +126,7 @@ describe('ProductsPage', () => {
     const user = userEvent.setup();
     renderPage();
 
-    await user.click(screen.getAllByTitle('Xóa')[0]);
+    await user.click(screen.getAllByTitle('Ngừng bán')[0]);
     await user.click(screen.getByRole('button', { name: 'Ngừng Bán' }));
 
     await waitFor(() => expect(mutateAsync).toHaveBeenCalledWith(1));
@@ -131,12 +135,10 @@ describe('ProductsPage', () => {
     ).toBeInTheDocument();
   });
 
-  it('opens the edit modal prefilled with the selected product', async () => {
-    const user = userEvent.setup();
+  it('links "Sửa" to the product detail page (info, variants, and images are edited there)', () => {
     renderPage();
 
-    await user.click(screen.getAllByTitle('Chỉnh sửa')[1]);
-
-    expect(screen.getByLabelText(/Tên sản phẩm/i)).toHaveValue('iPhone 14');
+    const editLinks = screen.getAllByRole('link', { name: /Sửa/i });
+    expect(editLinks[1]).toHaveAttribute('href', '/admin/products/iphone-14');
   });
 });

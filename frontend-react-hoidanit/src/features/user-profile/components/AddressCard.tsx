@@ -20,7 +20,7 @@ export const AddressCard = ({
   <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm">
     <div className="flex items-start justify-between gap-4">
       <div className="flex items-start gap-3 min-w-0">
-        <div className="w-9 h-9 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0">
           <MapPin className="w-4 h-4" />
         </div>
         <div className="min-w-0">

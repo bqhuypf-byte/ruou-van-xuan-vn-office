@@ -38,3 +38,14 @@ export const useDeleteProduct = () => {
     },
   });
 };
+
+export const useHardDeleteProduct = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: (id: number) => productService.deleteProductPermanently(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: PRODUCT_QUERY_KEY });
+    },
+  });
+};

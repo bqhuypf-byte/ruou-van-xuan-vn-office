@@ -1,5 +1,5 @@
 import { DataSource } from 'typeorm';
-import { faker } from '@faker-js/faker';
+import { fakerVI as faker } from '@faker-js/faker';
 import * as bcrypt from 'bcrypt';
 import { Role } from '../../features/roles/entities/role.entity';
 import { User } from '../../features/users/entities/user.entity';
@@ -58,7 +58,7 @@ export async function seedUsers(dataSource: DataSource, count = 20) {
         roleId: customerRole.id,
         email: faker.internet.email().toLowerCase(),
         passwordHash,
-        fullName: faker.person.fullName(),
+        fullName: `${faker.person.lastName()} ${faker.person.firstName()}`,
         phone: fakePhone(),
         isActive: true,
       }),

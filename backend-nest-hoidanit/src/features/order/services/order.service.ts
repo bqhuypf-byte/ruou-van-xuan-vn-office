@@ -89,4 +89,9 @@ export class OrderService {
     const saved = await this.orderRepository.save(order);
     return this.attachItems(saved);
   }
+
+  async removeManyAdmin(ids: number[]): Promise<void> {
+    await this.orderItemRepository.removeByOrderIds(ids);
+    await this.orderRepository.removeByIds(ids);
+  }
 }

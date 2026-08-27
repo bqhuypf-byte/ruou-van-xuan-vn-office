@@ -1,11 +1,13 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { useTranslation } from 'react-i18next';
 import { ChevronDown, ClipboardList, LogOut, MapPin, SlidersHorizontal } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
 import { useClickOutside } from '@/shared/hooks/useClickOutside';
 import { ROUTES } from '@/routes/routes';
 
 export const UserMenu = () => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
@@ -31,7 +33,7 @@ export const UserMenu = () => {
         onClick={() => setIsOpen((open) => !open)}
         className="flex items-center gap-2 pl-2 ml-1 py-1.5 pr-2 rounded-full border-l border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-indigo-600 text-white flex items-center justify-center text-sm font-semibold shrink-0">
+        <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-semibold shrink-0">
           {initial}
         </div>
         <span className="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -43,48 +45,48 @@ export const UserMenu = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-slate-900 border border-slate-800 shadow-xl overflow-hidden z-50">
-          <div className="p-4 border-b border-slate-800">
-            <p className="font-semibold text-white">{user.fullName}</p>
-            <p className="text-xs text-slate-400 truncate">{user.email}</p>
+        <div className="absolute right-0 mt-2 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden z-50">
+          <div className="p-4 border-b border-slate-100 dark:border-slate-800">
+            <p className="font-semibold text-slate-900 dark:text-white">{user.fullName}</p>
+            <p className="text-xs text-slate-500 dark:text-slate-400 truncate">{user.email}</p>
           </div>
 
           <nav className="p-2">
             <Link
               to={ROUTES.PROFILE}
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               <MapPin className="w-4 h-4 shrink-0" />
-              Địa Chỉ Của Tôi
+              {t('userMenu.myAddresses')}
             </Link>
             <Link
               to={ROUTES.ORDERS}
               onClick={() => setIsOpen(false)}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
             >
               <ClipboardList className="w-4 h-4 shrink-0" />
-              Đơn Hàng Của Tôi
+              {t('userMenu.myOrders')}
             </Link>
             {isAdmin && (
               <Link
                 to={ROUTES.ADMIN_ROLES}
                 onClick={() => setIsOpen(false)}
-                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+                className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
               >
                 <SlidersHorizontal className="w-4 h-4 shrink-0" />
-                Trang Quản Trị
+                {t('userMenu.adminPanel')}
               </Link>
             )}
           </nav>
 
-          <div className="border-t border-slate-800 p-2">
+          <div className="border-t border-slate-100 dark:border-slate-800 p-2">
             <button
               onClick={handleLogout}
-              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-rose-400 hover:bg-rose-950/40 transition-colors"
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/40 transition-colors"
             >
               <LogOut className="w-4 h-4 shrink-0" />
-              Đăng Xuất
+              {t('userMenu.logout')}
             </button>
           </div>
         </div>

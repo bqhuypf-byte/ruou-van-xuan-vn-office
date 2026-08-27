@@ -60,4 +60,8 @@ export const productService = {
   deleteProduct: async (id: number): Promise<void> => {
     await axiosInstance.delete(`/admin/products/${id}`);
   },
+
+  deleteProductPermanently: async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/admin/products/${id}/permanent`);
+  },
 };

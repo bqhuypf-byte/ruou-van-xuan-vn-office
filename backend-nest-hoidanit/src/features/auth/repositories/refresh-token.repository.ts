@@ -28,7 +28,10 @@ export class RefreshTokenRepository {
   }
 
   async revokeAllForUser(userId: number): Promise<void> {
-    await this.repository.update({ userId, isRevoked: false }, { isRevoked: true });
+    await this.repository.update(
+      { userId, isRevoked: false },
+      { isRevoked: true },
+    );
   }
 
   async deleteExpired(): Promise<void> {

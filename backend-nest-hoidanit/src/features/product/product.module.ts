@@ -10,14 +10,22 @@ import { CategoryRepository } from './repositories/category.repository';
 import { ProductRepository } from './repositories/product.repository';
 import { ProductVariantRepository } from './repositories/product-variant.repository';
 import { ProductImageRepository } from './repositories/product-image.repository';
+import { ProductRatingRepository } from './repositories/product-rating.repository';
 import { Category } from './entities/category.entity';
 import { Product } from './entities/product.entity';
 import { ProductVariant } from './entities/product-variant.entity';
 import { ProductImage } from './entities/product-image.entity';
+import { Review } from '../review/entities/review.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Category, Product, ProductVariant, ProductImage]),
+    TypeOrmModule.forFeature([
+      Category,
+      Product,
+      ProductVariant,
+      ProductImage,
+      Review,
+    ]),
   ],
   controllers: [
     CategoryController,
@@ -32,6 +40,7 @@ import { ProductImage } from './entities/product-image.entity';
     ProductRepository,
     ProductVariantRepository,
     ProductImageRepository,
+    ProductRatingRepository,
   ],
   exports: [CategoryService, ProductService, ProductVariantService],
 })

@@ -2,16 +2,26 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
+import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn({ type: 'bigint' })
+  @PrimaryColumn({
+    type: 'bigint',
+    generated: 'increment',
+    transformer: bigintTransformer,
+  })
   id: number;
 
-  @Column({ type: 'bigint', name: 'role_id', nullable: true })
+  @Column({
+    type: 'bigint',
+    name: 'role_id',
+    nullable: true,
+    transformer: bigintTransformer,
+  })
   roleId: number | null;
 
   @Column({ type: 'varchar', length: 255, unique: true })

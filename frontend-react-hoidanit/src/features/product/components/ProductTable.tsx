@@ -1,5 +1,6 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
-import { Package, Edit2, Trash2, Settings2, ImageOff } from 'lucide-react';
+import { Package, Edit2, Trash2, ImageOff, X, XOctagon } from 'lucide-react';
 import { Badge, Button } from '@/shared/components/ui';
 import type { Product } from '../types/product.types';
 import type { FlatCategory } from '../hooks/useCategories';
@@ -9,19 +10,31 @@ export interface ProductTableProps {
   products: Product[];
   categories: FlatCategory[];
   isLoading: boolean;
-  onEdit: (product: Product) => void;
   onDelete: (product: Product) => void;
+  onHardDelete: (product: Product) => void;
+  onChangeCategory: (product: Product, newCategoryId: number) => void;
+  selectedIds: Set<number>;
+  onToggleSelect: (id: number) => void;
+  onToggleSelectAll: () => void;
+  startIndex?: number;
 }
 
 export const ProductTable = ({
   products,
   categories,
   isLoading,
-  onEdit,
   onDelete,
+  onHardDelete,
+  onChangeCategory,
+  selectedIds,
+  onToggleSelect,
+  onToggleSelectAll,
+  startIndex = 0,
 }: ProductTableProps) => {
+  const [reassigningId, setReassigningId] = useState<number | null>(null);
   const categoryName = (categoryId: number) =>
     categories.find((c) => c.id === categoryId)?.name ?? `#${categoryId}`;
+  const allSelected = products.length > 0 && products.every((p) => selectedIds.has(p.id));
 
   if (isLoading) {
     return (
@@ -51,7 +64,7 @@ export const ProductTable = ({
   if (products.length === 0) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-12 text-center shadow-sm">
-        <div className="w-16 h-16 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="w-16 h-16 bg-brand-50 dark:bg-brand-950/50 text-brand-600 dark:text-brand-400 rounded-2xl flex items-center justify-center mx-auto mb-4">
           <Package className="w-8 h-8" />
         </div>
         <h3 className="text-base font-semibold text-slate-900 dark:text-white">
@@ -70,7 +83,16 @@ export const ProductTable = ({
         <table className="w-full text-left text-sm border-collapse">
           <thead>
             <tr className="bg-slate-50/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
-              <th className="py-3.5 px-6">ID</th>
+              <th className="py-3.5 px-6 w-10">
+                <input
+                  type="checkbox"
+                  className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+                  checked={allSelected}
+                  onChange={onToggleSelectAll}
+                  aria-label="Chọn tất cả"
+                />
+              </th>
+              <th className="py-3.5 px-6">STT</th>
               <th className="py-3.5 px-6">Sản Phẩm</th>
               <th className="py-3.5 px-6">Danh Mục</th>
               <th className="py-3.5 px-6">Trạng Thái</th>
@@ -78,13 +100,24 @@ export const ProductTable = ({
             </tr>
           </thead>
           <tbody className="divide-y divide-slate-100 dark:divide-slate-800">
-            {products.map((product) => (
+            {products.map((product, index) => (
               <tr
                 key={product.id}
-                className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
+                className={`hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${
+                  selectedIds.has(product.id) ? 'bg-brand-50/60 dark:bg-brand-950/20' : ''
+                }`}
               >
+                <td className="py-4 px-6">
+                  <input
+                    type="checkbox"
+                    className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+                    checked={selectedIds.has(product.id)}
+                    onChange={() => onToggleSelect(product.id)}
+                    aria-label={`Chọn sản phẩm ${product.name}`}
+                  />
+                </td>
                 <td className="py-4 px-6 font-mono text-xs text-slate-500 dark:text-slate-400">
-                  #{product.id}
+                  {startIndex + index + 1}
                 </td>
                 <td className="py-4 px-6">
                   <div className="flex items-center gap-3">
@@ -110,9 +143,44 @@ export const ProductTable = ({
                   </div>
                 </td>
                 <td className="py-4 px-6">
-                  <Badge variant="primary" size="sm">
-                    {categoryName(product.categoryId)}
-                  </Badge>
+                  {reassigningId === product.id ? (
+                    <select
+                      autoFocus
+                      className="rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-xs py-1.5 px-2 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
+                      defaultValue=""
+                      onBlur={() => setReassigningId(null)}
+                      onChange={(e) => {
+                        const newCategoryId = Number(e.target.value);
+                        if (newCategoryId) onChangeCategory(product, newCategoryId);
+                        setReassigningId(null);
+                      }}
+                    >
+                      <option value="" disabled>
+                        Chọn danh mục khác...
+                      </option>
+                      {categories
+                        .filter((c) => c.id !== product.categoryId)
+                        .map((c) => (
+                          <option key={c.id} value={c.id}>
+                            {'—'.repeat(c.depth)} {c.name}
+                          </option>
+                        ))}
+                    </select>
+                  ) : (
+                    <Badge variant="primary" size="sm">
+                      <span className="inline-flex items-center gap-1">
+                        {categoryName(product.categoryId)}
+                        <button
+                          type="button"
+                          onClick={() => setReassigningId(product.id)}
+                          title="Gỡ khỏi danh mục này (chọn danh mục khác)"
+                          className="hover:text-rose-600 dark:hover:text-rose-400"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    </Badge>
+                  )}
                 </td>
                 <td className="py-4 px-6">
                   {product.isActive ? (
@@ -131,31 +199,34 @@ export const ProductTable = ({
                       <Button
                         variant="ghost"
                         size="sm"
-                        title="Quản lý biến thể & hình ảnh"
-                        leftIcon={<Settings2 className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
+                        title="Sửa thông tin, phân loại, giá, tồn kho và hình ảnh"
+                        leftIcon={<Edit2 className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
                       >
-                        Quản Lý
+                        Sửa
                       </Button>
                     </Link>
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onEdit(product)}
-                      title="Chỉnh sửa"
-                      leftIcon={<Edit2 className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
-                    >
-                      Sửa
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
                       onClick={() => onDelete(product)}
-                      title="Xóa"
+                      title="Ngừng bán"
                       className="text-rose-600 hover:bg-rose-50 hover:text-rose-700 dark:text-rose-400 dark:hover:bg-rose-950/50"
                       leftIcon={<Trash2 className="w-4 h-4" />}
                     >
                       Xóa
                     </Button>
+                    {!product.isActive && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onHardDelete(product)}
+                        title="Xóa vĩnh viễn"
+                        className="text-rose-700 hover:bg-rose-100 hover:text-rose-800 dark:text-rose-300 dark:hover:bg-rose-950/70"
+                        leftIcon={<XOctagon className="w-4 h-4" />}
+                      >
+                        Xóa Vĩnh Viễn
+                      </Button>
+                    )}
                   </div>
                 </td>
               </tr>

@@ -21,10 +21,10 @@ const mockCategory: Category = {
   slug: 'electronics',
   description: null,
   thumbnailUrl: null,
-  showInTopCategories: false,
-  showInDailyEssentials: false,
+  showInProductSections: true,
+  homeSectionTitle: null,
   homeSortOrder: 0,
-  children: [],
+  homeDisplayStyle: 'grid' as const,  children: [],
 };
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
