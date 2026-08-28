@@ -405,6 +405,7 @@ export const ProductsPage = () => {
       )}
 
       <ProductFormModal
+        key={String(isFormOpen)}
         isOpen={isFormOpen}
         onClose={() => setIsFormOpen(false)}
         onSubmit={handleSaveForm}

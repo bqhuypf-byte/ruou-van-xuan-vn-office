@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Modal } from '@/shared/components/ui';
@@ -33,7 +32,6 @@ export const ProductFormModal = ({
     register,
     control,
     handleSubmit,
-    reset,
     setValue,
     watch,
     formState: { errors },
@@ -43,12 +41,6 @@ export const ProductFormModal = ({
   });
 
   const hasGroup2 = watch('hasGroup2');
-
-  useEffect(() => {
-    if (isOpen) {
-      reset(emptyProductFormValues());
-    }
-  }, [isOpen, reset]);
 
   const handleFormSubmit = async (data: ProductFormData) => {
     await onSubmit(buildProductSubmitPayload(data));
