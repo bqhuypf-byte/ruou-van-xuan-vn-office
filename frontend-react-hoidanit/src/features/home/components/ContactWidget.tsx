@@ -132,12 +132,16 @@ export const ContactWidget = ({ channels }: ContactWidgetProps) => {
         <button
           onClick={() => setIsOpen((open) => !open)}
           aria-label={t('contactWidget.toggle')}
-          className={`relative flex items-center gap-2 pl-4 pr-5 h-14 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-xl transition-colors ${
+          className={`relative flex items-center justify-center gap-2 w-14 h-14 sm:w-auto sm:justify-start sm:pl-4 sm:pr-5 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-xl transition-colors ${
             isOpen ? '' : 'contact-widget-shake'
           }`}
         >
           {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6 shrink-0" />}
-          {!isOpen && <span className="font-semibold whitespace-nowrap">{t('contactWidget.toggle')}</span>}
+          {!isOpen && (
+            <span className="hidden sm:inline font-semibold whitespace-nowrap">
+              {t('contactWidget.toggle')}
+            </span>
+          )}
         </button>
       </div>
     </div>

@@ -9,10 +9,10 @@ export const VoucherFloatingButton = ({ onClick }: VoucherFloatingButtonProps) =
     <button
       onClick={onClick}
       aria-label="Tất Cả Ưu Đãi"
-      className="flex items-center gap-2 pl-4 pr-5 h-14 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-xl transition-colors"
+      className="flex items-center justify-center gap-2 w-14 h-14 sm:w-auto sm:justify-start sm:pl-4 sm:pr-5 rounded-full bg-rose-600 hover:bg-rose-700 text-white shadow-xl transition-colors"
     >
       <Ticket className="w-6 h-6 shrink-0" />
-      <span className="font-semibold whitespace-nowrap">Ưu Đãi</span>
+      <span className="hidden sm:inline font-semibold whitespace-nowrap">Ưu Đãi</span>
     </button>
   </div>
 );
