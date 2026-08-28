@@ -191,23 +191,8 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
           {/* Gallery */}
-          <div className="flex gap-3">
-            {gallery.length > 1 && (
-              <div className="flex flex-col gap-3 shrink-0">
-                {gallery.map((url) => (
-                  <button
-                    key={url}
-                    onClick={() => setActiveImage(url)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 bg-slate-100 dark:bg-slate-800 transition-colors duration-200 ${
-                      activeImage === url ? 'border-brand-600' : 'border-transparent'
-                    }`}
-                  >
-                    <img src={url} alt="" className="w-full h-full object-contain" />
-                  </button>
-                ))}
-              </div>
-            )}
-            <div className="flex-1 aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
+          <div className="flex flex-col gap-3">
+            <div className="aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
               {activeImage ? (
                 <img src={activeImage} alt={product.name} className="w-full h-full object-contain" />
               ) : (
@@ -219,6 +204,21 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 </div>
               )}
             </div>
+            {gallery.length > 1 && (
+              <div className="flex gap-3 overflow-x-auto">
+                {gallery.map((url) => (
+                  <button
+                    key={url}
+                    onClick={() => setActiveImage(url)}
+                    className={`w-16 h-16 sm:w-20 sm:h-20 shrink-0 rounded-xl overflow-hidden border-2 bg-slate-100 dark:bg-slate-800 transition-colors duration-200 ${
+                      activeImage === url ? 'border-brand-600' : 'border-transparent'
+                    }`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-contain" />
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
 
           {/* Info */}
