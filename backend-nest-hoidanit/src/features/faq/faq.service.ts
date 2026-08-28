@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { FaqRepository } from './repositories/faq.repository';
 import { CreateFaqDto } from './dto/create-faq.dto';
 import { UpdateFaqDto } from './dto/update-faq.dto';
@@ -26,7 +27,7 @@ export class FaqService {
     if (!faq) {
       throw new NotFoundException(`Faq #${id} not found`);
     }
-    Object.assign(faq, dto);
+    assignDefined(faq, dto);
     return this.faqRepository.save(faq);
   }
 

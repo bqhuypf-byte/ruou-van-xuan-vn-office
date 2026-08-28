@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { UserRepository } from './repositories/user.repository';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -70,7 +71,7 @@ export class UsersService {
       }
     }
 
-    Object.assign(user, dto);
+    assignDefined(user, dto);
     const saved = await this.userRepository.save(user);
     return this.sanitize(saved);
   }

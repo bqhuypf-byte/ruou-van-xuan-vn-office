@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { HomepageContentRepository } from './repositories/homepage-content.repository';
 import { UpdateHomepageContentDto } from './dto/update-homepage-content.dto';
 import {
@@ -48,7 +49,7 @@ export class HomepageContentService {
 
   async update(dto: UpdateHomepageContentDto): Promise<HomepageContent> {
     const content = await this.findOrCreate();
-    Object.assign(content, dto);
+    assignDefined(content, dto);
     return this.repository.save(content);
   }
 }

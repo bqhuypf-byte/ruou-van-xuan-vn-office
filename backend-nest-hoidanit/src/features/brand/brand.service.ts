@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { BrandRepository } from './repositories/brand.repository';
 import { CreateBrandDto } from './dto/create-brand.dto';
 import { UpdateBrandDto } from './dto/update-brand.dto';
@@ -26,7 +27,7 @@ export class BrandService {
     if (!brand) {
       throw new NotFoundException(`Brand #${id} not found`);
     }
-    Object.assign(brand, dto);
+    assignDefined(brand, dto);
     return this.brandRepository.save(brand);
   }
 

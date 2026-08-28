@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { RoleRepository } from './repositories/role.repository';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -45,7 +46,7 @@ export class RolesService {
         throw new ConflictException(`Role "${dto.name}" already exists`);
       }
     }
-    Object.assign(role, dto);
+    assignDefined(role, dto);
     return this.roleRepository.save(role);
   }
 

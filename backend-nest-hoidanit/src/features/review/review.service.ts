@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { ReviewRepository } from './repositories/review.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
@@ -105,7 +106,7 @@ export class ReviewService {
     dto: UpdateReviewDto,
   ): Promise<ReviewResponse> {
     const review = await this.findOwned(id, userId);
-    Object.assign(review, dto);
+    assignDefined(review, dto);
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);
   }

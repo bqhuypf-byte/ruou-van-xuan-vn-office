@@ -1,4 +1,5 @@
 import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { PageRepository } from './repositories/page.repository';
 import { CreatePageDto } from './dto/create-page.dto';
 import { UpdatePageDto } from './dto/update-page.dto';
@@ -45,7 +46,7 @@ export class PageService {
         throw new ConflictException(`Slug "${dto.slug}" đã được sử dụng`);
       }
     }
-    Object.assign(page, dto);
+    assignDefined(page, dto);
     return this.pageRepository.save(page);
   }
 

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { SiteSettingsRepository } from './repositories/site-settings.repository';
 import { UpdateSiteSettingsDto } from './dto/update-site-settings.dto';
 import {
@@ -101,7 +102,7 @@ export class SiteSettingsService {
 
   async update(dto: UpdateSiteSettingsDto): Promise<SiteSettings> {
     const settings = await this.findOrCreate();
-    Object.assign(settings, dto);
+    assignDefined(settings, dto);
     return this.repository.save(settings);
   }
 }

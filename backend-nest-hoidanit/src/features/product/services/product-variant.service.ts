@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { assignDefined } from '../../../shared/utils/assign-defined.util';
 import { ProductRepository } from '../repositories/product.repository';
 import { ProductVariantRepository } from '../repositories/product-variant.repository';
 import { CreateVariantDto } from '../dto/create-variant.dto';
@@ -58,7 +59,7 @@ export class ProductVariantService {
     }
 
     const { price, salePrice, ...rest } = dto;
-    Object.assign(variant, rest);
+    assignDefined(variant, rest);
     if (price !== undefined) {
       variant.price = price.toFixed(2);
     }

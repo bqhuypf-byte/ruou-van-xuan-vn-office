@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { BannerRepository } from './repositories/banner.repository';
 import { CreateBannerDto } from './dto/create-banner.dto';
 import { UpdateBannerDto } from './dto/update-banner.dto';
@@ -26,7 +27,7 @@ export class BannerService {
     if (!banner) {
       throw new NotFoundException(`Banner #${id} not found`);
     }
-    Object.assign(banner, dto);
+    assignDefined(banner, dto);
     return this.bannerRepository.save(banner);
   }
 

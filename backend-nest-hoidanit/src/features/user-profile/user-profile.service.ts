@@ -1,4 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { AddressRepository } from './repositories/address.repository';
 import { CreateAddressDto } from './dto/create-address.dto';
 import { UpdateAddressDto } from './dto/update-address.dto';
@@ -39,7 +40,7 @@ export class UserProfileService {
       await this.addressRepository.clearDefaultForUser(userId, id);
     }
 
-    Object.assign(address, dto);
+    assignDefined(address, dto);
     return this.addressRepository.save(address);
   }
 

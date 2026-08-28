@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DataSource } from 'typeorm';
+import { assignDefined } from '../../../shared/utils/assign-defined.util';
 import { CategoryRepository } from '../repositories/category.repository';
 import { ProductRepository } from '../repositories/product.repository';
 import { ProductVariantRepository } from '../repositories/product-variant.repository';
@@ -204,7 +205,7 @@ export class ProductService {
       }
     }
 
-    Object.assign(product, dto);
+    assignDefined(product, dto);
     return this.productRepository.save(product);
   }
 

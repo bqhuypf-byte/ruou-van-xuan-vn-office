@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { assignDefined } from '../../../shared/utils/assign-defined.util';
 import { CategoryRepository } from '../repositories/category.repository';
 import { ProductRepository } from '../repositories/product.repository';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -106,7 +107,7 @@ export class CategoryService {
     }
 
     const previousTitle = category.homeSectionTitle || category.name;
-    Object.assign(category, dto);
+    assignDefined(category, dto);
     const saved = await this.categoryRepository.save(category);
     this.eventEmitter.emit('category.saved', {
       previousTitle,
