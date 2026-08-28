@@ -6,6 +6,7 @@ import { ArrowLeft, Plus, AlertCircle, Save } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { Spinner } from '@/shared/components/ui';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
+import { slugify } from '@/shared/utils/slugify';
 import { VariantTable } from '../components/VariantTable';
 import { VariantMatrixTable } from '../components/VariantMatrixTable';
 import type { VariantMatrixSaveRow } from '../components/VariantMatrixTable';
@@ -77,6 +78,19 @@ export const ProductDetailPage = () => {
     defaultValues: emptyProductFormValues(),
   });
   const hasGroup2 = watchProduct('hasGroup2');
+  const nameValue = watchProduct('name');
+  const slugValue = watchProduct('slug');
+
+  // Auto-generate the slug from the name while the Slug field is empty — mirrors
+  // the category form's behavior. Only kicks in when slug has no value, so it
+  // never silently rewrites the slug of an already-saved, already-linked product.
+  useEffect(() => {
+    if (slugValue) return;
+    const generatedSlug = slugify(nameValue || '');
+    if (!generatedSlug) return;
+    setProductValue('slug', generatedSlug);
+  }, [nameValue, slugValue, setProductValue]);
+
   const watchedGroup1 = useWatch({ control: productControl, name: 'group1' });
   const watchedGroup2 = useWatch({ control: productControl, name: 'group2' });
   const formVariantGroups = variantGroupsFromForm({
