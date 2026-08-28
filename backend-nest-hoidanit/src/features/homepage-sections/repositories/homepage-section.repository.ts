@@ -25,6 +25,10 @@ export class HomepageSectionRepository {
     return this.repository.findOne({ where: { id } });
   }
 
+  findByTitle(title: string): Promise<HomepageSection | null> {
+    return this.repository.findOne({ where: { title } });
+  }
+
   findByIds(ids: number[]): Promise<HomepageSection[]> {
     if (ids.length === 0) return Promise.resolve([]);
     return this.repository

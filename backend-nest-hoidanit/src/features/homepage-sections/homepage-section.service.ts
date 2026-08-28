@@ -1,8 +1,10 @@
 import {
   ConflictException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
 import { HomepageSectionRepository } from './repositories/homepage-section.repository';
 import { HomepageSectionItemRepository } from './repositories/homepage-section-item.repository';
 import { ProductService } from '../product/services/product.service';
@@ -19,11 +21,28 @@ import {
 
 @Injectable()
 export class HomepageSectionService {
+  private readonly logger = new Logger(HomepageSectionService.name);
+
   constructor(
     private readonly sectionRepository: HomepageSectionRepository,
     private readonly itemRepository: HomepageSectionItemRepository,
     private readonly productService: ProductService,
   ) {}
+
+  /**
+   * Homepage sections are auto-generated from category names at seed time but
+   * have no FK to categories. When a category is deleted, drop the homepage
+   * section that shares its exact title so stale sections don't linger.
+   */
+  @OnEvent('category.deleted')
+  async handleCategoryDeleted({ name }: { id: number; name: string }): Promise<void> {
+    const section = await this.sectionRepository.findByTitle(name);
+    if (!section) return;
+    await this.sectionRepository.remove(section);
+    this.logger.log(
+      `Removed homepage section "${name}" after its source category was deleted`,
+    );
+  }
 
   private async buildViews(
     sections: HomepageSection[],

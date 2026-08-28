@@ -4,6 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 import { CategoryRepository } from '../repositories/category.repository';
 import { ProductRepository } from '../repositories/product.repository';
 import { CreateCategoryDto } from '../dto/create-category.dto';
@@ -18,6 +19,7 @@ export class CategoryService {
   constructor(
     private readonly categoryRepository: CategoryRepository,
     private readonly productRepository: ProductRepository,
+    private readonly eventEmitter: EventEmitter2,
   ) {}
 
   private buildTree(
@@ -147,5 +149,9 @@ export class CategoryService {
     }
 
     await this.categoryRepository.remove(category);
+    this.eventEmitter.emit('category.deleted', {
+      id: category.id,
+      name: category.name,
+    });
   }
 }
