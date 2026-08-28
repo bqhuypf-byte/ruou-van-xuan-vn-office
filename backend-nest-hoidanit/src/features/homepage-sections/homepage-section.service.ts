@@ -44,6 +44,55 @@ export class HomepageSectionService {
     );
   }
 
+  /**
+   * Keeps the homepage section that mirrors a category (matched by title,
+   * same convention as handleCategoryDeleted) in sync with that category's
+   * own display settings — title, sort order, display style and whether it
+   * should show at all — every time the category is created or edited.
+   */
+  @OnEvent('category.saved')
+  async handleCategorySaved(payload: {
+    previousTitle: string | null;
+    name: string;
+    homeSectionTitle: string | null;
+    showInProductSections: boolean;
+    homeSortOrder: number;
+    homeDisplayStyle: 'grid' | 'carousel';
+  }): Promise<void> {
+    const newTitle = payload.homeSectionTitle || payload.name;
+    let section = payload.previousTitle
+      ? await this.sectionRepository.findByTitle(payload.previousTitle)
+      : null;
+    if (!section) {
+      section = await this.sectionRepository.findByTitle(newTitle);
+    }
+
+    if (!payload.showInProductSections) {
+      if (section && section.isActive) {
+        section.isActive = false;
+        await this.sectionRepository.save(section);
+        this.logger.log(`Deactivated homepage section "${section.title}"`);
+      }
+      return;
+    }
+
+    if (!section) {
+      section = this.sectionRepository.create({
+        title: newTitle,
+        displayStyle: payload.homeDisplayStyle,
+        sortOrder: payload.homeSortOrder,
+        isActive: true,
+      });
+      this.logger.log(`Created homepage section "${newTitle}" from category`);
+    } else {
+      section.title = newTitle;
+      section.displayStyle = payload.homeDisplayStyle;
+      section.sortOrder = payload.homeSortOrder;
+      section.isActive = true;
+    }
+    await this.sectionRepository.save(section);
+  }
+
   private async buildViews(
     sections: HomepageSection[],
     { onlyActiveProducts }: { onlyActiveProducts: boolean },

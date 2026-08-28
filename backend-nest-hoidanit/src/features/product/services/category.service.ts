@@ -69,7 +69,16 @@ export class CategoryService {
     }
 
     const category = this.categoryRepository.create(dto);
-    return this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.save(category);
+    this.eventEmitter.emit('category.saved', {
+      previousTitle: null,
+      name: saved.name,
+      homeSectionTitle: saved.homeSectionTitle,
+      showInProductSections: saved.showInProductSections,
+      homeSortOrder: saved.homeSortOrder,
+      homeDisplayStyle: saved.homeDisplayStyle,
+    });
+    return saved;
   }
 
   async update(id: number, dto: UpdateCategoryDto): Promise<Category> {
@@ -96,8 +105,18 @@ export class CategoryService {
       await this.assertNoCycle(id, dto.parentId);
     }
 
+    const previousTitle = category.homeSectionTitle || category.name;
     Object.assign(category, dto);
-    return this.categoryRepository.save(category);
+    const saved = await this.categoryRepository.save(category);
+    this.eventEmitter.emit('category.saved', {
+      previousTitle,
+      name: saved.name,
+      homeSectionTitle: saved.homeSectionTitle,
+      showInProductSections: saved.showInProductSections,
+      homeSortOrder: saved.homeSortOrder,
+      homeDisplayStyle: saved.homeDisplayStyle,
+    });
+    return saved;
   }
 
   private async assertNoCycle(
