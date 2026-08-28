@@ -198,20 +198,18 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                   <button
                     key={url}
                     onClick={() => setActiveImage(url)}
-                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 transition-colors duration-200 ${
-                      activeImage === url
-                        ? 'border-brand-600'
-                        : 'border-transparent bg-slate-100 dark:bg-slate-800'
+                    className={`w-16 h-16 sm:w-20 sm:h-20 rounded-xl overflow-hidden border-2 bg-slate-100 dark:bg-slate-800 transition-colors duration-200 ${
+                      activeImage === url ? 'border-brand-600' : 'border-transparent'
                     }`}
                   >
-                    <img src={url} alt="" className="w-full h-full object-cover" />
+                    <img src={url} alt="" className="w-full h-full object-contain p-1.5" />
                   </button>
                 ))}
               </div>
             )}
-            <div className="flex-1 aspect-square rounded-2xl overflow-hidden flex items-center justify-center">
+            <div className="flex-1 aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
               {activeImage ? (
-                <img src={activeImage} alt={product.name} className="w-full h-full object-cover" />
+                <img src={activeImage} alt={product.name} className="w-full h-full object-contain p-6" />
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center text-white/85"
