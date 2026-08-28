@@ -56,6 +56,8 @@ const contactChannelSchema = z.object({
 const settingsSchema = z.object({
   siteName: z.string().min(1, 'Bắt buộc').max(100, 'Tối đa 100 ký tự'),
   logoUrl: z.string().max(500).optional(),
+  browserTitle: z.string().max(255, 'Tối đa 255 ký tự').optional(),
+  faviconUrl: z.string().max(500).optional(),
   topBarMessage: z.string().min(1, 'Bắt buộc').max(255, 'Tối đa 255 ký tự'),
   deliverToText: z.string().min(1, 'Bắt buộc').max(100, 'Tối đa 100 ký tự'),
   contactPhone: z.string().min(1, 'Bắt buộc').max(20, 'Tối đa 20 ký tự'),
@@ -89,6 +91,8 @@ type SettingsFormData = z.infer<typeof settingsSchema>;
 const emptyValues: SettingsFormData = {
   siteName: '',
   logoUrl: '',
+  browserTitle: '',
+  faviconUrl: '',
   topBarMessage: '',
   deliverToText: '',
   contactPhone: '',
@@ -210,6 +214,8 @@ export const SiteSettingsPage = () => {
       reset({
         siteName: settings.siteName,
         logoUrl: settings.logoUrl ?? '',
+        browserTitle: settings.browserTitle ?? '',
+        faviconUrl: settings.faviconUrl ?? '',
         topBarMessage: settings.topBarMessage,
         deliverToText: settings.deliverToText,
         contactPhone: settings.contactPhone,
@@ -246,6 +252,8 @@ export const SiteSettingsPage = () => {
       await updateMutation.mutateAsync({
         ...data,
         logoUrl: data.logoUrl || undefined,
+        browserTitle: data.browserTitle || undefined,
+        faviconUrl: data.faviconUrl || undefined,
         facebookUrl: data.facebookUrl || undefined,
         zaloUrl: data.zaloUrl || undefined,
         appStoreUrl: data.appStoreUrl || undefined,
@@ -322,6 +330,27 @@ export const SiteSettingsPage = () => {
                     value={field.value}
                     onChange={field.onChange}
                     error={errors.logoUrl?.message}
+                  />
+                )}
+              />
+            </div>
+            <div className="grid sm:grid-cols-2 gap-4">
+              <Input
+                label="Tiêu đề tab trình duyệt"
+                placeholder="Rượu Vạn Xuân - Rượu Nếp, Rượu Ngâm, Rượu Gạo Truyền Thống"
+                helperText="Chữ hiện trên tab trình duyệt và kết quả tìm kiếm Google."
+                error={errors.browserTitle?.message}
+                {...register('browserTitle')}
+              />
+              <Controller
+                name="faviconUrl"
+                control={control}
+                render={({ field }) => (
+                  <ImageDropzone
+                    label="Icon tab trình duyệt (favicon)"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.faviconUrl?.message}
                   />
                 )}
               />

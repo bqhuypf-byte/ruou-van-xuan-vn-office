@@ -11,12 +11,14 @@ import './index.css'
 import '@/shared/i18n/config'
 import { queryClient } from '@/shared/lib/queryClient'
 import { AuthProvider } from '@/features/auth'
+import { SiteMetaSync } from '@/features/home'
 import { router } from '@/routes'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
+        <SiteMetaSync />
         <RouterProvider router={router} />
       </AuthProvider>
     </QueryClientProvider>

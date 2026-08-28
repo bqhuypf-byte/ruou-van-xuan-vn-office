@@ -9,6 +9,8 @@ import {
 const DEFAULT_SETTINGS: Omit<SiteSettings, 'id' | 'updatedAt'> = {
   siteName: 'MegaMart',
   logoUrl: null,
+  browserTitle: null,
+  faviconUrl: null,
   topBarMessage: 'Welcome to worldwide MegaMart!',
   deliverToText: 'Deliver to 423651',
   contactPhone: '+1 202-918-2132',

@@ -88,6 +88,8 @@ export interface SiteSettings {
   id: number;
   siteName: string;
   logoUrl: string | null;
+  browserTitle: string | null;
+  faviconUrl: string | null;
   topBarMessage: string;
   deliverToText: string;
   contactPhone: string;

@@ -49,6 +49,22 @@ export class SiteSettings {
   @Column({ type: 'varchar', length: 500, name: 'logo_url', nullable: true })
   logoUrl: string | null;
 
+  @Column({
+    type: 'varchar',
+    length: 255,
+    name: 'browser_title',
+    nullable: true,
+  })
+  browserTitle: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 500,
+    name: 'favicon_url',
+    nullable: true,
+  })
+  faviconUrl: string | null;
+
   @Column({ type: 'varchar', length: 255, name: 'top_bar_message' })
   topBarMessage: string;
 

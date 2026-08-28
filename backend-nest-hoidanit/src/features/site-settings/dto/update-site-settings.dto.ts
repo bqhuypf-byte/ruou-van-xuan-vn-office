@@ -111,6 +111,16 @@ export class UpdateSiteSettingsDto {
   @IsOptional()
   @IsString()
   @MaxLength(255)
+  browserTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  faviconUrl?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
   topBarMessage?: string;
 
   @IsOptional()

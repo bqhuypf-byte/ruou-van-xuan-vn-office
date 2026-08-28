@@ -30,3 +30,4 @@ export * from './components/VoucherFloatingButton';
 export * from './components/TrustBadgeStrip';
 export * from './components/FaqAccordion';
 export * from './components/ContactWidget';
+export * from './components/SiteMetaSync';

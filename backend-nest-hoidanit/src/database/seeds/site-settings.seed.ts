@@ -9,6 +9,13 @@ export async function seedSiteSettings(dataSource: DataSource) {
 
   const existing = await repo.findOne({ where: { id: SITE_SETTINGS_ID } });
   if (existing) {
+    if (!existing.browserTitle) {
+      existing.browserTitle =
+        'Rượu Vạn Xuân - Rượu Nếp, Rượu Ngâm, Rượu Gạo Truyền Thống';
+      await repo.save(existing);
+      console.log('✓ Backfilled browser title on existing site settings');
+    }
+
     const needsFooterBackfill =
       !existing.footerDescription ||
       !existing.footerAboutLinks ||
@@ -217,6 +224,8 @@ export async function seedSiteSettings(dataSource: DataSource) {
       id: SITE_SETTINGS_ID,
       siteName: 'Rượu Vạn Xuân',
       logoUrl: null,
+      browserTitle: 'Rượu Vạn Xuân - Rượu Nếp, Rượu Ngâm, Rượu Gạo Truyền Thống',
+      faviconUrl: null,
       topBarMessage: 'Chào mừng đến với Rượu Vạn Xuân!',
       deliverToText: 'Giao Hàng Toàn Quốc',
       contactPhone: '+84 90 123 4567',
