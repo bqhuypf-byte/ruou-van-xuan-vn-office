@@ -100,25 +100,29 @@ export const CategoryFormModal = ({
     if (isOpen) {
       isSlugManuallyEditedRef.current = Boolean(categoryToEdit);
       if (categoryToEdit) {
+        const isChild = Boolean(categoryToEdit.parentId);
         reset({
           name: categoryToEdit.name,
           slug: categoryToEdit.slug,
           parentId: categoryToEdit.parentId ? String(categoryToEdit.parentId) : '',
           description: categoryToEdit.description ?? '',
           thumbnailUrl: categoryToEdit.thumbnailUrl ?? '',
-          showInProductSections: categoryToEdit.showInProductSections,
+          // Mục con không có UI để bật/đặt các trường này, nên khi là mục con
+          // luôn coi như tắt (không tự tạo khối riêng trên trang chủ).
+          showInProductSections: isChild ? false : categoryToEdit.showInProductSections,
           homeSectionTitle: categoryToEdit.homeSectionTitle ?? '',
           homeSortOrder: String(categoryToEdit.homeSortOrder ?? 0),
           homeDisplayStyle: categoryToEdit.homeDisplayStyle ?? 'grid',
         });
       } else {
+        const isChild = Boolean(defaultParentId);
         reset({
           name: '',
           slug: '',
           parentId: defaultParentId ? String(defaultParentId) : '',
           description: '',
           thumbnailUrl: '',
-          showInProductSections: true,
+          showInProductSections: !isChild,
           homeSectionTitle: '',
           homeSortOrder: '0',
           homeDisplayStyle: 'grid',
@@ -207,83 +211,93 @@ export const CategoryFormModal = ({
           </select>
         </div>
 
-        <Controller
-          name="thumbnailUrl"
-          control={control}
-          render={({ field }) => (
-            <ImageDropzone
-              label="Ảnh Đại Diện"
-              value={field.value}
-              onChange={field.onChange}
-              error={errors.thumbnailUrl?.message}
-              helperText="Hiển thị ở lưới danh mục trang chủ và banner trang danh mục"
-            />
-          )}
-        />
-
-        <div className="w-full space-y-1.5">
-          <label
-            htmlFor="description"
-            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-          >
-            Nội Dung Mô Tả
-          </label>
-          <textarea
-            id="description"
-            rows={3}
-            placeholder="Mô tả ngắn về danh mục..."
-            className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
-            {...register('description')}
-          />
-        </div>
-
-        <div className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
-          <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            Hiển thị trên trang chủ
-          </p>
-          {isRootCategory && (
-            <>
-              <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
-                <input
-                  type="checkbox"
-                  className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
-                  {...register('showInProductSections')}
-                />
-                Hiện thành khối sản phẩm riêng ở trang chủ (kèm nút "Xem Tất Cả")
-              </label>
-              <Input
-                label="Tiêu đề khối trên trang chủ"
-                placeholder={`Để trống sẽ dùng tên danh mục`}
-                helperText='Tên hiển thị ở tiêu đề khối trên trang chủ, khác với "Tên danh mục" nếu cần'
-                error={errors.homeSectionTitle?.message}
-                {...register('homeSectionTitle')}
+        {isRootCategory && (
+          <Controller
+            name="thumbnailUrl"
+            control={control}
+            render={({ field }) => (
+              <ImageDropzone
+                label="Ảnh Đại Diện"
+                value={field.value}
+                onChange={field.onChange}
+                error={errors.thumbnailUrl?.message}
+                helperText="Hiển thị ở lưới danh mục trang chủ và banner trang danh mục"
               />
-            </>
-          )}
+            )}
+          />
+        )}
+
+        {isRootCategory && (
+          <div className="w-full space-y-1.5">
+            <label
+              htmlFor="description"
+              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+            >
+              Nội Dung Mô Tả
+            </label>
+            <textarea
+              id="description"
+              rows={3}
+              placeholder="Mô tả ngắn về danh mục..."
+              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
+              {...register('description')}
+            />
+          </div>
+        )}
+
+        {isRootCategory ? (
+          <div className="space-y-3 rounded-xl border border-slate-200 dark:border-slate-800 p-4">
+            <p className="text-sm font-medium text-slate-700 dark:text-slate-300">
+              Hiển thị trên trang chủ
+            </p>
+            <label className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300">
+              <input
+                type="checkbox"
+                className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+                {...register('showInProductSections')}
+              />
+              Hiện thành khối sản phẩm riêng ở trang chủ (kèm nút "Xem Tất Cả")
+            </label>
+            <Input
+              label="Tiêu đề khối trên trang chủ"
+              placeholder={`Để trống sẽ dùng tên danh mục`}
+              helperText='Tên hiển thị ở tiêu đề khối trên trang chủ, khác với "Tên danh mục" nếu cần'
+              error={errors.homeSectionTitle?.message}
+              {...register('homeSectionTitle')}
+            />
+            <Input
+              label="Thứ tự hiển thị"
+              type="number"
+              placeholder="0"
+              helperText="Số nhỏ hơn hiển thị trước"
+              {...register('homeSortOrder')}
+            />
+            <div className="w-full space-y-1.5">
+              <label
+                htmlFor="homeDisplayStyle"
+                className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+              >
+                Kiểu hiển thị sản phẩm
+              </label>
+              <select
+                id="homeDisplayStyle"
+                className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
+                {...register('homeDisplayStyle')}
+              >
+                <option value="grid">Lưới (Grid)</option>
+                <option value="carousel">Cuộn ngang (Carousel)</option>
+              </select>
+            </div>
+          </div>
+        ) : (
           <Input
-            label="Thứ tự hiển thị"
+            label="Thứ tự hiển thị trong danh mục cha"
             type="number"
             placeholder="0"
             helperText="Số nhỏ hơn hiển thị trước"
             {...register('homeSortOrder')}
           />
-          <div className="w-full space-y-1.5">
-            <label
-              htmlFor="homeDisplayStyle"
-              className="block text-sm font-medium text-slate-700 dark:text-slate-300"
-            >
-              Kiểu hiển thị sản phẩm
-            </label>
-            <select
-              id="homeDisplayStyle"
-              className="block w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-2 px-3 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
-              {...register('homeDisplayStyle')}
-            >
-              <option value="grid">Lưới (Grid)</option>
-              <option value="carousel">Cuộn ngang (Carousel)</option>
-            </select>
-          </div>
-        </div>
+        )}
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">
           <Button variant="outline" onClick={onClose} type="button">

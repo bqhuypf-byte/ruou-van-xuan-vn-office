@@ -151,6 +151,14 @@ export class CategoryService {
 
     const productCount = await this.productRepository.countByCategoryId(id);
     if (productCount > 0) {
+      // A child category with no explicit target: reassign its products to
+      // its own parent automatically instead of forcing the admin to pick
+      // one — the parent always exists and is an obviously safe fallback.
+      // Root categories have no such fallback, so they still require an
+      // explicit target (CategoryHasProductsException below).
+      if (targetCategoryId === undefined && category.parentId !== null) {
+        targetCategoryId = category.parentId;
+      }
       if (targetCategoryId === undefined) {
         throw new CategoryHasProductsException(
           `Category still has ${productCount} product(s) assigned to it`,
