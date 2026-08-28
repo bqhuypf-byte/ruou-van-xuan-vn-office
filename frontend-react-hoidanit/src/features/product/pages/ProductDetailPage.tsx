@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,7 +14,6 @@ import { VariantFormModal } from '../components/VariantFormModal';
 import type { VariantFormSubmitData } from '../components/VariantFormModal';
 import {
   productSchema,
-  emptyProductFormValues,
   productFormValuesFrom,
   buildProductSubmitPayload,
   variantGroupsFromForm,
@@ -27,11 +26,13 @@ import { ImageGallery } from '../components/ImageGallery';
 import { ImageAddModal } from '../components/ImageAddModal';
 import { useProductDetail } from '../hooks/useProductDetail';
 import { useCategories } from '../hooks/useCategories';
+import type { FlatCategory } from '../hooks/useCategories';
 import { useUpdateProduct } from '../hooks/useProductMutations';
 import { useCreateVariant, useUpdateVariant } from '../hooks/useVariantMutations';
 import { useAddImages, useDeleteImage } from '../hooks/useImageMutations';
 import type { ProductVariant } from '../types/variant.types';
 import type { ProductImage } from '../types/image.types';
+import type { ProductDetail } from '../services/product.service';
 import { ROUTES } from '@/routes/routes';
 
 type TabKey = 'info' | 'description' | 'images' | 'variants';
@@ -48,6 +49,45 @@ export const ProductDetailPage = () => {
   const { data: product, isLoading, isError, error, refetch } = useProductDetail(slug);
   const { allCategories } = useCategories();
 
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-[50vh]">
+        <Spinner />
+      </div>
+    );
+  }
+
+  if (isError || !product) {
+    return (
+      <div className="max-w-3xl mx-auto p-8">
+        <div className="bg-rose-50 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300 p-4 rounded-xl border border-rose-200 dark:border-rose-800 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-5 h-5" />
+            <span>
+              Không thể tải sản phẩm ({error instanceof Error ? error.message : 'Không tìm thấy'}).
+            </span>
+          </div>
+          <Button variant="outline" size="sm" onClick={() => refetch()}>
+            Thử Lại
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  // Keyed by product.id so switching to a different product's edit page fully
+  // remounts the form (fresh useForm + defaultValues) instead of relying on an
+  // imperative reset()-after-mount, which in this codebase has repeatedly proven
+  // unreliable at actually refreshing already-rendered input DOM nodes.
+  return <ProductEditForm key={product.id} product={product} allCategories={allCategories} />;
+};
+
+interface ProductEditFormProps {
+  product: ProductDetail;
+  allCategories: FlatCategory[];
+}
+
+const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [isVariantFormOpen, setIsVariantFormOpen] = useState(false);
   const [isImageAddOpen, setIsImageAddOpen] = useState(false);
@@ -69,13 +109,12 @@ export const ProductDetailPage = () => {
     register: registerProduct,
     control: productControl,
     handleSubmit: handleProductSubmit,
-    reset: resetProductForm,
     setValue: setProductValue,
     watch: watchProduct,
     formState: { errors: productErrors },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
-    defaultValues: emptyProductFormValues(),
+    defaultValues: productFormValuesFrom(product),
   });
   const hasGroup2 = watchProduct('hasGroup2');
   const nameValue = watchProduct('name');
@@ -99,18 +138,7 @@ export const ProductDetailPage = () => {
     group2: watchedGroup2 ?? { name: '', values: [] },
   });
 
-  // Only seed the form when a different product loads — background refetches
-  // (window focus, cache invalidation) must not wipe unsaved classification edits.
-  const seededProductId = useRef<number | null>(null);
-  useEffect(() => {
-    if (product && seededProductId.current !== product.id) {
-      seededProductId.current = product.id;
-      resetProductForm(productFormValuesFrom(product));
-    }
-  }, [product, resetProductForm]);
-
   const handleSaveProductInfo = async (data: ProductFormData) => {
-    if (!product) return;
     setFeedback(null);
     try {
       await updateProduct.mutateAsync({ id: product.id, input: buildProductSubmitPayload(data) });
@@ -134,7 +162,6 @@ export const ProductDetailPage = () => {
   };
 
   const handleSaveMatrix = async (rows: VariantMatrixSaveRow[]) => {
-    if (!product) return;
     setFeedback(null);
     setIsSavingMatrix(true);
     try {
@@ -180,7 +207,6 @@ export const ProductDetailPage = () => {
   };
 
   const handleSaveVariant = async (data: VariantFormSubmitData) => {
-    if (!product) return;
     setFeedback(null);
     try {
       if (selectedVariant) {
@@ -199,7 +225,6 @@ export const ProductDetailPage = () => {
   };
 
   const handleAddImage = async (imageUrls: string[]) => {
-    if (!product) return;
     setFeedback(null);
     try {
       await addImages.mutateAsync({
@@ -236,32 +261,6 @@ export const ProductDetailPage = () => {
       setDeletingImageId(null);
     }
   };
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-[50vh]">
-        <Spinner />
-      </div>
-    );
-  }
-
-  if (isError || !product) {
-    return (
-      <div className="max-w-3xl mx-auto p-8">
-        <div className="bg-rose-50 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300 p-4 rounded-xl border border-rose-200 dark:border-rose-800 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <AlertCircle className="w-5 h-5" />
-            <span>
-              Không thể tải sản phẩm ({error instanceof Error ? error.message : 'Không tìm thấy'}).
-            </span>
-          </div>
-          <Button variant="outline" size="sm" onClick={() => refetch()}>
-            Thử Lại
-          </Button>
-        </div>
-      </div>
-    );
-  }
 
   const hasVariantGroups = formVariantGroups.length > 0;
   const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
