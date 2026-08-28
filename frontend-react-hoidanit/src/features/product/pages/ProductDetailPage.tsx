@@ -1,6 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useParams, Link } from 'react-router';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowLeft, Plus, AlertCircle, Save } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
@@ -16,6 +16,7 @@ import {
   emptyProductFormValues,
   productFormValuesFrom,
   buildProductSubmitPayload,
+  variantGroupsFromForm,
   ProductBasicInfoFields,
   ProductDescriptionField,
   ProductClassificationFields,
@@ -76,9 +77,20 @@ export const ProductDetailPage = () => {
     defaultValues: emptyProductFormValues(),
   });
   const hasGroup2 = watchProduct('hasGroup2');
+  const watchedGroup1 = useWatch({ control: productControl, name: 'group1' });
+  const watchedGroup2 = useWatch({ control: productControl, name: 'group2' });
+  const formVariantGroups = variantGroupsFromForm({
+    group1: watchedGroup1 ?? { name: '', values: [] },
+    hasGroup2,
+    group2: watchedGroup2 ?? { name: '', values: [] },
+  });
 
+  // Only seed the form when a different product loads — background refetches
+  // (window focus, cache invalidation) must not wipe unsaved classification edits.
+  const seededProductId = useRef<number | null>(null);
   useEffect(() => {
-    if (product) {
+    if (product && seededProductId.current !== product.id) {
+      seededProductId.current = product.id;
       resetProductForm(productFormValuesFrom(product));
     }
   }, [product, resetProductForm]);
@@ -237,7 +249,10 @@ export const ProductDetailPage = () => {
     );
   }
 
-  const hasVariantGroups = Boolean(product.variantAttributes && product.variantAttributes.length > 0);
+  const hasVariantGroups = formVariantGroups.length > 0;
+  const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
+  const formGroupsSignature = JSON.stringify(formVariantGroups);
+  const hasUnsavedGroups = hasVariantGroups && formGroupsSignature !== savedGroupsSignature;
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -340,11 +355,17 @@ export const ProductDetailPage = () => {
                       </Button>
                     )}
                   </div>
+                  {hasUnsavedGroups && (
+                    <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
+                      Bảng bên dưới đang xem trước theo phân loại vừa nhập. Bấm "Lưu Chỉnh Sửa" để lưu phân
+                      loại, sau đó bấm "Lưu Tất Cả" để lưu giá/tồn kho.
+                    </p>
+                  )}
                   {hasVariantGroups ? (
                     <VariantMatrixTable
                       productName={product.name}
                       productSlug={product.slug}
-                      groups={product.variantAttributes ?? []}
+                      groups={formVariantGroups}
                       variants={product.variants}
                       isSaving={isSavingMatrix}
                       onSaveAll={handleSaveMatrix}

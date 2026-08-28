@@ -126,6 +126,19 @@ export const VariantMatrixTable = ({
     setRows((prev) => prev.map((row) => (row.key === key ? { ...row, ...patch } : row)));
   };
 
+  const [bulk, setBulk] = useState({ price: '', stockQuantity: '', salePrice: '' });
+
+  const applyBulk = () => {
+    setRows((prev) =>
+      prev.map((row) => ({
+        ...row,
+        price: bulk.price !== '' ? bulk.price : row.price,
+        salePrice: bulk.salePrice !== '' ? bulk.salePrice : row.salePrice,
+        stockQuantity: bulk.stockQuantity !== '' ? bulk.stockQuantity : row.stockQuantity,
+      })),
+    );
+  };
+
   const handleSave = async () => {
     const dirtyRows: VariantMatrixSaveRow[] = [];
     for (const row of rows) {
@@ -163,13 +176,50 @@ export const VariantMatrixTable = ({
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="flex items-center justify-between px-5 py-3 border-b border-slate-200 dark:border-slate-800">
-        <p className="text-xs text-slate-500 dark:text-slate-400">
-          Điền giá và tồn kho cho từng tổ hợp, rồi bấm Lưu để áp dụng tất cả cùng lúc. Ảnh lấy từ mục
-          "Phân Loại Hàng" ở màn sửa sản phẩm.
-        </p>
+      <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <p className="text-sm font-semibold text-slate-900 dark:text-white">Danh sách phân loại hàng</p>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+            Điền giá và tồn kho cho từng tổ hợp, rồi bấm Lưu để áp dụng tất cả cùng lúc. Ảnh lấy từ mục
+            "Phân Loại Hàng" ở trên.
+          </p>
+        </div>
         <Button size="sm" onClick={handleSave} isLoading={isSaving} leftIcon={<Save className="w-4 h-4" />}>
           Lưu Tất Cả
+        </Button>
+      </div>
+      <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
+        <div className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 bg-white dark:bg-slate-900">
+          <span className="text-slate-400 text-xs">₫</span>
+          <input
+            type="number"
+            step="0.01"
+            value={bulk.price}
+            onChange={(e) => setBulk((b) => ({ ...b, price: e.target.value }))}
+            className="w-28 bg-transparent text-sm focus:outline-none dark:text-white"
+            placeholder="Giá"
+          />
+        </div>
+        <div className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 bg-white dark:bg-slate-900">
+          <span className="text-slate-400 text-xs">₫</span>
+          <input
+            type="number"
+            step="0.01"
+            value={bulk.salePrice}
+            onChange={(e) => setBulk((b) => ({ ...b, salePrice: e.target.value }))}
+            className="w-28 bg-transparent text-sm focus:outline-none dark:text-white"
+            placeholder="Giá khuyến mãi"
+          />
+        </div>
+        <input
+          type="number"
+          value={bulk.stockQuantity}
+          onChange={(e) => setBulk((b) => ({ ...b, stockQuantity: e.target.value }))}
+          className="w-28 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 text-sm bg-white dark:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 dark:text-white"
+          placeholder="Kho hàng"
+        />
+        <Button size="sm" variant="outline" onClick={applyBulk}>
+          Áp dụng cho tất cả phân loại
         </Button>
       </div>
       <div className="overflow-x-auto">

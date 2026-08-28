@@ -92,24 +92,33 @@ export const productFormValuesFrom = (product: Product): ProductFormData => {
   };
 };
 
-export const buildProductSubmitPayload = (data: ProductFormData): ProductFormSubmitData => {
-  const buildGroup = (group: ProductFormData['group1']): VariantAttributeGroup | null => {
-    const name = group.name.trim();
-    const values = group.values.map((v) => v.value.trim()).filter(Boolean);
-    if (!name || values.length === 0) return null;
+const buildVariantGroup = (group: ProductFormData['group1']): VariantAttributeGroup | null => {
+  const name = (group.name ?? '').trim();
+  const values = (group.values ?? [])
+    .map((v) => (v.value ?? '').trim())
+    .filter(Boolean);
+  if (!name || values.length === 0) return null;
 
-    const images: Record<string, string> = {};
-    for (const v of group.values) {
-      const trimmed = v.value.trim();
-      if (trimmed && v.imageUrl) images[trimmed] = v.imageUrl;
-    }
+  const images: Record<string, string> = {};
+  for (const v of group.values) {
+    const trimmed = v.value.trim();
+    if (trimmed && v.imageUrl) images[trimmed] = v.imageUrl;
+  }
 
-    return { name, values, ...(Object.keys(images).length > 0 ? { images } : {}) };
-  };
+  return { name, values, ...(Object.keys(images).length > 0 ? { images } : {}) };
+};
 
-  const variantAttributes = [buildGroup(data.group1), data.hasGroup2 ? buildGroup(data.group2) : null].filter(
+/** Live variant-attribute groups derived from the current form state — used to preview the
+ * price/stock matrix before the product is saved. */
+export const variantGroupsFromForm = (
+  data: Pick<ProductFormData, 'group1' | 'hasGroup2' | 'group2'>,
+): VariantAttributeGroup[] =>
+  [buildVariantGroup(data.group1), data.hasGroup2 ? buildVariantGroup(data.group2) : null].filter(
     (g): g is VariantAttributeGroup => g !== null,
   );
+
+export const buildProductSubmitPayload = (data: ProductFormData): ProductFormSubmitData => {
+  const variantAttributes = variantGroupsFromForm(data);
 
   return {
     categoryId: Number(data.categoryId),

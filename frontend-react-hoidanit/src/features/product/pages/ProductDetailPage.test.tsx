@@ -147,6 +147,24 @@ describe('ProductDetailPage', () => {
     expect(await screen.findByText('Đã thêm biến thể "IP15-WHT-256".')).toBeInTheDocument();
   });
 
+  it('auto-generates the price/stock matrix when a classification option is typed', async () => {
+    const user = userEvent.setup();
+    renderPage();
+
+    await user.click(screen.getByRole('button', { name: 'Biến Thể Sản Phẩm' }));
+    // Old empty-variant table initially
+    expect(screen.queryByText('Danh sách phân loại hàng')).not.toBeInTheDocument();
+
+    await user.type(screen.getByPlaceholderText('Ví dụ: Màu sắc'), 'Độ');
+    await user.type(screen.getAllByPlaceholderText('Nhập')[0], '30 độ');
+
+    expect(await screen.findByText('Danh sách phân loại hàng')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /Áp dụng cho tất cả phân loại/i })).toBeInTheDocument();
+    expect(screen.getByRole('columnheader', { name: 'Giá' })).toBeInTheDocument();
+    // "Thêm Biến Thể" (old empty-state action) is hidden once the matrix takes over
+    expect(screen.queryByRole('button', { name: /Thêm Biến Thể/i })).not.toBeInTheDocument();
+  });
+
   it('adds a new image via the add image modal', async () => {
     const mutateAsync = vi.fn().mockResolvedValue(undefined);
     vi.mocked(useAddImages).mockReturnValue({
