@@ -49,12 +49,12 @@ export const LanguageSwitcher = () => {
       <button
         onClick={() => setIsOpen((open) => !open)}
         aria-label={t('language.label')}
-        className="flex items-center gap-2.5 px-4 py-3 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-base font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
+        className="flex items-center justify-center gap-2.5 w-11 h-11 sm:w-auto sm:justify-start sm:px-4 sm:py-3 rounded-full sm:rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl text-base font-semibold text-slate-700 hover:bg-slate-50 dark:text-slate-200 dark:hover:bg-slate-800 transition-colors"
       >
-        <FlagIcon code={current.flag} className="w-7 h-5" />
-        <span>{current.code.toUpperCase()}</span>
+        <FlagIcon code={current.flag} className="w-6 h-4 sm:w-7 sm:h-5" />
+        <span className="hidden sm:inline">{current.code.toUpperCase()}</span>
         <ChevronDown
-          className={`w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+          className={`hidden sm:block w-5 h-5 text-slate-400 transition-transform ${isOpen ? 'rotate-180' : ''}`}
         />
       </button>
     </div>

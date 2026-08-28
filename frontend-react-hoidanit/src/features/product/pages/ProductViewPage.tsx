@@ -332,7 +332,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
               )}
             </div>
 
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-stretch gap-3">
               <Button
                 size="lg"
                 onClick={handleBuyNow}
@@ -349,7 +349,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 isLoading={addCartItem.isPending}
                 disabled={!selectedVariant || outOfStock}
                 leftIcon={<ShoppingCart className="w-4 h-4" />}
-                className="rounded-full flex-1"
+                className="rounded-full flex-1 whitespace-nowrap"
               >
                 {t('product.addToCart')}
               </Button>
