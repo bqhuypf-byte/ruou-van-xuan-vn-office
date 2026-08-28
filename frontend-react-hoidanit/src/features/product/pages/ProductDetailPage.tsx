@@ -124,8 +124,6 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
   // the category form's behavior. Only kicks in when slug has no value, so it
   // never silently rewrites the slug of an already-saved, already-linked product.
   useEffect(() => {
-    (window as unknown as { __slugDebug?: unknown[] }).__slugDebug ??= [];
-    (window as unknown as { __slugDebug: unknown[] }).__slugDebug.push({ nameValue, slugValue });
     if (slugValue) return;
     const generatedSlug = slugify(nameValue || '');
     if (!generatedSlug) return;
