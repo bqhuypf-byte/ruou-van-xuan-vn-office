@@ -8,6 +8,9 @@ export interface CategoryTableProps {
   onEdit: (category: FlatCategory) => void;
   onDelete: (category: FlatCategory) => void;
   onAddChild: (category: FlatCategory) => void;
+  selectedIds: Set<number>;
+  onToggleSelect: (id: number) => void;
+  onToggleSelectAll: () => void;
 }
 
 export const CategoryTable = ({
@@ -16,7 +19,11 @@ export const CategoryTable = ({
   onEdit,
   onDelete,
   onAddChild,
+  selectedIds,
+  onToggleSelect,
+  onToggleSelectAll,
 }: CategoryTableProps) => {
+  const allSelected = categories.length > 0 && categories.every((c) => selectedIds.has(c.id));
   if (isLoading) {
     return (
       <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
@@ -64,6 +71,15 @@ export const CategoryTable = ({
         <table className="w-full text-left text-sm border-collapse">
           <thead>
             <tr className="bg-slate-50/80 dark:bg-slate-800/50 text-slate-500 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+              <th className="py-3.5 px-4 w-10">
+                <input
+                  type="checkbox"
+                  checked={allSelected}
+                  onChange={onToggleSelectAll}
+                  aria-label="Chọn tất cả"
+                  className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500/30"
+                />
+              </th>
               <th className="py-3.5 px-6">ID</th>
               <th className="py-3.5 px-6">Tên Danh Mục</th>
               <th className="py-3.5 px-6">Slug</th>
@@ -75,8 +91,19 @@ export const CategoryTable = ({
             {categories.map((category) => (
               <tr
                 key={category.id}
-                className="hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors"
+                className={`hover:bg-slate-50/60 dark:hover:bg-slate-800/40 transition-colors ${
+                  selectedIds.has(category.id) ? 'bg-brand-50/50 dark:bg-brand-950/20' : ''
+                }`}
               >
+                <td className="py-4 px-4">
+                  <input
+                    type="checkbox"
+                    checked={selectedIds.has(category.id)}
+                    onChange={() => onToggleSelect(category.id)}
+                    aria-label={`Chọn ${category.name}`}
+                    className="w-4 h-4 rounded border-slate-300 dark:border-slate-600 text-brand-600 focus:ring-brand-500/30"
+                  />
+                </td>
                 <td className="py-4 px-6 font-mono text-xs text-slate-500 dark:text-slate-400">
                   #{category.id}
                 </td>

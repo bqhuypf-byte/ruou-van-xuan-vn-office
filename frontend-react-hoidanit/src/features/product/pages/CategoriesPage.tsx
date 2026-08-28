@@ -1,11 +1,12 @@
 import { useState } from 'react';
-import { Plus, Search, FolderTree, Layers, Network, AlertCircle } from 'lucide-react';
+import { Plus, Search, FolderTree, Layers, Network, AlertCircle, Trash2 } from 'lucide-react';
 import { Button, Input } from '@/shared/components/ui';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { CategoryTable } from '../components/CategoryTable';
 import { CategoryFormModal } from '../components/CategoryFormModal';
 import type { CategoryFormSubmitData } from '../components/CategoryFormModal';
 import { CategoryDeleteModal } from '../components/CategoryDeleteModal';
+import { CategoryBulkDeleteModal } from '../components/CategoryBulkDeleteModal';
 import { useCategories } from '../hooks/useCategories';
 import type { FlatCategory } from '../hooks/useCategories';
 import {
@@ -21,6 +22,9 @@ export const CategoriesPage = () => {
   const [needsReassignTarget, setNeedsReassignTarget] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<FlatCategory | null>(null);
   const [defaultParentId, setDefaultParentId] = useState<number | null>(null);
+  const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set());
+  const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
     message: string;
@@ -108,6 +112,56 @@ export const CategoriesPage = () => {
     }
   };
 
+  const handleToggleSelect = (id: number) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
+  const handleToggleSelectAll = () => {
+    setSelectedIds((prev) => {
+      const allVisibleSelected = categories.length > 0 && categories.every((c) => prev.has(c.id));
+      if (allVisibleSelected) return new Set();
+      return new Set(categories.map((c) => c.id));
+    });
+  };
+
+  const selectedCategories = allCategories.filter((c) => selectedIds.has(c.id));
+
+  const handleBulkDeleteConfirm = async () => {
+    setIsBulkDeleting(true);
+    setFeedback(null);
+    // Delete deepest categories first so children never block their parent's deletion
+    const ordered = [...selectedCategories].sort((a, b) => b.depth - a.depth);
+    let successCount = 0;
+    let failCount = 0;
+    for (const category of ordered) {
+      try {
+        await deleteMutation.mutateAsync({ id: category.id });
+        successCount += 1;
+      } catch {
+        failCount += 1;
+      }
+    }
+    setIsBulkDeleting(false);
+    setIsBulkDeleteOpen(false);
+    setSelectedIds(new Set());
+    if (failCount === 0) {
+      setFeedback({ type: 'success', message: `Đã xóa ${successCount} danh mục thành công.` });
+    } else {
+      setFeedback({
+        type: 'error',
+        message: `Đã xóa ${successCount} danh mục, ${failCount} danh mục không xóa được (còn sản phẩm hoặc danh mục con).`,
+      });
+    }
+  };
+
   const totalCount = allCategories.length;
   const rootCount = allCategories.filter((c) => c.parentId === null).length;
   const childCount = totalCount - rootCount;
@@ -192,7 +246,7 @@ export const CategoriesPage = () => {
         </div>
       )}
 
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 shadow-sm flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div className="w-full sm:w-80">
           <Input
             placeholder="Tìm theo tên hoặc slug..."
@@ -201,6 +255,16 @@ export const CategoriesPage = () => {
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
+        {selectedIds.size > 0 && (
+          <Button
+            variant="danger"
+            size="sm"
+            leftIcon={<Trash2 className="w-4 h-4" />}
+            onClick={() => setIsBulkDeleteOpen(true)}
+          >
+            Xóa Đã Chọn ({selectedIds.size})
+          </Button>
+        )}
       </div>
 
       <CategoryTable
@@ -209,6 +273,9 @@ export const CategoriesPage = () => {
         onEdit={handleOpenEdit}
         onDelete={handleOpenDelete}
         onAddChild={handleOpenCreateChild}
+        selectedIds={selectedIds}
+        onToggleSelect={handleToggleSelect}
+        onToggleSelectAll={handleToggleSelectAll}
       />
 
       <CategoryFormModal
@@ -232,6 +299,14 @@ export const CategoriesPage = () => {
         categoryOptions={allCategories}
         needsReassignTarget={needsReassignTarget}
         isLoading={deleteMutation.isPending}
+      />
+
+      <CategoryBulkDeleteModal
+        isOpen={isBulkDeleteOpen}
+        onClose={() => setIsBulkDeleteOpen(false)}
+        onConfirm={handleBulkDeleteConfirm}
+        categoriesToDelete={selectedCategories}
+        isLoading={isBulkDeleting}
       />
     </div>
   );
