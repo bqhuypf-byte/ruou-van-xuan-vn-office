@@ -202,14 +202,14 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                       activeImage === url ? 'border-brand-600' : 'border-transparent'
                     }`}
                   >
-                    <img src={url} alt="" className="w-full h-full object-contain p-1.5" />
+                    <img src={url} alt="" className="w-full h-full object-contain" />
                   </button>
                 ))}
               </div>
             )}
             <div className="flex-1 aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
               {activeImage ? (
-                <img src={activeImage} alt={product.name} className="w-full h-full object-contain p-6" />
+                <img src={activeImage} alt={product.name} className="w-full h-full object-contain" />
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center text-white/85"
