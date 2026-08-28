@@ -1,6 +1,8 @@
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { Button, Modal } from '@/shared/components/ui';
+import { slugify } from '@/shared/utils/slugify';
 import {
   productSchema,
   emptyProductFormValues,
@@ -41,6 +43,15 @@ export const ProductFormModal = ({
   });
 
   const hasGroup2 = watch('hasGroup2');
+  const nameValue = watch('name');
+  const isSlugManuallyEditedRef = useRef(false);
+
+  useEffect(() => {
+    if (isSlugManuallyEditedRef.current) return;
+    const generatedSlug = slugify(nameValue || '');
+    if (!generatedSlug) return;
+    setValue('slug', generatedSlug);
+  }, [nameValue, setValue]);
 
   const handleFormSubmit = async (data: ProductFormData) => {
     await onSubmit(buildProductSubmitPayload(data));
@@ -63,6 +74,9 @@ export const ProductFormModal = ({
           setValue={setValue}
           hasGroup2={hasGroup2}
           categoryOptions={categoryOptions}
+          onSlugManualEdit={() => {
+            isSlugManuallyEditedRef.current = true;
+          }}
         />
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">

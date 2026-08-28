@@ -264,9 +264,16 @@ export interface ProductBasicInfoFieldsProps {
   control: Control<ProductFormData>;
   errors: FieldErrors<ProductFormData>;
   categoryOptions: FlatCategory[];
+  onSlugManualEdit?: () => void;
 }
 
-export const ProductBasicInfoFields = ({ register, control, errors, categoryOptions }: ProductBasicInfoFieldsProps) => (
+export const ProductBasicInfoFields = ({
+  register,
+  control,
+  errors,
+  categoryOptions,
+  onSlugManualEdit,
+}: ProductBasicInfoFieldsProps) => (
   <>
     <Input
       label="Tên sản phẩm"
@@ -281,7 +288,8 @@ export const ProductBasicInfoFields = ({ register, control, errors, categoryOpti
       placeholder="vi-du: iphone-15"
       leftIcon={<Link2 className="w-4 h-4" />}
       error={errors.slug?.message}
-      {...register('slug')}
+      helperText="Tự động sinh theo tên, có thể sửa tay."
+      {...register('slug', { onChange: onSlugManualEdit })}
     />
 
     <div className="w-full space-y-1.5">
@@ -426,6 +434,7 @@ export interface ProductFormFieldsProps {
   setValue: UseFormSetValue<ProductFormData>;
   hasGroup2: boolean;
   categoryOptions: FlatCategory[];
+  onSlugManualEdit?: () => void;
 }
 
 /** Combines all product form field groups in one continuous scroll — used by the quick-create modal. */
@@ -436,9 +445,16 @@ export const ProductFormFields = ({
   setValue,
   hasGroup2,
   categoryOptions,
+  onSlugManualEdit,
 }: ProductFormFieldsProps) => (
   <>
-    <ProductBasicInfoFields register={register} control={control} errors={errors} categoryOptions={categoryOptions} />
+    <ProductBasicInfoFields
+      register={register}
+      control={control}
+      errors={errors}
+      categoryOptions={categoryOptions}
+      onSlugManualEdit={onSlugManualEdit}
+    />
     <ProductDescriptionField control={control} errors={errors} />
     <ProductClassificationFields
       register={register}
