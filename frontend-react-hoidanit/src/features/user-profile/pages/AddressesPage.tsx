@@ -6,6 +6,7 @@ import { AddressCard } from '../components/AddressCard';
 import { AddressFormModal } from '../components/AddressFormModal';
 import type { AddressFormSubmitData } from '../components/AddressFormModal';
 import { AddressDeleteModal } from '../components/AddressDeleteModal';
+import { ChangePasswordCard } from '../components/ChangePasswordCard';
 import { useAddresses } from '../hooks/useAddresses';
 import {
   useCreateAddress,
@@ -87,6 +88,8 @@ export const AddressesPage = () => {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-6">
+        <ChangePasswordCard />
+
         <div className="flex items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
