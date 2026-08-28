@@ -202,7 +202,10 @@ const ClassificationGroupEditor = ({
   const handleValueChange = (index: number, value: string) => {
     const isLast = index === fields.length - 1;
     if (isLast && value.trim() !== '') {
-      append({ value: '', imageUrl: '' });
+      // shouldFocus: false — react-hook-form defaults to focusing the newly
+      // appended field, which would steal focus away mid-keystroke from the
+      // field the user is actually typing into.
+      append({ value: '', imageUrl: '' }, { shouldFocus: false });
     }
   };
 
