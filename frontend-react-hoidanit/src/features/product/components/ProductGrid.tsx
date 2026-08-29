@@ -10,7 +10,7 @@ export interface ProductGridProps {
 export const ProductGrid = ({ products, isLoading, skeletonCount = 8 }: ProductGridProps) => {
   if (isLoading) {
     return (
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
         {Array.from({ length: skeletonCount }).map((_, i) => (
           <div
             key={i}
@@ -22,7 +22,7 @@ export const ProductGrid = ({ products, isLoading, skeletonCount = 8 }: ProductG
   }
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
+    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-5">
       {products.map((product) => (
         <ProductCard key={product.id} product={product} />
       ))}

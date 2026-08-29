@@ -69,7 +69,7 @@ export const ProductListPage = () => {
           )}
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap justify-center">
+        <div className="-mx-4 flex items-center gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:flex-wrap sm:justify-center sm:px-0">
           <Button
             variant={categoryId === undefined ? 'primary' : 'outline'}
             size="sm"

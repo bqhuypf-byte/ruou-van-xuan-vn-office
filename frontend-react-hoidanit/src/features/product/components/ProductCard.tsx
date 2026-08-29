@@ -55,7 +55,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
         <button
           onClick={handleWishlistClick}
           aria-label={t('productCard.wishlist')}
-          className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 shadow-sm flex items-center justify-center hover:bg-white dark:hover:bg-slate-900 transition-colors"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 shadow-sm flex items-center justify-center hover:bg-white dark:hover:bg-slate-900 transition-colors"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
@@ -75,7 +75,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
           <img
             src={product.thumbnailUrl}
             alt={product.name}
-            className="w-full h-full object-contain p-6 group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain p-3 sm:p-6 group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
           <div
@@ -87,13 +87,13 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-4 gap-1.5">
+      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1.5">
         <div className="flex items-start justify-between gap-2">
-          <h3 className="font-semibold text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+          <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
             {product.name}
           </h3>
           {product.priceFrom != null && (
-            <span className="shrink-0 font-bold text-slate-900 dark:text-white">
+            <span className="shrink-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white">
               {formatPrice(product.priceFrom)}
             </span>
           )}

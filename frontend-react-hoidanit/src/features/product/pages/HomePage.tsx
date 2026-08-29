@@ -35,7 +35,7 @@ export const HomePage = () => {
       {banner && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <section
-            className="relative overflow-hidden rounded-3xl min-h-[360px] sm:min-h-[440px] flex items-center px-8 sm:px-16"
+            className="relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[300px] sm:min-h-[440px] flex items-center px-6 sm:px-16"
             style={{ backgroundColor: banner.bgColor ?? 'var(--color-accent-mint)' }}
           >
             <div
@@ -43,13 +43,13 @@ export const HomePage = () => {
               style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
               aria-hidden
             />
-            <div className="relative z-10 max-w-md py-10">
+            <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
               {banner.subtitle && (
                 <p className="text-brand-700 font-semibold text-sm uppercase tracking-wide">
                   {banner.subtitle}
                 </p>
               )}
-              <h1 className="mt-3 text-3xl sm:text-5xl font-bold text-brand-900 leading-[1.1]">
+              <h1 className="mt-3 text-2xl sm:text-5xl font-bold text-brand-900 leading-[1.1]">
                 {banner.title}
               </h1>
               {banner.badgeText && (
@@ -59,7 +59,7 @@ export const HomePage = () => {
               )}
               {banner.ctaLink && (
                 <Button
-                  className="mt-6 rounded-full px-7 bg-brand-600 hover:bg-brand-700 text-white"
+                  className="mt-6 min-h-11 rounded-full px-7 bg-brand-600 hover:bg-brand-700 text-white"
                   onClick={handleBannerCta}
                 >
                   {t('home.shopNow')}
@@ -70,7 +70,7 @@ export const HomePage = () => {
               <img
                 src={banner.imageUrl}
                 alt={banner.title}
-                className="hidden sm:block absolute right-10 top-1/2 -translate-y-1/2 max-h-[85%] object-contain drop-shadow-xl"
+                className="absolute -right-8 bottom-0 w-[52%] sm:right-10 sm:top-1/2 sm:w-auto sm:max-h-[85%] sm:-translate-y-1/2 object-contain opacity-50 sm:opacity-100 drop-shadow-xl"
               />
             )}
             {heroBanners.length > 1 && (
@@ -79,14 +79,14 @@ export const HomePage = () => {
                   onClick={() =>
                     setActiveBanner((i) => (i - 1 + heroBanners.length) % heroBanners.length)
                   }
-                  className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/50 hover:bg-white/70 text-brand-900 flex items-center justify-center"
+                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
                   aria-label={t('home.prevBanner')}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setActiveBanner((i) => (i + 1) % heroBanners.length)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-white/50 hover:bg-white/70 text-brand-900 flex items-center justify-center"
+                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
                   aria-label={t('home.nextBanner')}
                 >
                   <ChevronRight className="w-5 h-5" />

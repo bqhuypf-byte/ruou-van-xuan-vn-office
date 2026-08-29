@@ -39,7 +39,7 @@ export const ContactWidget = ({ channels }: ContactWidgetProps) => {
   if (activeChannels.length === 0) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 z-50" ref={containerRef}>
+    <div className="fixed right-3 bottom-[calc(5.25rem+env(safe-area-inset-bottom))] sm:bottom-4 sm:right-4 z-50" ref={containerRef}>
       {isOpen && (
         <div className="absolute bottom-full right-0 mb-2 w-72 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-2xl overflow-hidden">
           {activeChannels.map((channel, index) => {
@@ -132,11 +132,11 @@ export const ContactWidget = ({ channels }: ContactWidgetProps) => {
         <button
           onClick={() => setIsOpen((open) => !open)}
           aria-label={t('contactWidget.toggle')}
-          className={`relative flex items-center justify-center gap-2 w-14 h-14 sm:w-auto sm:justify-start sm:pl-4 sm:pr-5 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-xl transition-colors ${
+          className={`relative flex items-center justify-center gap-1.5 min-h-10 px-3 sm:min-h-14 sm:gap-2 sm:pl-4 sm:pr-5 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg sm:shadow-xl transition-colors ${
             isOpen ? '' : 'contact-widget-shake'
           }`}
         >
-          {isOpen ? <X className="w-6 h-6" /> : <MessageCircle className="w-6 h-6 shrink-0" />}
+          {isOpen ? <X className="w-5 h-5 sm:w-6 sm:h-6" /> : <MessageCircle className="w-4 h-4 sm:w-6 sm:h-6 shrink-0" />}
           {!isOpen && (
             <span className="hidden sm:inline font-semibold whitespace-nowrap">
               {t('contactWidget.toggle')}
