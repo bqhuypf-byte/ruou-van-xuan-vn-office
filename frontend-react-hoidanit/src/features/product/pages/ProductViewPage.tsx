@@ -167,7 +167,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
   ].filter((url): url is string => !!url);
 
   return (
-    <div className="bg-white dark:bg-slate-950">
+    <div className="bg-white dark:bg-slate-950 pb-20 sm:pb-0">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
         {/* Breadcrumb */}
         <nav className="flex items-center flex-wrap gap-1.5 text-sm text-slate-500 dark:text-slate-400">
@@ -441,6 +441,40 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
       </div>
 
       <PromoBand />
+
+      {/* Mobile Sticky Bottom Action Bar */}
+      <div className="fixed inset-x-0 bottom-0 z-30 sm:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
+        <div className="flex items-center gap-3">
+          <div className="flex-1 min-w-0">
+            <span className="text-[10px] text-slate-500 dark:text-slate-400 block leading-tight truncate">
+              {product.name}
+            </span>
+            <span className="text-base font-extrabold text-brand-700 dark:text-brand-400 font-heading leading-tight">
+              {price ? formatPrice(price) : 'Liên hệ'}
+            </span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleAddToCart}
+            isLoading={addCartItem.isPending}
+            disabled={!selectedVariant || outOfStock}
+            className="rounded-full px-3 text-xs"
+            aria-label={t('product.addToCart')}
+          >
+            <ShoppingCart className="w-4 h-4" />
+          </Button>
+          <Button
+            size="sm"
+            onClick={handleBuyNow}
+            isLoading={addCartItem.isPending}
+            disabled={!selectedVariant || outOfStock}
+            className="rounded-full px-5 text-xs font-bold"
+          >
+            {t('product.buyNow')}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };

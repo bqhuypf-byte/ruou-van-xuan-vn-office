@@ -11,6 +11,7 @@ export * from './components/DealCard';
 export * from './components/CategoryPillNav';
 export * from './components/ProductCarousel';
 export * from './components/CategoryTileGrid';
+export * from './components/CategoryFilterSidebar';
 export * from './components/DealsSection';
 export * from './components/CategoryProductSection';
 export * from './stores/productCache.store';

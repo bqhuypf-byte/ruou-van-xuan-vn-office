@@ -1,0 +1,64 @@
+<!-- @dsCard group="Admin CMS" viewport="1280x760" name="Admin CMS" subtitle="Products, Categories, Site Settings — click-through" -->
+<!doctype html><html><head><meta charset="utf-8"><title>Rượu Vạn Xuân — Admin</title>
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script src="./image-slot.js"></script>
+<script src="../../_ds_bundle.js"></script>
+<style>body{margin:0;background:var(--surface-alt)}</style>
+</head><body>
+<div id="root"></div>
+<script type="text/babel" src="ProductsScreen.jsx"></script>
+<script type="text/babel" src="CategoriesScreen.jsx"></script>
+<script type="text/babel" src="HomeContentScreen.jsx"></script>
+<script type="text/babel" src="SiteSettingsScreen.jsx"></script>
+<script type="text/babel">
+function App() {
+  const [route, setRoute] = React.useState('products');
+  React.useEffect(() => { lucide.createIcons(); }, [route]);
+  const navItems = [
+    ['products', 'Sản Phẩm', 'package'],
+    ['categories', 'Danh Mục', 'folder-tree'],
+    ['homecontent', 'Nội Dung Trang Chủ', 'sparkles'],
+    ['settings', 'Cấu Hình Thương Hiệu', 'settings'],
+  ];
+  return (
+    <div style={{ minHeight: '100vh', display: 'flex' }}>
+      <aside style={{ width: 256, background: 'var(--surface-inverse)', color: '#fff', display: 'flex', flexDirection: 'column', flexShrink: 0 }}>
+        <div style={{ height: 64, display: 'flex', alignItems: 'center', gap: 12, padding: '0 24px', borderBottom: '1px solid var(--slate-800)' }}>
+          <div style={{ width: 36, height: 36, borderRadius: 'var(--radius-xl)', background: 'var(--brand)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 700, fontSize: 13 }}>VX</div>
+          <span style={{ fontWeight: 700, fontSize: 'var(--text-lg)' }}>Admin Portal</span>
+        </div>
+        <nav style={{ flex: 1, padding: 16, display: 'flex', flexDirection: 'column', gap: 4 }}>
+          <div style={{ padding: '0 12px 8px', fontSize: 11, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '.05em', color: 'var(--slate-400)' }}>Hệ Thống</div>
+          {navItems.map(([k, l, icon]) => (
+            <a key={k} href="#" onClick={(e) => { e.preventDefault(); setRoute(k); }} style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '10px 12px', borderRadius: 'var(--radius-xl)', fontSize: 'var(--text-sm)', fontWeight: 500, textDecoration: 'none', background: route === k ? 'var(--brand)' : 'transparent', color: route === k ? '#fff' : 'var(--slate-300)' }}>
+              <i data-lucide={icon} style={{ width: 16, height: 16 }}></i>{l}
+            </a>
+          ))}
+        </nav>
+        <div style={{ padding: 16, borderTop: '1px solid var(--slate-800)', display: 'flex', alignItems: 'center', gap: 12 }}>
+          <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'var(--slate-800)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--indigo-500)' }}><i data-lucide="user-check" style={{ width: 16, height: 16 }}></i></div>
+          <div style={{ fontSize: 12 }}><p style={{ margin: 0, fontWeight: 600 }}>Admin User</p><p style={{ margin: 0, color: 'var(--slate-400)' }}>admin@vanxuan.vn</p></div>
+        </div>
+      </aside>
+      <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column' }}>
+        <header style={{ height: 64, background: 'var(--surface)', borderBottom: '1px solid var(--border)', display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
+          <span style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 'var(--radius-full)', background: 'var(--brand-subtle)', color: 'var(--brand-subtle-text)', border: '1px solid var(--brand-subtle-border)' }}>Admin Environment</span>
+          <a href="#" style={{ fontSize: 12, fontWeight: 500, color: 'var(--muted)' }}>Về Trang Chủ</a>
+        </header>
+        <main style={{ flex: 1, minWidth: 0, overflowX: 'auto', overflowY: 'auto' }}>
+          {route === 'products' && <window.ProductsScreen />}
+          {route === 'categories' && <window.CategoriesScreen />}
+          {route === 'homecontent' && <window.HomeContentScreen />}
+          {route === 'settings' && <window.SiteSettingsScreen />}
+        </main>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body></html>

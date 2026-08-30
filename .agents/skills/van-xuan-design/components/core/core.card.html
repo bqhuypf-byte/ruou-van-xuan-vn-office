@@ -1,0 +1,52 @@
+<!-- @dsCard group="Components" viewport="700x520" name="Core" subtitle="Button, Badge, Input, Modal, Spinner" -->
+<link rel="stylesheet" href="../../styles.css">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<script src="../../_ds_bundle.js"></script>
+<div id="root" style="padding:20px;display:flex;flex-direction:column;gap:20px;background:var(--surface)"></div>
+<script type="text/babel">
+const { Button, Badge, Input, Modal, Spinner } = window.VNXuNDesignSystem_8cbe37;
+function Demo(){
+  const [open,setOpen]=React.useState(false);
+  return (
+    <>
+      <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+        <Button variant="primary">Thêm Vào Giỏ</Button>
+        <Button variant="secondary">Hủy</Button>
+        <Button variant="danger">Xóa</Button>
+        <Button variant="outline">Thử Lại</Button>
+        <Button variant="ghost">Sửa</Button>
+        <Button variant="primary" isLoading>Đang lưu</Button>
+        <Button variant="primary" disabled>Disabled</Button>
+        <Button variant="primary" size="sm">Small</Button>
+        <Button variant="primary" size="lg" style={{borderRadius:'var(--radius-full)'}}>Xem Ưu Đãi</Button>
+      </div>
+      <div style={{display:'flex',gap:8,flexWrap:'wrap',alignItems:'center'}}>
+        <Badge variant="default">Size M</Badge>
+        <Badge variant="primary">Rượu Vang</Badge>
+        <Badge variant="success">Đang Bán</Badge>
+        <Badge variant="warning">Sắp Hết</Badge>
+        <Badge variant="danger">-20%</Badge>
+        <Badge variant="info">Mới</Badge>
+        <Spinner size="sm" /><Spinner size="md" /><Spinner size="lg" />
+      </div>
+      <div style={{display:'flex',gap:12,maxWidth:420}}>
+        <Input label="Tên sản phẩm" placeholder="Ví dụ: Rượu Nếp Cẩm" />
+        <Input label="Email" placeholder="you@example.com" error="Bắt buộc" />
+      </div>
+      <div>
+        <Button variant="outline" onClick={()=>setOpen(true)}>Mở Modal</Button>
+        <Modal isOpen={open} onClose={()=>setOpen(false)} title="Tạo Sản Phẩm Mới" description="Nhập thông tin để tạo sản phẩm mới" size="md">
+          <p style={{fontSize:'var(--text-sm)',color:'var(--muted)'}}>Nội dung form ở đây.</p>
+          <div style={{display:'flex',justifyContent:'flex-end',gap:12,marginTop:16}}>
+            <Button variant="outline" onClick={()=>setOpen(false)}>Hủy</Button>
+            <Button variant="primary" onClick={()=>setOpen(false)}>Tạo Mới</Button>
+          </div>
+        </Modal>
+      </div>
+    </>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Demo/>);
+</script>

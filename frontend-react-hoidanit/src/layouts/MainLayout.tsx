@@ -161,18 +161,18 @@ export const MainLayout = () => {
             onClick={() => setIsMobileMenuOpen(false)}
             aria-label="Đóng danh mục"
           />
-          <aside className="relative flex h-full w-[min(21rem,88vw)] flex-col bg-white shadow-2xl dark:bg-slate-900">
-            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4 dark:border-slate-800">
-              <span className="font-semibold text-slate-900 dark:text-white">Danh mục sản phẩm</span>
-              <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-800" aria-label="Đóng">
+          <aside className="relative flex h-full w-[min(21rem,88vw)] flex-col bg-white shadow-2xl">
+            <div className="flex items-center justify-between border-b border-slate-200 px-5 py-4">
+              <span className="font-semibold text-slate-900">Danh mục sản phẩm</span>
+              <button type="button" onClick={() => setIsMobileMenuOpen(false)} className="rounded-lg p-2 text-slate-500 hover:bg-slate-100" aria-label="Đóng">
                 <X className="w-5 h-5" />
               </button>
             </div>
             <div className="overflow-y-auto p-4">
-              <CategoryPillNav />
+              <CategoryPillNav variant="mobile" onNavigate={() => setIsMobileMenuOpen(false)} />
             </div>
-            <div className="mt-auto border-t border-slate-200 p-4 dark:border-slate-800">
-              <Link to={ROUTES.ORDERS} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 text-sm font-medium text-brand-700 dark:text-brand-400">
+            <div className="mt-auto border-t border-slate-200 p-4">
+              <Link to={ROUTES.ORDERS} onClick={() => setIsMobileMenuOpen(false)} className="flex items-center gap-2 text-sm font-medium text-brand-700">
                 <Truck className="w-4 h-4" />
                 {t('header.trackOrder')}
               </Link>

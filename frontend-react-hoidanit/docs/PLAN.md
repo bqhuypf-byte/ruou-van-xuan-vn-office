@@ -58,25 +58,27 @@ pill quantity stepper, "Add to Cart". Below: 2 tabs (Mô Tả Sản Phẩm / Đ�
   app. Didn't add an always-empty tab just to match the layout; can build it once there's a real
   content source (could reuse the `site-content`-style admin-managed pattern from the Homepage).
 
-## 3. Category Page — `[~]`
+## 3. Category Page — `[x]` done, awaiting review
 
-Existing (`CategoryPage.tsx`): breadcrumb, subcategory chips, product grid, pagination — functional
-but plain. Revise to match reference's two-column layout: filter sidebar on the left (see #4),
-product grid + sort dropdown on the right, results count.
+Rebuilt `CategoryPage.tsx`: breadcrumb navigation, category hero banner with title/description, subcategory chips, 2-column responsive layout (sticky filter sidebar on desktop, full-width product grid on right), mobile filter trigger button, live product counter, active filter tags with dismiss buttons, empty state with reset filter CTA, pagination bar.
 
-## 4. Filters — `[ ]`
+## 4. Filters — `[x]` done, awaiting review
 
-Reusable filter panel (categories tree, price range slider, color swatches if applicable to variants,
-size buttons) used two ways per the reference: persistent sidebar on desktop Category Page, slide-over
-drawer on mobile ("Filters" mobile frame). Wires into existing `QueryProductDto` params
-(`categoryId`, `minPrice`, `maxPrice`) — price filtering exists on the backend already but has no
-UI yet.
+Implemented `CategoryFilterSidebar.tsx`:
+- Hierarchical category tree with active indicators and descendant expansion.
+- Price range presets (Dưới 500k, 500k-1M, 1M-2M, Trên 2M) + custom Min/Max inputs with "Áp dụng giá".
+- Clear all filters button with icon and responsive states.
+- Dual usage: persistent sticky sidebar on Desktop (`lg:block`), and slide-over animated drawer with backdrop on Mobile (`lg:hidden`).
+- Connected end-to-end to `QueryProductDto` (`categoryId`, `minPrice`, `maxPrice`) via `useProducts` hook.
 
-## 5. Cart Page — `[~]`
+## 5. Cart Page — `[x]` done, awaiting review
 
-Existing `CartPage.tsx` (cart feature) needs review against reference: line items with thumbnail/
-name/variant/price/quantity stepper/remove, order summary panel (subtotal, shipping, total), promo
-code input, checkout CTA, same newsletter band + footer as Homepage.
+Rebuilt `CartPage.tsx` and `CartItemRow.tsx`:
+- Mobile-first dual layout for line items: optimized compact card layout on Mobile (< sm) with 80x80 thumbnail, title, attribute badges, touch stepper, unit price, and quick trash action; wide tabular row on Desktop (>= sm).
+- Dynamic Free Shipping progress bar with threshold calculation and animated bar.
+- Order Summary panel with price breakdown, applied voucher indicator, promo code input form, and secure checkout CTA (sticky on Desktop).
+- Mobile sticky checkout action bar fixed at screen bottom with iOS safe-area-inset padding.
+- Integrated `PromoBand` and site footer across the experience.
 
 ---
 

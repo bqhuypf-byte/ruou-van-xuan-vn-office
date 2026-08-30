@@ -58,6 +58,9 @@ export interface ProductFilterParams {
   categoryId?: number;
   isActive?: boolean;
   isFeaturedDeal?: boolean;
+  minPrice?: number;
+  maxPrice?: number;
   page?: number;
   limit?: number;
 }
+

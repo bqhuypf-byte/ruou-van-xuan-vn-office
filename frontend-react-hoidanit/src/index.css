@@ -36,6 +36,15 @@ body {
   font-family: var(--font-sans);
 }
 
+@media (max-width: 767px) {
+  :root { color-scheme: light; }
+  .dark\:bg-slate-950, .dark\:bg-slate-900 { background-color: #fff !important; }
+  .dark\:bg-slate-800 { background-color: #f8fafc !important; }
+  .dark\:text-white, .dark\:text-slate-200, .dark\:text-slate-300 { color: #0f172a !important; }
+  .dark\:text-slate-400 { color: #64748b !important; }
+  .dark\:border-slate-800, .dark\:border-slate-700 { border-color: #e2e8f0 !important; }
+}
+
 h1,
 h2,
 h3 {

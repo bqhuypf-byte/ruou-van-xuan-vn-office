@@ -27,6 +27,8 @@ export const productService = {
         categoryId: params?.categoryId,
         isActive: params?.isActive,
         isFeaturedDeal: params?.isFeaturedDeal,
+        minPrice: params?.minPrice,
+        maxPrice: params?.maxPrice,
         page: params?.page,
         limit: params?.limit,
       },
