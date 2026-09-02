@@ -95,11 +95,11 @@ export const CartItemRow = ({
                 onClick={() => onQuantityChange(Math.max(1, item.quantity - 1))}
                 disabled={isUpdating || item.quantity <= 1}
                 aria-label={t('cart.decreaseQty')}
-                className="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
+                className="w-9 h-9 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
               >
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-7 text-center text-xs font-semibold text-slate-900 dark:text-white">
+              <span className="w-8 text-center text-xs font-semibold text-slate-900 dark:text-white">
                 {item.quantity}
               </span>
               <button
@@ -107,7 +107,7 @@ export const CartItemRow = ({
                 onClick={() => onQuantityChange(item.quantity + 1)}
                 disabled={isUpdating || item.quantity >= item.stockQuantity}
                 aria-label={t('cart.increaseQty')}
-                className="w-7 h-7 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
+                className="w-9 h-9 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
               >
                 <Plus className="w-3 h-3" />
               </button>

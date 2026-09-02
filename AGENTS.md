@@ -48,6 +48,7 @@ A full-featured e-commerce platform inspired by Amazon. This project demonstrate
 - `/fe-crud [feature]` - Generate frontend CRUD (pages, components, hooks)
 - `/be-test [feature]` - Write backend tests (unit + integration)
 - `/fe-test [feature]` - Write frontend tests (component + hook)
+- `/responsive-van-xuan [scope]` - Review or implement responsive storefront/admin behavior for mobile and tablet
 
 ### Skill Routing
 When user asks to:

@@ -9,9 +9,10 @@ import { BottleIcon } from '@/shared/components/icons';
 
 export interface DealCardProps {
   deal: FeaturedDeal;
+  className?: string;
 }
 
-export const DealCard = ({ deal }: DealCardProps) => {
+export const DealCard = ({ deal, className = '' }: DealCardProps) => {
   const { t } = useTranslation();
   const { product, price, originalPrice, discountPercent, savings, badgeText } = deal;
   const rating = product.rating ?? 0;
@@ -20,7 +21,7 @@ export const DealCard = ({ deal }: DealCardProps) => {
   return (
     <Link
       to={ROUTES.PRODUCT_DETAIL.replace(':slug', product.slug)}
-      className="group relative block shrink-0 w-[227px] rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-brand-600 transition-all"
+      className={`group relative block min-w-0 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-brand-600 transition-all ${className}`}
     >
       {badgeText ? (
         <span className="absolute top-0 right-0 z-10 bg-rose-600 text-white text-xs font-semibold px-3 py-1 rounded-bl-2xl">
@@ -44,20 +45,32 @@ export const DealCard = ({ deal }: DealCardProps) => {
           />
         ) : (
           <div
-            className="w-full h-full flex items-center justify-center text-white/85"
-            style={{ backgroundColor: getPlaceholderTint(product.id) }}
+            className="w-full h-full relative flex flex-col items-center justify-center gap-2 text-white/90 overflow-hidden"
+            style={{ background: `linear-gradient(135deg, ${getPlaceholderTint(product.id)} 0%, ${getPlaceholderTint(product.id)}dd 50%, ${getPlaceholderTint(product.id)}99 100%)` }}
           >
-            <BottleIcon className="w-10 h-10" />
+            {/* Decorative rings */}
+            <div
+              className="absolute -right-6 -top-6 w-28 h-28 rounded-full border-[3px] border-white/10"
+              aria-hidden
+            />
+            <div
+              className="absolute -left-4 -bottom-4 w-20 h-20 rounded-full border-[3px] border-white/10"
+              aria-hidden
+            />
+            <BottleIcon className="w-14 h-14 sm:w-16 sm:h-16 drop-shadow-lg" />
+            <span className="text-[10px] sm:text-xs font-medium text-white/70 text-center px-3 line-clamp-1">
+              {product.name}
+            </span>
           </div>
         )}
       </div>
 
-      <div className="bg-white dark:bg-slate-900 rounded-b-2xl p-4 space-y-1.5">
-        <p className="font-semibold text-slate-900 dark:text-white text-[16px] line-clamp-2 min-h-[2.5em]">
+      <div className="space-y-1.5 rounded-b-2xl bg-white p-2.5 sm:p-4 dark:bg-slate-900">
+        <p className="min-h-[2.5em] text-center text-sm font-semibold text-slate-900 line-clamp-2 sm:text-left sm:text-[16px] dark:text-white">
           {product.name}
         </p>
         {reviewCount > 0 && (
-          <div className="flex items-center gap-1.5">
+          <div className="hidden items-center gap-1.5 sm:flex">
             <div className="flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
@@ -73,8 +86,8 @@ export const DealCard = ({ deal }: DealCardProps) => {
             <span className="text-xs text-slate-500 dark:text-slate-400">({reviewCount})</span>
           </div>
         )}
-        <div className="flex items-baseline gap-2">
-          <span className="font-bold text-slate-900 dark:text-white text-[16px]">
+        <div className="flex items-baseline justify-center gap-2 sm:justify-start">
+          <span className="text-sm font-bold text-brand-700 sm:text-[16px] sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
             {formatPrice(price)}
           </span>
           {originalPrice !== null && (
@@ -84,11 +97,11 @@ export const DealCard = ({ deal }: DealCardProps) => {
           )}
         </div>
         {savings !== null && savings > 0 && (
-          <p className="text-[#249b3e] font-semibold text-sm">
+          <p className="hidden text-sm font-semibold text-[#249b3e] sm:block">
             {t('productCard.savings', { amount: formatPrice(savings) })}
           </p>
         )}
-        <span className="mt-2 block text-center rounded-full border border-brand-600 text-brand-600 dark:border-brand-400 dark:text-brand-400 text-xs font-semibold py-1.5 group-hover:bg-brand-600 group-hover:text-white transition-colors">
+        <span className="mt-2 hidden rounded-full border border-brand-600 py-1.5 text-center text-xs font-semibold text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white sm:block dark:border-brand-400 dark:text-brand-400">
           {t('productCard.viewProduct')}
         </span>
       </div>

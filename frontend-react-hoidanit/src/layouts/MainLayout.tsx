@@ -31,6 +31,8 @@ export const MainLayout = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isMobileSearchOpen, setIsMobileSearchOpen] = useState(false);
   const { data: settings } = useSiteSettings();
+  const hasPageActionBar =
+    location.pathname === ROUTES.CART || /^\/products\/[^/]+$/.test(location.pathname);
 
   const siteName = settings?.siteName ?? DEFAULT_SITE_NAME;
 
@@ -181,17 +183,17 @@ export const MainLayout = () => {
         </div>
       )}
 
-      <main className="flex-1 pb-[4.5rem] md:pb-0">
+      <main className={`flex-1 ${hasPageActionBar ? 'pb-0' : 'pb-[4.5rem] md:pb-0'}`}>
         <Outlet />
       </main>
 
       <Footer />
-      <nav className="fixed inset-x-0 bottom-0 z-40 flex h-[4.5rem] items-center justify-around border-t border-slate-200 bg-white px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-900 md:hidden" aria-label="Điều hướng chính">
+      {!hasPageActionBar && <nav className="fixed inset-x-0 bottom-0 z-40 flex h-[4.5rem] items-center justify-around border-t border-slate-200 bg-white px-2 pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgba(15,23,42,0.06)] dark:border-slate-800 dark:bg-slate-900 md:hidden" aria-label="Điều hướng chính">
         <MobileNavLink to={ROUTES.HOME} isActive={location.pathname === ROUTES.HOME} icon={<House className="w-5 h-5" />} label="Trang chủ" />
         <MobileNavLink to={ROUTES.PRODUCTS} isActive={location.pathname.startsWith(ROUTES.PRODUCTS) || location.pathname.startsWith('/categories')} icon={<LayoutGrid className="w-5 h-5" />} label="Sản phẩm" />
         <MobileNavLink to={ROUTES.CART} isActive={location.pathname === ROUTES.CART} icon={<ShoppingBag className="w-5 h-5" />} label={t('header.cart')} />
         <MobileNavLink to={isAuthenticated ? ROUTES.PROFILE : ROUTES.LOGIN} isActive={location.pathname === ROUTES.PROFILE || location.pathname === ROUTES.LOGIN} icon={isAuthenticated ? <UserRound className="w-5 h-5" /> : <LogIn className="w-5 h-5" />} label="Tài khoản" />
-      </nav>
+      </nav>}
       <LanguageSwitcher />
       <ContactWidget channels={settings?.contactChannels ?? []} />
       <VoucherFloatingButton onClick={() => setIsVoucherPopupOpen(true)} />

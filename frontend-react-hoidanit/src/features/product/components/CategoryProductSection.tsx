@@ -37,7 +37,7 @@ export const CategoryProductSection = ({
         </h2>
         <Link
           to={categoryLink}
-          className="inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline shrink-0"
+          className="hidden lg:inline-flex items-center gap-1 text-sm font-semibold text-brand-600 dark:text-brand-400 hover:underline shrink-0"
         >
           {t('common.viewAll')}
           <ChevronRight className="w-4 h-4" />
@@ -53,20 +53,40 @@ export const CategoryProductSection = ({
             />
           ))}
         </div>
-      ) : displayStyle === 'carousel' ? (
-        <ProductCarousel>
-          {products.map((product) => (
-            <div key={product.id} className="snap-start shrink-0 w-[227px]">
-              <ProductCard product={product} />
-            </div>
-          ))}
-        </ProductCarousel>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-5">
-          {products.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:hidden">
+            {products.slice(0, 4).map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+
+          <Link
+            to={categoryLink}
+            className="mx-auto flex min-h-11 w-fit items-center gap-1 rounded-full border border-brand-600 px-5 py-2 text-sm font-semibold text-brand-600 transition-colors hover:bg-brand-600 hover:text-white lg:hidden"
+          >
+            {t('common.viewAll')}
+            <ChevronRight className="w-4 h-4" />
+          </Link>
+
+          <div className="hidden lg:block">
+            {displayStyle === 'carousel' ? (
+              <ProductCarousel>
+                {products.map((product) => (
+                  <div key={product.id} className="snap-start shrink-0 w-[227px]">
+                    <ProductCard product={product} />
+                  </div>
+                ))}
+              </ProductCarousel>
+            ) : (
+              <div className="grid grid-cols-3 lg:grid-cols-4 gap-5">
+                {products.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+            )}
+          </div>
+        </>
       )}
     </div>
   );

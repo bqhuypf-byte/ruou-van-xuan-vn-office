@@ -1,6 +1,6 @@
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { MapPin, Phone } from 'lucide-react';
+import { ChevronDown, MapPin, Phone } from 'lucide-react';
 import { useSiteSettings } from '@/features/home';
 
 const FacebookIcon = ({ className }: { className?: string }) => (
@@ -71,8 +71,8 @@ export const Footer = () => {
 
   return (
     <footer className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14 space-y-8">
-        <div className="grid gap-10 sm:grid-cols-2 lg:grid-cols-6">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
+        <div className="grid gap-0 sm:gap-10 sm:grid-cols-2 lg:grid-cols-6">
           <div className="sm:col-span-2 lg:col-span-2 space-y-5">
             <div className="flex items-center gap-2.5 font-bold text-lg text-brand-600 dark:text-white">
               {settings?.logoUrl ? (
@@ -150,18 +150,7 @@ export const Footer = () => {
           </div>
 
           {linkColumns.map((col) => (
-            <div key={col.title}>
-              <h3 className="text-sm font-bold text-slate-900 dark:text-white">{col.title}</h3>
-              <ul className="mt-4 space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    <Link to={link.url} className="hover:text-brand-600 transition-colors">
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <FooterLinkColumn key={col.title} title={col.title} links={col.links} />
           ))}
         </div>
 
@@ -204,3 +193,42 @@ export const Footer = () => {
     </footer>
   );
 };
+
+const FooterLinkColumn = ({
+  title,
+  links,
+}: {
+  title: string;
+  links: { label: string; url: string }[];
+}) => (
+  <>
+    <details className="group border-t border-slate-200 sm:hidden dark:border-slate-800">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-3 text-sm font-bold text-slate-900 [&::-webkit-details-marker]:hidden dark:text-white">
+        {title}
+        <ChevronDown className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" />
+      </summary>
+      <ul className="space-y-2.5 pb-4 text-sm text-slate-500 dark:text-slate-400">
+        {links.map((link) => (
+          <li key={link.label}>
+            <Link to={link.url} className="hover:text-brand-600 transition-colors">
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </details>
+
+    <div className="hidden sm:block">
+      <h3 className="text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+      <ul className="mt-4 space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
+        {links.map((link) => (
+          <li key={link.label}>
+            <Link to={link.url} className="hover:text-brand-600 transition-colors">
+              {link.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </>
+);

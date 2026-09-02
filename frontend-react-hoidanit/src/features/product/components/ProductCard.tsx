@@ -55,7 +55,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
         <button
           onClick={handleWishlistClick}
           aria-label={t('productCard.wishlist')}
-          className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-8 h-8 rounded-full bg-white/90 dark:bg-slate-900/90 shadow-sm flex items-center justify-center hover:bg-white dark:hover:bg-slate-900 transition-colors"
+          className="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 hidden w-8 h-8 items-center justify-center rounded-full bg-white/90 shadow-sm transition-colors hover:bg-white sm:flex dark:bg-slate-900/90 dark:hover:bg-slate-900"
         >
           <Heart
             className={`w-4 h-4 transition-colors ${
@@ -87,26 +87,26 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
         )}
       </div>
 
-      <div className="flex flex-col flex-1 p-3 sm:p-4 gap-1.5">
-        <div className="flex items-start justify-between gap-2">
-          <h3 className="text-sm sm:text-base font-semibold text-slate-900 dark:text-white line-clamp-2 group-hover:text-brand-600 dark:group-hover:text-brand-400 transition-colors">
+      <div className="flex flex-col flex-1 gap-1.5 p-2.5 sm:p-4">
+        <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
+          <h3 className="w-full text-center text-sm font-semibold text-slate-900 line-clamp-2 transition-colors group-hover:text-brand-600 sm:text-left sm:text-base dark:text-white dark:group-hover:text-brand-400">
             {product.name}
           </h3>
           {product.priceFrom != null && (
-            <span className="shrink-0 text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+            <span className="w-full shrink-0 text-center text-sm font-bold text-brand-700 sm:w-auto sm:text-right sm:text-base sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
               {formatPrice(product.priceFrom)}
             </span>
           )}
         </div>
 
         {product.description && (
-          <p className="text-sm text-slate-500 dark:text-slate-400 line-clamp-1">
+          <p className="hidden text-sm text-slate-500 line-clamp-1 sm:block dark:text-slate-400">
             {stripHtml(product.description)}
           </p>
         )}
 
         {reviewCount > 0 && (
-          <div className="flex items-center gap-1.5">
+          <div className="hidden items-center gap-1.5 sm:flex">
             <div className="flex items-center gap-0.5">
               {Array.from({ length: 5 }).map((_, i) => (
                 <Star
@@ -123,7 +123,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
           </div>
         )}
 
-        <div className="mt-auto pt-2">
+        <div className="mt-auto hidden pt-2 sm:block">
           <Button
             variant="outline"
             size="sm"
