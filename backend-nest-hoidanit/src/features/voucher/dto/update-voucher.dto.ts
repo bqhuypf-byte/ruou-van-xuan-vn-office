@@ -29,7 +29,7 @@ export class UpdateVoucherDto {
 
   @IsOptional()
   @IsString()
-  description?: string;
+  description?: string | null;
 
   @IsOptional()
   @IsIn(['percent', 'fixed'])
@@ -48,15 +48,15 @@ export class UpdateVoucherDto {
   @IsOptional()
   @IsNumber()
   @Min(0)
-  maxDiscountAmount?: number;
+  maxDiscountAmount?: number | null;
 
   @IsOptional()
   @IsString()
-  startDate?: string;
+  startDate?: string | null;
 
   @IsOptional()
   @IsString()
-  endDate?: string;
+  endDate?: string | null;
 
   @IsOptional()
   @IsInt()

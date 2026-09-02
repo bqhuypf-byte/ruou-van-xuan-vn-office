@@ -205,7 +205,15 @@ export interface CreateVoucherInput {
   isActive?: boolean;
 }
 
-export type UpdateVoucherInput = Partial<CreateVoucherInput>;
+export type UpdateVoucherInput = Omit<
+  Partial<CreateVoucherInput>,
+  'description' | 'maxDiscountAmount' | 'startDate' | 'endDate'
+> & {
+  description?: string | null;
+  maxDiscountAmount?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+};
 
 export interface VoucherValidationResult {
   code: string;

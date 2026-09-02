@@ -1,50 +1,73 @@
 import { useEffect } from 'react';
-import { useForm } from 'react-hook-form';
+import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { Button, Input, Modal, Select } from '@/shared/components/ui';
 import type { Voucher } from '../types/home.types';
 
-const voucherSchema = z.object({
-  code: z
-    .string()
-    .min(1, 'Bắt buộc')
-    .max(50, 'Tối đa 50 ký tự')
-    .regex(/^[A-Z0-9]+$/, 'Chỉ chữ in hoa và số (vd: SALE10)'),
-  title: z.string().min(1, 'Bắt buộc').max(255, 'Tối đa 255 ký tự'),
-  description: z.string().max(2000, 'Tối đa 2000 ký tự').optional(),
-  discountType: z.enum(['percent', 'fixed']),
-  discountValue: z
-    .string()
-    .min(1, 'Bắt buộc')
-    .refine((val) => Number(val) > 0, 'Phải lớn hơn 0'),
-  minOrderAmount: z.string().optional(),
-  maxDiscountAmount: z.string().optional(),
-  startDate: z.string().optional(),
-  endDate: z.string().optional(),
-  isActive: z.boolean(),
-}).superRefine((data, ctx) => {
-  if (data.discountType === 'percent' && Number(data.discountValue) > 100) {
-    ctx.addIssue({
-      code: 'custom',
-      path: ['discountValue'],
-      message: 'Phần trăm giảm không được vượt quá 100%',
-    });
-  }
-});
+const voucherSchema = z
+  .object({
+    code: z
+      .string()
+      .min(1, 'Bắt buộc')
+      .max(50, 'Tối đa 50 ký tự')
+      .regex(/^[A-Z0-9]+$/, 'Chỉ chữ in hoa và số (vd: SALE10)'),
+    title: z.string().min(1, 'Bắt buộc').max(255, 'Tối đa 255 ký tự'),
+    description: z.string().max(2000, 'Tối đa 2000 ký tự').optional(),
+    discountType: z.enum(['percent', 'fixed']),
+    discountValue: z
+      .string()
+      .min(1, 'Bắt buộc')
+      .refine((val) => Number(val) > 0, 'Phải lớn hơn 0'),
+    minOrderAmount: z
+      .string()
+      .optional()
+      .refine((value) => !value || Number(value) >= 0, 'Không được nhỏ hơn 0'),
+    maxDiscountAmount: z
+      .string()
+      .optional()
+      .refine((value) => !value || Number(value) >= 0, 'Không được nhỏ hơn 0'),
+    startDate: z.string().optional(),
+    endDate: z.string().optional(),
+    sortOrder: z
+      .string()
+      .optional()
+      .refine(
+        (value) => !value || (Number.isInteger(Number(value)) && Number(value) >= 0),
+        'Phải là số nguyên từ 0 trở lên',
+      ),
+    isActive: z.boolean(),
+  })
+  .superRefine((data, ctx) => {
+    if (data.discountType === 'percent' && Number(data.discountValue) > 100) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['discountValue'],
+        message: 'Phần trăm giảm không được vượt quá 100%',
+      });
+    }
+    if (data.startDate && data.endDate && data.endDate < data.startDate) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['endDate'],
+        message: 'Ngày kết thúc phải sau ngày bắt đầu',
+      });
+    }
+  });
 
 type VoucherFormData = z.infer<typeof voucherSchema>;
 
 export interface VoucherFormSubmitData {
   code: string;
   title: string;
-  description?: string;
+  description?: string | null;
   discountType: 'percent' | 'fixed';
   discountValue: number;
   minOrderAmount?: number;
-  maxDiscountAmount?: number;
-  startDate?: string;
-  endDate?: string;
+  maxDiscountAmount?: number | null;
+  startDate?: string | null;
+  endDate?: string | null;
+  sortOrder?: number;
   isActive: boolean;
 }
 
@@ -66,6 +89,7 @@ const emptyValues: VoucherFormData = {
   maxDiscountAmount: '',
   startDate: '',
   endDate: '',
+  sortOrder: '0',
   isActive: true,
 };
 
@@ -82,6 +106,8 @@ export const VoucherFormModal = ({
     register,
     handleSubmit,
     reset,
+    setValue,
+    control,
     formState: { errors },
   } = useForm<VoucherFormData>({
     resolver: zodResolver(voucherSchema),
@@ -103,6 +129,7 @@ export const VoucherFormModal = ({
             : '',
           startDate: voucherToEdit.startDate ?? '',
           endDate: voucherToEdit.endDate ?? '',
+          sortOrder: String(voucherToEdit.sortOrder),
           isActive: voucherToEdit.isActive,
         });
       } else {
@@ -111,20 +138,32 @@ export const VoucherFormModal = ({
     }
   }, [isOpen, voucherToEdit, reset]);
 
+  const discountType = useWatch({ control, name: 'discountType' });
+
   const handleFormSubmit = async (data: VoucherFormData) => {
-    await onSubmit({
-      code: data.code,
-      title: data.title,
-      description: data.description || undefined,
-      discountType: data.discountType,
-      discountValue: Number(data.discountValue),
-      minOrderAmount: data.minOrderAmount ? Number(data.minOrderAmount) : undefined,
-      maxDiscountAmount: data.maxDiscountAmount ? Number(data.maxDiscountAmount) : undefined,
-      startDate: data.startDate || undefined,
-      endDate: data.endDate || undefined,
-      isActive: data.isActive,
-    });
-    onClose();
+    try {
+      await onSubmit({
+        code: data.code,
+        title: data.title,
+        description: data.description || (isEditing ? null : undefined),
+        discountType: data.discountType,
+        discountValue: Number(data.discountValue),
+        minOrderAmount: data.minOrderAmount ? Number(data.minOrderAmount) : undefined,
+        maxDiscountAmount:
+          data.discountType === 'percent' && data.maxDiscountAmount
+            ? Number(data.maxDiscountAmount)
+            : isEditing
+              ? null
+              : undefined,
+        startDate: data.startDate || (isEditing ? null : undefined),
+        endDate: data.endDate || (isEditing ? null : undefined),
+        sortOrder: data.sortOrder ? Number(data.sortOrder) : 0,
+        isActive: data.isActive,
+      });
+      onClose();
+    } catch {
+      // The page displays the API error and keeps this form open for correction.
+    }
   };
 
   return (
@@ -132,7 +171,7 @@ export const VoucherFormModal = ({
       isOpen={isOpen}
       onClose={onClose}
       title={isEditing ? 'Chỉnh Sửa Voucher' : 'Thêm Voucher Mới'}
-      description="Hiển thị trong popup 'Tất Cả Ưu Đãi' ở đầu trang cho khách hàng"
+      description="Cấu hình điều kiện và cách ưu đãi được tự động xét trong giỏ hàng"
       size="lg"
     >
       <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-5 mt-2">
@@ -143,6 +182,11 @@ export const VoucherFormModal = ({
             disabled={isEditing}
             error={errors.code?.message}
             {...register('code')}
+            onChange={(event) =>
+              setValue('code', event.target.value.toUpperCase(), {
+                shouldValidate: true,
+              })
+            }
           />
           <Input
             label="Tiêu đề"
@@ -188,7 +232,12 @@ export const VoucherFormModal = ({
             min={0}
             step={1000}
             placeholder="Để trống nếu không giới hạn"
-            helperText="Chỉ áp dụng cho loại %"
+            helperText={
+              discountType === 'percent'
+                ? 'Giới hạn số tiền giảm của voucher phần trăm'
+                : 'Không áp dụng cho giảm số tiền cố định'
+            }
+            disabled={discountType === 'fixed'}
             error={errors.maxDiscountAmount?.message}
             {...register('maxDiscountAmount')}
           />
@@ -205,7 +254,27 @@ export const VoucherFormModal = ({
             {...register('minOrderAmount')}
           />
           <Input label="Bắt đầu" type="date" {...register('startDate')} />
-          <Input label="Kết thúc" type="date" {...register('endDate')} />
+          <Input
+            label="Kết thúc"
+            type="date"
+            error={errors.endDate?.message}
+            {...register('endDate')}
+          />
+        </div>
+
+        <Input
+          label="Thứ tự hiển thị"
+          type="number"
+          min={0}
+          step={1}
+          helperText="Số nhỏ xuất hiện trước trong danh sách ưu đãi; khi mức giảm bằng nhau, số nhỏ được ưu tiên."
+          error={errors.sortOrder?.message}
+          {...register('sortOrder')}
+        />
+
+        <div className="rounded-xl border border-brand-200 bg-brand-50/70 p-3 text-xs leading-5 text-brand-900 dark:border-brand-900/60 dark:bg-brand-950/30 dark:text-brand-300">
+          Khi bật, voucher được hiển thị công khai. Giỏ hàng sẽ tự động áp voucher hợp lệ giúp khách
+          tiết kiệm nhiều nhất; khách vẫn có thể nhập mã khác để thay thế.
         </div>
 
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
@@ -214,7 +283,7 @@ export const VoucherFormModal = ({
             className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
             {...register('isActive')}
           />
-          Hiển thị voucher này cho khách hàng
+          Kích hoạt, hiển thị công khai và cho phép tự động áp dụng
         </label>
 
         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800">

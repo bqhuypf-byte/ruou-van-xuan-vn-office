@@ -100,8 +100,12 @@ export class VoucherService {
       voucher.discountValue = dto.discountValue.toFixed(2);
     if (dto.minOrderAmount !== undefined)
       voucher.minOrderAmount = dto.minOrderAmount.toFixed(2);
-    if (dto.maxDiscountAmount !== undefined)
-      voucher.maxDiscountAmount = dto.maxDiscountAmount.toFixed(2);
+    if (dto.maxDiscountAmount !== undefined) {
+      voucher.maxDiscountAmount =
+        dto.maxDiscountAmount === null
+          ? null
+          : dto.maxDiscountAmount.toFixed(2);
+    }
     if (dto.startDate !== undefined) voucher.startDate = dto.startDate;
     if (dto.endDate !== undefined) voucher.endDate = dto.endDate;
     if (dto.sortOrder !== undefined) voucher.sortOrder = dto.sortOrder;

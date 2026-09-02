@@ -25,6 +25,8 @@ const makeVoucher = (overrides: Partial<Voucher> = {}): Voucher =>
 describe('VoucherService', () => {
   const repository = {
     findByCode: jest.fn(),
+    findById: jest.fn(),
+    save: jest.fn(),
   } as unknown as jest.Mocked<VoucherRepository>;
   const service = new VoucherService(repository);
 
@@ -68,5 +70,28 @@ describe('VoucherService', () => {
     await expect(service.validate('SALE10', 200000)).rejects.toBeInstanceOf(
       BadRequestException,
     );
+  });
+
+  it('clears optional voucher fields when Admin removes their values', async () => {
+    const voucher = makeVoucher({
+      description: 'Điều kiện cũ',
+      maxDiscountAmount: '100000.00',
+      startDate: '2026-01-01',
+      endDate: '2026-12-31',
+    });
+    repository.findById.mockResolvedValue(voucher);
+    repository.save.mockResolvedValue(voucher);
+
+    const result = await service.update(1, {
+      description: null,
+      maxDiscountAmount: null,
+      startDate: null,
+      endDate: null,
+    });
+
+    expect(result.description).toBeNull();
+    expect(result.maxDiscountAmount).toBeNull();
+    expect(result.startDate).toBeNull();
+    expect(result.endDate).toBeNull();
   });
 });

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -15,20 +15,23 @@ import { Button } from '@/shared/components/ui';
 import { PromoBand } from '@/shared/components/layout';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { formatPrice } from '@/shared/utils/formatPrice';
-import { useSiteSettings, useVoucherValidation } from '@/features/home';
+import {
+  getBestEligibleVoucher,
+  getNextVoucher,
+  useSiteSettings,
+  useVoucherValidation,
+  useVouchers,
+} from '@/features/home';
 import { ROUTES } from '@/routes/routes';
 import { CartItemRow } from '../components/CartItemRow';
 import { useCart } from '../hooks/useCart';
-import {
-  useClearCart,
-  useRemoveCartItem,
-  useUpdateCartItem,
-} from '../hooks/useCartMutations';
+import { useClearCart, useRemoveCartItem, useUpdateCartItem } from '../hooks/useCartMutations';
 
 export const CartPage = () => {
   const { t } = useTranslation();
   const { items, itemCount, subtotal, isLoading, isError, error, refetch } = useCart();
   const { data: settings } = useSiteSettings();
+  const { data: publicVouchers } = useVouchers();
   const updateItem = useUpdateCartItem();
   const removeItem = useRemoveCartItem();
   const clearCart = useClearCart();
@@ -37,8 +40,18 @@ export const CartPage = () => {
   const [couponCode, setCouponCode] = useState('');
   const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
 
-  const voucherValidation = useVoucherValidation(appliedCouponCode, subtotal);
+  const automaticVoucher = useMemo(
+    () => getBestEligibleVoucher(publicVouchers ?? [], subtotal),
+    [publicVouchers, subtotal],
+  );
+  const nextVoucher = useMemo(
+    () => getNextVoucher(publicVouchers ?? [], subtotal),
+    [publicVouchers, subtotal],
+  );
+  const effectiveVoucherCode = appliedCouponCode ?? automaticVoucher?.code ?? null;
+  const voucherValidation = useVoucherValidation(effectiveVoucherCode, subtotal);
   const appliedVoucher = voucherValidation.data;
+  const isManualVoucher = Boolean(appliedCouponCode);
   const discountAmount = appliedVoucher?.discountAmount ?? 0;
   const discountedSubtotal = Math.max(0, subtotal - discountAmount);
   const checkoutHref = appliedVoucher
@@ -99,12 +112,20 @@ export const CartPage = () => {
     }
   };
 
+  const handleUseAutomaticVoucher = () => {
+    setCouponCode('');
+    setAppliedCouponCode(null);
+  };
+
   return (
     <div className="min-h-screen bg-slate-50/60 dark:bg-slate-950">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10 space-y-8">
         {/* Breadcrumb */}
         <nav className="flex items-center gap-1.5 text-xs sm:text-sm text-slate-500 dark:text-slate-400">
-          <Link to={ROUTES.HOME} className="hover:text-brand-700 dark:hover:text-brand-400 transition-colors">
+          <Link
+            to={ROUTES.HOME}
+            className="hover:text-brand-700 dark:hover:text-brand-400 transition-colors"
+          >
             {t('common.home', 'Trang chủ')}
           </Link>
           <ChevronRight className="w-3.5 h-3.5" />
@@ -119,7 +140,8 @@ export const CartPage = () => {
             </h1>
             {items.length > 0 && (
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Bạn đang có <strong className="text-slate-900 dark:text-white">{itemCount}</strong> sản phẩm trong giỏ hàng
+                Bạn đang có <strong className="text-slate-900 dark:text-white">{itemCount}</strong>{' '}
+                sản phẩm trong giỏ hàng
               </p>
             )}
           </div>
@@ -179,7 +201,11 @@ export const CartPage = () => {
               {t('cart.emptySubtitle')}
             </p>
             <Link to={ROUTES.PRODUCTS}>
-              <Button size="lg" className="rounded-full shadow-md px-8" rightIcon={<ArrowRight className="w-4 h-4" />}>
+              <Button
+                size="lg"
+                className="rounded-full shadow-md px-8"
+                rightIcon={<ArrowRight className="w-4 h-4" />}
+              >
                 {t('common.continueShopping')}
               </Button>
             </Link>
@@ -196,11 +222,13 @@ export const CartPage = () => {
                       <Truck className="w-4 h-4 text-brand-700 dark:text-brand-400 shrink-0" />
                       <span>
                         {amountToFreeShipping === 0
-                          ? '🎉 Chúc mừng! Đơn hàng của bạn đã đủ điều kiện Freeship.'
+                          ? 'Đơn hàng đã đủ điều kiện miễn phí giao hàng.'
                           : `Mua thêm ${formatPrice(amountToFreeShipping)} để được Miễn phí giao hàng`}
                       </span>
                     </div>
-                    <span className="text-xs text-brand-700 dark:text-brand-400 font-bold">{shippingProgress}%</span>
+                    <span className="text-xs text-brand-700 dark:text-brand-400 font-bold">
+                      {shippingProgress}%
+                    </span>
                   </div>
                   <div className="h-2 w-full rounded-full bg-brand-200/50 dark:bg-brand-900/50 overflow-hidden">
                     <div
@@ -234,11 +262,15 @@ export const CartPage = () => {
               <div className="space-y-3 text-sm">
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>{t('cart.itemCount')}</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{itemCount} sản phẩm</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {itemCount} sản phẩm
+                  </span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>{t('cart.subtotal')}</span>
-                  <span className="font-semibold text-slate-900 dark:text-white">{formatPrice(subtotal)}</span>
+                  <span className="font-semibold text-slate-900 dark:text-white">
+                    {formatPrice(subtotal)}
+                  </span>
                 </div>
                 <div className="flex justify-between text-slate-600 dark:text-slate-400">
                   <span>Phí vận chuyển</span>
@@ -253,7 +285,7 @@ export const CartPage = () => {
                       <Tag className="w-3.5 h-3.5" />
                       Mã: {appliedVoucher.code}
                     </span>
-                    <span>Đã áp dụng</span>
+                    <span>{isManualVoucher ? 'Đã áp dụng' : 'Tự động'}</span>
                   </div>
                 )}
                 {appliedVoucher && (
@@ -266,6 +298,18 @@ export const CartPage = () => {
 
               {/* Promo Code Input */}
               <form onSubmit={handleApplyCoupon} className="pt-2">
+                {!isManualVoucher && appliedVoucher && (
+                  <p className="mb-2 text-xs text-slate-500 dark:text-slate-400">
+                    Hệ thống đã chọn ưu đãi tiết kiệm nhất cho đơn hàng này.
+                  </p>
+                )}
+                {!appliedVoucher && nextVoucher && (
+                  <div className="mb-3 rounded-xl border border-brand-200 bg-brand-50/70 p-3 text-xs text-brand-900 dark:border-brand-900/60 dark:bg-brand-950/30 dark:text-brand-300">
+                    Mua thêm{' '}
+                    <strong>{formatPrice(Number(nextVoucher.minOrderAmount) - subtotal)}</strong> để
+                    nhận ưu đãi “{nextVoucher.title}”.
+                  </div>
+                )}
                 <div className="flex gap-2">
                   <div className="relative flex-1">
                     <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
@@ -292,19 +336,33 @@ export const CartPage = () => {
                     {getApiErrorMessage(voucherValidation.error, 'Mã khuyến mãi không hợp lệ.')}
                   </p>
                 )}
+                {isManualVoucher && automaticVoucher && (
+                  <button
+                    type="button"
+                    onClick={handleUseAutomaticVoucher}
+                    className="mt-2 text-xs font-semibold text-brand-700 hover:underline dark:text-brand-400"
+                  >
+                    Dùng lại ưu đãi tốt nhất
+                  </button>
+                )}
               </form>
 
               {/* Total & Checkout CTA */}
               <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-4">
                 <div className="flex justify-between items-baseline">
-                  <span className="text-base font-bold text-slate-900 dark:text-white">Tổng thanh toán</span>
+                  <span className="text-base font-bold text-slate-900 dark:text-white">
+                    Tổng thanh toán
+                  </span>
                   <span className="text-xl sm:text-2xl font-extrabold text-brand-700 dark:text-brand-400 font-heading">
                     {formatPrice(discountedSubtotal)}
                   </span>
                 </div>
 
                 <Link to={checkoutHref} className="block">
-                  <Button size="lg" className="w-full rounded-2xl py-3.5 font-bold shadow-md shadow-brand-900/10">
+                  <Button
+                    size="lg"
+                    className="w-full rounded-2xl py-3.5 font-bold shadow-md shadow-brand-900/10"
+                  >
                     {t('cart.proceedToCheckout')}
                   </Button>
                 </Link>
@@ -329,7 +387,9 @@ export const CartPage = () => {
         <div className="fixed inset-x-0 bottom-0 z-30 lg:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-3.5 pb-[calc(1rem+env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">
           <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
             <div>
-              <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Tổng cộng</span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">
+                Tổng cộng
+              </span>
               <span className="text-lg font-extrabold text-brand-700 dark:text-brand-400 font-heading leading-tight">
                 {formatPrice(discountedSubtotal)}
               </span>

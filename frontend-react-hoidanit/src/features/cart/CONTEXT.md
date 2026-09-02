@@ -18,9 +18,12 @@ Cart state is server-backed (per `01-share-docs/API_SPEC.md`'s Cart Feature), no
 ## Architecture-diagram exception
 
 FE-ARCHITECTURE.md's Cross-Feature Communication diagram only draws `cart → product` and `cart → auth`. Two intentional exceptions here, both narrow (a hook import, not deep internals):
+
 - `features/product/pages/ProductViewPage.tsx` imports `useAddCartItem` from `@/features/cart` (product → cart) — the product detail page is where "Add to Cart" naturally lives.
 - `features/auth/pages/LoginPage.tsx` imports `useMergeCart` from `@/features/cart` (auth → cart) — merging the guest cart into the user's cart is a natural post-login side effect (best-effort: failure doesn't block login/navigation, since a guest cart may simply not exist).
 
 ## Checkout
 
-The cart validates a voucher with `POST /vouchers/validate` against the live item subtotal. A valid fixed or percentage discount updates the displayed total immediately, then the code is passed to `/checkout?voucher=...`. Checkout validates it again before order submission, and the backend performs the final authoritative validation when creating the order.
+The cart loads public vouchers from `GET /vouchers`, calculates which currently eligible voucher saves the customer the most, and validates that voucher with `POST /vouchers/validate` before applying it automatically. If no voucher is eligible yet, it shows the nearest minimum-order threshold as an upsell prompt. Customers can still enter a different code manually; that choice overrides the automatic recommendation until they select "Dùng lại ưu đãi tốt nhất".
+
+A valid fixed or percentage discount updates the displayed total immediately, then the code is passed to `/checkout?voucher=...`. Checkout validates it again before order submission, and the backend performs the final authoritative validation when creating the order.
