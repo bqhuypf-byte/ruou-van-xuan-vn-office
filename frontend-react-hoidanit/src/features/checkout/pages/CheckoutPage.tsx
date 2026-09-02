@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
@@ -16,7 +16,7 @@ import { formatPrice } from '@/shared/utils/formatPrice';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { useCart } from '@/features/cart';
-import { useSiteSettings } from '@/features/home';
+import { useSiteSettings, useVoucherValidation } from '@/features/home';
 import { useAddresses } from '@/features/user-profile';
 import { ROUTES } from '@/routes/routes';
 import { useCheckout } from '../hooks/useCheckout';
@@ -55,10 +55,14 @@ const PAYMENT_METHODS: {
 export const CheckoutPage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { items, itemCount, subtotal, isLoading: isCartLoading } = useCart();
   const { addresses, isLoading: isAddressesLoading } = useAddresses();
   const { data: settings } = useSiteSettings();
   const checkout = useCheckout();
+  const voucherCode = searchParams.get('voucher')?.trim().toUpperCase() || null;
+  const voucherValidation = useVoucherValidation(voucherCode, subtotal);
+  const appliedVoucher = voucherValidation.data;
 
   const [selectedAddressIdOverride, setSelectedAddressIdOverride] = useState<number | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cod');
@@ -74,8 +78,14 @@ export const CheckoutPage = () => {
   const isPickup = paymentMethod === 'store_pickup';
   const isFreeShipping = isPickup || (freeShippingThreshold > 0 && subtotal >= freeShippingThreshold);
   const shippingFee = isFreeShipping ? 0 : Number(settings?.shippingFee ?? 0);
-  const total = subtotal + shippingFee;
+  const discountAmount = appliedVoucher?.discountAmount ?? 0;
+  const total = Math.max(0, subtotal - discountAmount + shippingFee);
   const amountToFreeShipping = freeShippingThreshold - subtotal;
+  const checkoutError =
+    error ??
+    (voucherValidation.isError
+      ? getApiErrorMessage(voucherValidation.error, 'Mã khuyến mãi không còn hợp lệ.')
+      : null);
 
   const handlePlaceOrder = async () => {
     if (!selectedAddressId) return;
@@ -85,6 +95,7 @@ export const CheckoutPage = () => {
         addressId: selectedAddressId,
         paymentMethod,
         pickupStoreIndex: isPickup ? selectedStoreIndex : undefined,
+        voucherCode: appliedVoucher?.code,
         items: items.map((item) => ({
           productVariantId: item.productVariantId,
           productName: item.productName ?? item.sku,
@@ -131,10 +142,10 @@ export const CheckoutPage = () => {
           {t('checkout.title')}
         </h1>
 
-        {error && (
+        {checkoutError && (
           <div className="p-4 rounded-xl text-sm bg-rose-50 text-rose-800 dark:bg-rose-950/50 dark:text-rose-300 border border-rose-200 dark:border-rose-800 flex items-center gap-2">
             <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{error}</span>
+            <span>{checkoutError}</span>
           </div>
         )}
 
@@ -333,6 +344,16 @@ export const CheckoutPage = () => {
               <span>{itemCount}</span>
             </div>
             <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+              <span>{t('cart.subtotal')}</span>
+              <span>{formatPrice(subtotal)}</span>
+            </div>
+            {appliedVoucher && (
+              <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+                <span>Mã giảm giá ({appliedVoucher.code})</span>
+                <span className="font-semibold">-{formatPrice(discountAmount)}</span>
+              </div>
+            )}
+            <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
               <span>{t('order.shippingFee')}</span>
               <span>{isFreeShipping ? t('checkout.freeShipping') : formatPrice(shippingFee)}</span>
             </div>
@@ -358,7 +379,12 @@ export const CheckoutPage = () => {
             <Button
               className="w-full"
               size="lg"
-              disabled={!selectedAddressId || (isPickup && stores.length === 0)}
+              disabled={
+                !selectedAddressId ||
+                (isPickup && stores.length === 0) ||
+                (Boolean(voucherCode) &&
+                  (voucherValidation.isLoading || voucherValidation.isError))
+              }
               isLoading={checkout.isPending}
               onClick={handlePlaceOrder}
             >

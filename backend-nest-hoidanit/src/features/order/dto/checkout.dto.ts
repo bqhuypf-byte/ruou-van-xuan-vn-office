@@ -9,6 +9,7 @@ import {
   Min,
   MaxLength,
   ValidateNested,
+  Matches,
 } from 'class-validator';
 import { CheckoutItemDto } from './checkout-item.dto';
 
@@ -25,6 +26,12 @@ export class CheckoutDto {
   @IsInt()
   @Min(0)
   pickupStoreIndex?: number;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  @Matches(/^[A-Z0-9]+$/)
+  voucherCode?: string;
 
   @IsArray()
   @ArrayMinSize(1)

@@ -244,6 +244,16 @@ Types: image/jpeg, image/png, image/webp
 | PATCH | `/admin/orders/:id/status` | Update status | Admin |
 | PATCH | `/admin/orders/:id/payment` | Update payment | Admin |
 
+### Voucher Feature
+
+| Method | Path | Description | Auth |
+|--------|------|-------------|------|
+| POST | `/vouchers/validate` | Validate a voucher and calculate its discount for an order subtotal | No |
+| GET | `/admin/vouchers` | List vouchers | Admin |
+| POST | `/admin/vouchers` | Create voucher | Admin |
+| PATCH | `/admin/vouchers/:id` | Update voucher | Admin |
+| DELETE | `/admin/vouchers/:id` | Delete voucher | Admin |
+
 ### Review Feature
 
 | Method | Path | Description | Auth |
@@ -323,7 +333,8 @@ Types: image/jpeg, image/png, image/webp
 {
   "addressId": 5,
   "paymentMethod": "cod",
-  "note": "Call before delivery"
+  "note": "Call before delivery",
+  "voucherCode": "SALE10"
 }
 
 // Response 201
@@ -361,8 +372,9 @@ Types: image/jpeg, image/png, image/webp
 2. Snapshot product info → `order_items`
 3. Snapshot address → `shipping_address` (JSON)
 4. Deduct stock from `product_variants`
-5. Clear cart
-6. Use database transaction
+5. Revalidate `voucherCode` against the item subtotal and apply the configured fixed or percentage discount
+6. Clear cart
+7. Use database transaction
 
 | Error | Status | Condition |
 |-------|--------|-----------|

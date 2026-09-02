@@ -1,12 +1,42 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { VoucherRepository } from './repositories/voucher.repository';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Voucher } from './entities/voucher.entity';
 
+export interface VoucherValidationResult {
+  code: string;
+  title: string;
+  discountType: 'percent' | 'fixed';
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscountAmount: number | null;
+  discountAmount: number;
+  finalAmount: number;
+}
+
 @Injectable()
 export class VoucherService {
   constructor(private readonly voucherRepository: VoucherRepository) {}
+
+  private validateDiscountValue(
+    type: 'percent' | 'fixed',
+    value: number,
+  ): void {
+    if (value <= 0) {
+      throw new BadRequestException('Giá trị giảm giá phải lớn hơn 0');
+    }
+    if (type === 'percent' && value > 100) {
+      throw new BadRequestException(
+        'Mức giảm theo phần trăm không được vượt quá 100%',
+      );
+    }
+  }
 
   findActive(): Promise<Voucher[]> {
     return this.voucherRepository.findActiveSorted();
@@ -25,6 +55,7 @@ export class VoucherService {
   }
 
   async create(dto: CreateVoucherDto): Promise<Voucher> {
+    this.validateDiscountValue(dto.discountType, dto.discountValue);
     const existing = await this.voucherRepository.findByCode(dto.code);
     if (existing) {
       throw new ConflictException(`Mã voucher "${dto.code}" đã tồn tại`);
@@ -37,7 +68,9 @@ export class VoucherService {
       discountValue: dto.discountValue.toFixed(2),
       minOrderAmount: (dto.minOrderAmount ?? 0).toFixed(2),
       maxDiscountAmount:
-        dto.maxDiscountAmount !== undefined ? dto.maxDiscountAmount.toFixed(2) : null,
+        dto.maxDiscountAmount !== undefined
+          ? dto.maxDiscountAmount.toFixed(2)
+          : null,
       startDate: dto.startDate ?? null,
       endDate: dto.endDate ?? null,
       sortOrder: dto.sortOrder ?? 0,
@@ -48,6 +81,10 @@ export class VoucherService {
 
   async update(id: number, dto: UpdateVoucherDto): Promise<Voucher> {
     const voucher = await this.findOne(id);
+    this.validateDiscountValue(
+      dto.discountType ?? voucher.discountType,
+      dto.discountValue ?? Number(voucher.discountValue),
+    );
     if (dto.code && dto.code !== voucher.code) {
       const existing = await this.voucherRepository.findByCode(dto.code);
       if (existing) {
@@ -59,8 +96,10 @@ export class VoucherService {
     if (dto.title !== undefined) voucher.title = dto.title;
     if (dto.description !== undefined) voucher.description = dto.description;
     if (dto.discountType !== undefined) voucher.discountType = dto.discountType;
-    if (dto.discountValue !== undefined) voucher.discountValue = dto.discountValue.toFixed(2);
-    if (dto.minOrderAmount !== undefined) voucher.minOrderAmount = dto.minOrderAmount.toFixed(2);
+    if (dto.discountValue !== undefined)
+      voucher.discountValue = dto.discountValue.toFixed(2);
+    if (dto.minOrderAmount !== undefined)
+      voucher.minOrderAmount = dto.minOrderAmount.toFixed(2);
     if (dto.maxDiscountAmount !== undefined)
       voucher.maxDiscountAmount = dto.maxDiscountAmount.toFixed(2);
     if (dto.startDate !== undefined) voucher.startDate = dto.startDate;
@@ -69,6 +108,62 @@ export class VoucherService {
     if (dto.isActive !== undefined) voucher.isActive = dto.isActive;
 
     return this.voucherRepository.save(voucher);
+  }
+
+  async validate(
+    code: string,
+    orderAmount: number,
+  ): Promise<VoucherValidationResult> {
+    const normalizedCode = code.trim().toUpperCase();
+    const voucher = await this.voucherRepository.findByCode(normalizedCode);
+
+    if (!voucher || !voucher.isActive) {
+      throw new BadRequestException(
+        'Mã khuyến mãi không hợp lệ hoặc đã ngừng áp dụng',
+      );
+    }
+
+    const today = new Date().toISOString().slice(0, 10);
+    if (voucher.startDate && voucher.startDate > today) {
+      throw new BadRequestException('Mã khuyến mãi chưa đến thời gian áp dụng');
+    }
+    if (voucher.endDate && voucher.endDate < today) {
+      throw new BadRequestException('Mã khuyến mãi đã hết hạn');
+    }
+
+    const minOrderAmount = Number(voucher.minOrderAmount);
+    if (orderAmount < minOrderAmount) {
+      throw new BadRequestException(
+        `Đơn hàng phải đạt tối thiểu ${minOrderAmount.toLocaleString('vi-VN')} đ`,
+      );
+    }
+
+    const discountValue = Number(voucher.discountValue);
+    const maxDiscountAmount = voucher.maxDiscountAmount
+      ? Number(voucher.maxDiscountAmount)
+      : null;
+    let discountAmount =
+      voucher.discountType === 'percent'
+        ? (orderAmount * discountValue) / 100
+        : discountValue;
+
+    if (voucher.discountType === 'percent' && maxDiscountAmount !== null) {
+      discountAmount = Math.min(discountAmount, maxDiscountAmount);
+    }
+
+    discountAmount =
+      Math.round(Math.min(discountAmount, orderAmount) * 100) / 100;
+
+    return {
+      code: voucher.code,
+      title: voucher.title,
+      discountType: voucher.discountType,
+      discountValue,
+      minOrderAmount,
+      maxDiscountAmount,
+      discountAmount,
+      finalAmount: Math.round((orderAmount - discountAmount) * 100) / 100,
+    };
   }
 
   async remove(id: number): Promise<void> {

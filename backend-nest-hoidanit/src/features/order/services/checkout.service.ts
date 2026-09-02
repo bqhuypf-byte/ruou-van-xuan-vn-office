@@ -4,6 +4,7 @@ import { CartService } from '../../cart/cart.service';
 import { CartIdentity } from '../../cart/types/cart.types';
 import { UserProfileService } from '../../user-profile/user-profile.service';
 import { SiteSettingsService } from '../../site-settings/site-settings.service';
+import { VoucherService } from '../../voucher/voucher.service';
 import { CheckoutDto } from '../dto/checkout.dto';
 import { Order } from '../entities/order.entity';
 import { OrderItem } from '../entities/order-item.entity';
@@ -15,6 +16,7 @@ export class CheckoutService {
     private readonly userProfileService: UserProfileService,
     private readonly cartService: CartService,
     private readonly siteSettingsService: SiteSettingsService,
+    private readonly voucherService: VoucherService,
   ) {}
 
   async execute(
@@ -31,12 +33,18 @@ export class CheckoutService {
       (sum, item) => sum + item.price * item.quantity,
       0,
     );
+    const voucher = dto.voucherCode
+      ? await this.voucherService.validate(dto.voucherCode, itemsTotal)
+      : null;
     const freeShippingThreshold = Number(settings.freeShippingThreshold);
     const isFreeShipping =
       dto.paymentMethod === 'store_pickup' ||
       itemsTotal >= freeShippingThreshold;
     const shippingFee = isFreeShipping ? 0 : Number(settings.shippingFee);
-    const totalAmount = itemsTotal + shippingFee;
+    const totalAmount = Math.max(
+      0,
+      itemsTotal - (voucher?.discountAmount ?? 0) + shippingFee,
+    );
 
     const pickupStore =
       dto.paymentMethod === 'store_pickup'

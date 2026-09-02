@@ -13,5 +13,6 @@ export interface CheckoutInput {
   addressId: number;
   paymentMethod: PaymentMethod;
   pickupStoreIndex?: number;
+  voucherCode?: string;
   items: CheckoutItemInput[];
 }

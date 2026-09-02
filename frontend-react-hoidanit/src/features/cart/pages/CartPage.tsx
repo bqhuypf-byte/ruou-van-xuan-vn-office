@@ -15,7 +15,7 @@ import { Button } from '@/shared/components/ui';
 import { PromoBand } from '@/shared/components/layout';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { formatPrice } from '@/shared/utils/formatPrice';
-import { useSiteSettings } from '@/features/home';
+import { useSiteSettings, useVoucherValidation } from '@/features/home';
 import { ROUTES } from '@/routes/routes';
 import { CartItemRow } from '../components/CartItemRow';
 import { useCart } from '../hooks/useCart';
@@ -35,7 +35,15 @@ export const CartPage = () => {
   const [feedback, setFeedback] = useState<string | null>(null);
   const [busyItemId, setBusyItemId] = useState<number | null>(null);
   const [couponCode, setCouponCode] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState<string | null>(null);
+  const [appliedCouponCode, setAppliedCouponCode] = useState<string | null>(null);
+
+  const voucherValidation = useVoucherValidation(appliedCouponCode, subtotal);
+  const appliedVoucher = voucherValidation.data;
+  const discountAmount = appliedVoucher?.discountAmount ?? 0;
+  const discountedSubtotal = Math.max(0, subtotal - discountAmount);
+  const checkoutHref = appliedVoucher
+    ? `${ROUTES.CHECKOUT}?voucher=${encodeURIComponent(appliedVoucher.code)}`
+    : ROUTES.CHECKOUT;
 
   const freeShippingThreshold = Number(settings?.freeShippingThreshold ?? 0);
   const amountToFreeShipping = Math.max(0, freeShippingThreshold - subtotal);
@@ -82,7 +90,13 @@ export const CartPage = () => {
   const handleApplyCoupon = (e: React.FormEvent) => {
     e.preventDefault();
     if (!couponCode.trim()) return;
-    setAppliedCoupon(couponCode.trim().toUpperCase());
+    const normalizedCode = couponCode.trim().toUpperCase();
+    setCouponCode(normalizedCode);
+    if (normalizedCode === appliedCouponCode) {
+      void voucherValidation.refetch();
+    } else {
+      setAppliedCouponCode(normalizedCode);
+    }
   };
 
   return (
@@ -233,13 +247,19 @@ export const CartPage = () => {
                   </span>
                 </div>
 
-                {appliedCoupon && (
+                {appliedVoucher && (
                   <div className="flex justify-between text-emerald-600 dark:text-emerald-400 text-xs font-semibold bg-emerald-50 dark:bg-emerald-950/40 p-2.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
                     <span className="flex items-center gap-1.5">
                       <Tag className="w-3.5 h-3.5" />
-                      Mã: {appliedCoupon}
+                      Mã: {appliedVoucher.code}
                     </span>
                     <span>Đã áp dụng</span>
+                  </div>
+                )}
+                {appliedVoucher && (
+                  <div className="flex justify-between text-emerald-600 dark:text-emerald-400">
+                    <span>Giảm giá</span>
+                    <span className="font-semibold">-{formatPrice(discountAmount)}</span>
                   </div>
                 )}
               </div>
@@ -257,10 +277,21 @@ export const CartPage = () => {
                       className="w-full pl-9 pr-3 py-2 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-1 focus:ring-brand-600"
                     />
                   </div>
-                  <Button type="submit" variant="outline" size="sm" className="rounded-xl text-xs px-3.5">
+                  <Button
+                    type="submit"
+                    variant="outline"
+                    size="sm"
+                    isLoading={voucherValidation.isFetching}
+                    className="rounded-xl text-xs px-3.5"
+                  >
                     Áp dụng
                   </Button>
                 </div>
+                {voucherValidation.isError && appliedCouponCode && (
+                  <p className="mt-2 text-xs text-rose-600 dark:text-rose-400">
+                    {getApiErrorMessage(voucherValidation.error, 'Mã khuyến mãi không hợp lệ.')}
+                  </p>
+                )}
               </form>
 
               {/* Total & Checkout CTA */}
@@ -268,11 +299,11 @@ export const CartPage = () => {
                 <div className="flex justify-between items-baseline">
                   <span className="text-base font-bold text-slate-900 dark:text-white">Tổng thanh toán</span>
                   <span className="text-xl sm:text-2xl font-extrabold text-brand-700 dark:text-brand-400 font-heading">
-                    {formatPrice(subtotal)}
+                    {formatPrice(discountedSubtotal)}
                   </span>
                 </div>
 
-                <Link to={ROUTES.CHECKOUT} className="block">
+                <Link to={checkoutHref} className="block">
                   <Button size="lg" className="w-full rounded-2xl py-3.5 font-bold shadow-md shadow-brand-900/10">
                     {t('cart.proceedToCheckout')}
                   </Button>
@@ -300,10 +331,10 @@ export const CartPage = () => {
             <div>
               <span className="text-[11px] text-slate-500 dark:text-slate-400 block leading-tight">Tổng cộng</span>
               <span className="text-lg font-extrabold text-brand-700 dark:text-brand-400 font-heading leading-tight">
-                {formatPrice(subtotal)}
+                {formatPrice(discountedSubtotal)}
               </span>
             </div>
-            <Link to={ROUTES.CHECKOUT} className="flex-1 max-w-[200px]">
+            <Link to={checkoutHref} className="flex-1 max-w-[200px]">
               <Button size="md" className="w-full rounded-xl font-bold">
                 {t('cart.proceedToCheckout')}
               </Button>

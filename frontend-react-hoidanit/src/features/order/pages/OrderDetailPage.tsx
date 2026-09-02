@@ -125,6 +125,14 @@ export const OrderDetailPage = () => {
   }
 
   const canCancel = CANCELLABLE_STATUSES.includes(order.status);
+  const itemsSubtotal = order.items.reduce(
+    (sum, item) => sum + Number(item.price) * item.quantity,
+    0,
+  );
+  const discountAmount = Math.max(
+    0,
+    itemsSubtotal + Number(order.shippingFee) - Number(order.totalAmount),
+  );
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
@@ -377,6 +385,16 @@ export const OrderDetailPage = () => {
         </div>
 
         <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-6 shadow-sm space-y-2">
+          <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
+            <span>{t('cart.subtotal')}</span>
+            <span>{formatPrice(itemsSubtotal)}</span>
+          </div>
+          {discountAmount > 0 && (
+            <div className="flex justify-between text-sm text-emerald-600 dark:text-emerald-400">
+              <span>Giảm giá</span>
+              <span>-{formatPrice(discountAmount)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm text-slate-600 dark:text-slate-400">
             <span>{t('order.shippingFee')}</span>
             <span>{formatPrice(Number(order.shippingFee))}</span>

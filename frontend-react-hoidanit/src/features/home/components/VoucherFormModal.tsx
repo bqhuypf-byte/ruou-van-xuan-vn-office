@@ -23,6 +23,14 @@ const voucherSchema = z.object({
   startDate: z.string().optional(),
   endDate: z.string().optional(),
   isActive: z.boolean(),
+}).superRefine((data, ctx) => {
+  if (data.discountType === 'percent' && Number(data.discountValue) > 100) {
+    ctx.addIssue({
+      code: 'custom',
+      path: ['discountValue'],
+      message: 'Phần trăm giảm không được vượt quá 100%',
+    });
+  }
 });
 
 type VoucherFormData = z.infer<typeof voucherSchema>;

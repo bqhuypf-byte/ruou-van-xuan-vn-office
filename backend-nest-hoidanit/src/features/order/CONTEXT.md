@@ -22,6 +22,8 @@ CRUD + checkout for `orders` and `order_items` (per `01-share-docs/DATABASE.md`)
 
 Decision (confirmed with the project owner): `CheckoutDto` instead requires the client to pass a full `items: CheckoutItemDto[]` array — `productVariantId`, `productName`, `sku`, `price`, `quantity`, `thumbnailUrl?` — supplied directly by the client. This lets checkout work standalone today. **Swap this for a real `product_variants` lookup (with stock validation + `NOT` trusting client-supplied price) once that entity exists** — accepting price from the client is not safe for a real checkout flow.
 
+Voucher handling: `CheckoutDto` accepts an optional `voucherCode`. `CheckoutService` revalidates that code through `VoucherService` against the submitted item subtotal before saving the discounted total. Fixed discounts and percentage discounts are both supported; percentage vouchers respect `maxDiscountAmount`, and every discount is capped at the item subtotal.
+
 Consequences of this gap:
 - **No stock validation or deduction** happens (`PROD_003` from API_SPEC.md's error table is not raised anywhere in this feature).
 - `note` from the API_SPEC.md request example is not accepted/stored — `orders` has no `note` column in DATABASE.md.
@@ -32,5 +34,6 @@ Consequences of this gap:
 - `CheckoutService.execute` uses a `DataSource` `QueryRunner` transaction (per `BE-PROJECT-RULES.md`'s example) to insert the `Order` row and all `OrderItem` rows atomically.
 - `shippingAddress` is snapshotted from [[user-profile feature]]'s `Address` (validated via `UserProfileService.findOne(addressId, userId)`, so a non-owned address 404s) at checkout time — never a live FK, per DATABASE.md.
 - `product_variant_id` on `OrderItem` is a plain FK column with no relation, same pattern as `CartItem.productVariantId`.
+- Inactive, out-of-date, and below-minimum-order vouchers are rejected during checkout.
 - `cancel()` rejects with `BadRequestException` (API_SPEC.md's `ORD_002`) when status is `shipping`, `delivered`, or already `cancelled`.
 - Admin endpoints are the second feature (after `product`'s categories) to use `@UseGuards(JwtAuthGuard, RolesGuard)` + `@Roles('admin')`.

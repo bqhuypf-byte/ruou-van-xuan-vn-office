@@ -206,3 +206,14 @@ export interface CreateVoucherInput {
 }
 
 export type UpdateVoucherInput = Partial<CreateVoucherInput>;
+
+export interface VoucherValidationResult {
+  code: string;
+  title: string;
+  discountType: VoucherDiscountType;
+  discountValue: number;
+  minOrderAmount: number;
+  maxDiscountAmount: number | null;
+  discountAmount: number;
+  finalAmount: number;
+}

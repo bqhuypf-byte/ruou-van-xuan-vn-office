@@ -25,6 +25,7 @@ export * from './hooks/usePages';
 export * from './hooks/usePageMutations';
 export * from './hooks/useVouchers';
 export * from './hooks/useVoucherMutations';
+export * from './hooks/useVoucherValidation';
 export * from './components/VoucherPopup';
 export * from './components/VoucherFloatingButton';
 export * from './components/TrustBadgeStrip';

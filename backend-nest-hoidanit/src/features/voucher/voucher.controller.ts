@@ -15,6 +15,7 @@ import { RolesGuard } from '../../shared/guards/roles.guard';
 import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
+import { ValidateVoucherDto } from './dto/validate-voucher.dto';
 
 @Controller()
 export class VoucherController {
@@ -23,6 +24,11 @@ export class VoucherController {
   @Get('vouchers')
   findActive() {
     return this.voucherService.findActive();
+  }
+
+  @Post('vouchers/validate')
+  validate(@Body() dto: ValidateVoucherDto) {
+    return this.voucherService.validate(dto.code, dto.orderAmount);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

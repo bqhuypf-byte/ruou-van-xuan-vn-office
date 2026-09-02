@@ -4,7 +4,7 @@ Cart state is server-backed (per `01-share-docs/API_SPEC.md`'s Cart Feature), no
 
 ## Pages & Components
 
-- `CartPage` (`/cart`, public — works for guests): view/update quantity/remove/clear cart items, order summary.
+- `CartPage` (`/cart`, public — works for guests): view/update quantity/remove/clear cart items, validate and apply vouchers, order summary.
 - `CartBadge`: header cart icon + item-count badge, used in `MainLayout`.
 - `CartItemRow`: one line item — thumbnail, name/SKU, color/size badges, quantity stepper (capped at `stockQuantity`), line total, remove.
 
@@ -23,4 +23,4 @@ FE-ARCHITECTURE.md's Cross-Feature Communication diagram only draws `cart → pr
 
 ## Checkout
 
-Deliberately not built yet — `POST /orders/checkout` needs a shipping address, and there's no address-management UI (`user-profile` feature is still an empty stub). The cart page's "Thanh Toán" button is present but disabled with an explanatory tooltip, rather than silently omitted, so the gap is visible rather than confusing.
+The cart validates a voucher with `POST /vouchers/validate` against the live item subtotal. A valid fixed or percentage discount updates the displayed total immediately, then the code is passed to `/checkout?voucher=...`. Checkout validates it again before order submission, and the backend performs the final authoritative validation when creating the order.
