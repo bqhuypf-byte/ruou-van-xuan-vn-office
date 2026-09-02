@@ -111,6 +111,7 @@
     "proceedToCheckout": "Tiến Hành Thanh Toán",
     "decreaseQty": "Giảm số lượng",
     "increaseQty": "Tăng số lượng",
+    "quantityInput": "Nhập số lượng",
     "removeItem": "Xóa khỏi giỏ hàng"
   },
   "checkout": {

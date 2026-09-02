@@ -253,7 +253,7 @@ export const SiteSettingsPage = () => {
         ...data,
         logoUrl: data.logoUrl || undefined,
         browserTitle: data.browserTitle || undefined,
-        faviconUrl: data.faviconUrl || undefined,
+        faviconUrl: data.faviconUrl || null,
         facebookUrl: data.facebookUrl || undefined,
         zaloUrl: data.zaloUrl || undefined,
         appStoreUrl: data.appStoreUrl || undefined,
@@ -351,6 +351,7 @@ export const SiteSettingsPage = () => {
                     value={field.value}
                     onChange={field.onChange}
                     error={errors.faviconUrl?.message}
+                    helperText="Nên dùng ảnh vuông PNG hoặc WebP. Xóa ảnh và lưu để khôi phục favicon mặc định."
                   />
                 )}
               />

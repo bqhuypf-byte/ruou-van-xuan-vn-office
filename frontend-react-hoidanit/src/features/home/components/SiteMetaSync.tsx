@@ -16,13 +16,21 @@ export const SiteMetaSync = () => {
   }, [settings?.browserTitle]);
 
   useEffect(() => {
-    if (!settings?.faviconUrl) return;
+    if (!settings) return;
+
     const link =
       document.querySelector<HTMLLinkElement>("link[rel='icon']") ??
       document.head.appendChild(document.createElement('link'));
+
     link.rel = 'icon';
-    link.href = settings.faviconUrl;
-  }, [settings?.faviconUrl]);
+    link.href = settings.faviconUrl || '/favicon.svg';
+
+    if (settings.faviconUrl) {
+      link.removeAttribute('type');
+    } else {
+      link.type = 'image/svg+xml';
+    }
+  }, [settings]);
 
   return null;
 };

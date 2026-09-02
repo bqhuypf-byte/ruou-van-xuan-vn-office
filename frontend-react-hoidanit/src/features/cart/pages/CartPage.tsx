@@ -49,8 +49,10 @@ export const CartPage = () => {
     setBusyItemId(itemId);
     try {
       await updateItem.mutateAsync({ id: itemId, input: { quantity } });
+      return true;
     } catch (err) {
       setFeedback(getApiErrorMessage(err, t('cart.updateQtyError')));
+      return false;
     } finally {
       setBusyItemId(null);
     }

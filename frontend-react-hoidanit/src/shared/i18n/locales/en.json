@@ -111,6 +111,7 @@
     "proceedToCheckout": "Proceed to Checkout",
     "decreaseQty": "Decrease quantity",
     "increaseQty": "Increase quantity",
+    "quantityInput": "Enter quantity",
     "removeItem": "Remove from cart"
   },
   "checkout": {

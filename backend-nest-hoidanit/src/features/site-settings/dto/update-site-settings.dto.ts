@@ -116,7 +116,7 @@ export class UpdateSiteSettingsDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
-  faviconUrl?: string;
+  faviconUrl?: string | null;
 
   @IsOptional()
   @IsString()

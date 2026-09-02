@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { Minus, Plus, Trash2 } from 'lucide-react';
@@ -10,7 +11,7 @@ import type { EnrichedCartItem } from '../types/cart.types';
 
 export interface CartItemRowProps {
   item: EnrichedCartItem;
-  onQuantityChange: (quantity: number) => void;
+  onQuantityChange: (quantity: number) => boolean | void | Promise<boolean | void>;
   onRemove: () => void;
   isUpdating?: boolean;
   isRemoving?: boolean;
@@ -24,8 +25,53 @@ export const CartItemRow = ({
   isRemoving = false,
 }: CartItemRowProps) => {
   const { t } = useTranslation();
+  const [quantityInput, setQuantityInput] = useState<string | null>(null);
   const unitPrice = Number(item.salePrice ?? item.price);
   const lineTotal = unitPrice * item.quantity;
+
+  const commitQuantityInput = async () => {
+    const parsedQuantity = Number.parseInt(quantityInput ?? '', 10);
+    const nextQuantity = Number.isNaN(parsedQuantity)
+      ? item.quantity
+      : Math.min(item.stockQuantity, Math.max(1, parsedQuantity));
+
+    setQuantityInput(String(nextQuantity));
+
+    if (nextQuantity === item.quantity) {
+      setQuantityInput(null);
+      return;
+    }
+
+    const wasUpdated = await onQuantityChange(nextQuantity);
+    if (wasUpdated === false) {
+      setQuantityInput(null);
+    }
+  };
+
+  const quantityField = (className: string) => (
+    <input
+      type="text"
+      inputMode="numeric"
+      pattern="[0-9]*"
+      value={quantityInput ?? String(item.quantity)}
+      onChange={(event) => setQuantityInput(event.target.value.replace(/\D/g, ''))}
+      onBlur={() => void commitQuantityInput()}
+      onFocus={(event) => {
+        setQuantityInput(String(item.quantity));
+        event.currentTarget.select();
+      }}
+      onKeyDown={(event) => {
+        if (event.key === 'Enter') event.currentTarget.blur();
+        if (event.key === 'Escape') {
+          setQuantityInput(null);
+          event.currentTarget.blur();
+        }
+      }}
+      disabled={isUpdating}
+      aria-label={t('cart.quantityInput')}
+      className={className}
+    />
+  );
 
   const image = item.thumbnailUrl ? (
     <img src={item.thumbnailUrl} alt={item.productName ?? item.sku} className="w-full h-full object-cover" />
@@ -92,19 +138,25 @@ export const CartItemRow = ({
             <div className="flex items-center border border-slate-200 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-800/80 overflow-hidden">
               <button
                 type="button"
-                onClick={() => onQuantityChange(Math.max(1, item.quantity - 1))}
+                onClick={() => {
+                  setQuantityInput(null);
+                  void onQuantityChange(Math.max(1, item.quantity - 1));
+                }}
                 disabled={isUpdating || item.quantity <= 1}
                 aria-label={t('cart.decreaseQty')}
                 className="w-9 h-9 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
               >
                 <Minus className="w-3 h-3" />
               </button>
-              <span className="w-8 text-center text-xs font-semibold text-slate-900 dark:text-white">
-                {item.quantity}
-              </span>
+              {quantityField(
+                'w-10 h-9 border-x border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-center text-xs font-semibold text-slate-900 dark:text-white outline-none focus:ring-2 focus:ring-inset focus:ring-brand-600 disabled:opacity-50',
+              )}
               <button
                 type="button"
-                onClick={() => onQuantityChange(item.quantity + 1)}
+                onClick={() => {
+                  setQuantityInput(null);
+                  void onQuantityChange(item.quantity + 1);
+                }}
                 disabled={isUpdating || item.quantity >= item.stockQuantity}
                 aria-label={t('cart.increaseQty')}
                 className="w-9 h-9 flex items-center justify-center text-slate-600 hover:bg-slate-200 dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30"
@@ -140,19 +192,25 @@ export const CartItemRow = ({
         <div className="flex items-center gap-1.5 border border-slate-200 dark:border-slate-700 rounded-xl bg-slate-50 dark:bg-slate-800/80 p-1">
           <button
             type="button"
-            onClick={() => onQuantityChange(Math.max(1, item.quantity - 1))}
+            onClick={() => {
+              setQuantityInput(null);
+              void onQuantityChange(Math.max(1, item.quantity - 1));
+            }}
             disabled={isUpdating || item.quantity <= 1}
             aria-label={t('cart.decreaseQty')}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-white hover:shadow-xs dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30 transition-all"
           >
             <Minus className="w-3.5 h-3.5" />
           </button>
-          <span className="w-8 text-center text-sm font-semibold text-slate-900 dark:text-white">
-            {item.quantity}
-          </span>
+          {quantityField(
+            'w-10 h-7 rounded-md border border-transparent bg-transparent text-center text-sm font-semibold text-slate-900 dark:text-white outline-none hover:border-slate-300 hover:bg-white focus:border-brand-600 focus:bg-white focus:ring-2 focus:ring-brand-600/20 dark:hover:border-slate-600 dark:hover:bg-slate-900 dark:focus:border-brand-500 dark:focus:bg-slate-900 disabled:opacity-50 transition-colors',
+          )}
           <button
             type="button"
-            onClick={() => onQuantityChange(item.quantity + 1)}
+            onClick={() => {
+              setQuantityInput(null);
+              void onQuantityChange(item.quantity + 1);
+            }}
             disabled={isUpdating || item.quantity >= item.stockQuantity}
             aria-label={t('cart.increaseQty')}
             className="w-7 h-7 rounded-lg flex items-center justify-center text-slate-600 hover:bg-white hover:shadow-xs dark:text-slate-300 dark:hover:bg-slate-700 disabled:opacity-30 transition-all"
