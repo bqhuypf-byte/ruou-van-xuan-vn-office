@@ -1,10 +1,11 @@
-# Feature: User Profile (Addresses)
+# Feature: User Profile
 
 Client-facing address book CRUD, per `01-share-docs/API_SPEC.md`'s User Profile endpoints (`/addresses`). All endpoints are user-scoped server-side — there is no admin split here, unlike `product`.
 
 ## Page & Route
 
-- `AddressesPage` (`/profile`, protected): list/create/edit/delete addresses + "set as default." Linked from `MainLayout`'s header (user icon + a dedicated map-pin icon), both pointing at `ROUTES.PROFILE`.
+- `AddressesPage` (`/profile`, protected): list/create/edit/delete addresses + "set as default."
+- `AccountSecurityPage` (`/account-security`, protected): account security area containing the change-password form. Linked from the user menu and the mobile account navigation item.
 
 ## Structure
 

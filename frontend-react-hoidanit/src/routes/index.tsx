@@ -18,7 +18,7 @@ import {
 import { CartPage } from '@/features/cart';
 import { CheckoutPage } from '@/features/checkout';
 import { OrdersPage, OrderDetailPage, AdminOrdersPage } from '@/features/order';
-import { AddressesPage } from '@/features/user-profile';
+import { AccountSecurityPage, AddressesPage } from '@/features/user-profile';
 import { SiteContentPage } from '@/features/site-content';
 import {
   BannersPage,
@@ -57,6 +57,7 @@ export const router = createBrowserRouter([
           { path: 'orders', element: <OrdersPage /> },
           { path: 'orders/:id', element: <OrderDetailPage /> },
           { path: 'profile', element: <AddressesPage /> },
+          { path: 'account-security', element: <AccountSecurityPage /> },
         ],
       },
     ],

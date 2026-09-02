@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
-import { ChevronDown, ClipboardList, LogOut, MapPin, SlidersHorizontal } from 'lucide-react';
+import { ChevronDown, ClipboardList, LogOut, MapPin, ShieldCheck, SlidersHorizontal } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
 import { useClickOutside } from '@/shared/hooks/useClickOutside';
 import { ROUTES } from '@/routes/routes';
@@ -52,6 +52,14 @@ export const UserMenu = () => {
           </div>
 
           <nav className="p-2">
+            <Link
+              to={ROUTES.ACCOUNT_SECURITY}
+              onClick={() => setIsOpen(false)}
+              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white transition-colors"
+            >
+              <ShieldCheck className="w-4 h-4 shrink-0" />
+              {t('userMenu.accountSecurity')}
+            </Link>
             <Link
               to={ROUTES.PROFILE}
               onClick={() => setIsOpen(false)}

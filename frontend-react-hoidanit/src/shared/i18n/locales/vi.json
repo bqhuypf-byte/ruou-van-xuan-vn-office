@@ -22,6 +22,7 @@
     "cart": "Giỏ hàng"
   },
   "userMenu": {
+    "accountSecurity": "Tài Khoản & Bảo Mật",
     "myAddresses": "Địa Chỉ Của Tôi",
     "myOrders": "Đơn Hàng Của Tôi",
     "adminPanel": "Trang Quản Trị",

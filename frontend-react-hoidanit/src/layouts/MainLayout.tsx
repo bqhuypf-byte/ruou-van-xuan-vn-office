@@ -192,7 +192,16 @@ export const MainLayout = () => {
         <MobileNavLink to={ROUTES.HOME} isActive={location.pathname === ROUTES.HOME} icon={<House className="w-5 h-5" />} label="Trang chủ" />
         <MobileNavLink to={ROUTES.PRODUCTS} isActive={location.pathname.startsWith(ROUTES.PRODUCTS) || location.pathname.startsWith('/categories')} icon={<LayoutGrid className="w-5 h-5" />} label="Sản phẩm" />
         <MobileNavLink to={ROUTES.CART} isActive={location.pathname === ROUTES.CART} icon={<ShoppingBag className="w-5 h-5" />} label={t('header.cart')} />
-        <MobileNavLink to={isAuthenticated ? ROUTES.PROFILE : ROUTES.LOGIN} isActive={location.pathname === ROUTES.PROFILE || location.pathname === ROUTES.LOGIN} icon={isAuthenticated ? <UserRound className="w-5 h-5" /> : <LogIn className="w-5 h-5" />} label="Tài khoản" />
+        <MobileNavLink
+          to={isAuthenticated ? ROUTES.ACCOUNT_SECURITY : ROUTES.LOGIN}
+          isActive={
+            location.pathname === ROUTES.ACCOUNT_SECURITY ||
+            location.pathname === ROUTES.PROFILE ||
+            location.pathname === ROUTES.LOGIN
+          }
+          icon={isAuthenticated ? <UserRound className="w-5 h-5" /> : <LogIn className="w-5 h-5" />}
+          label="Tài khoản"
+        />
       </nav>}
       <LanguageSwitcher />
       <ContactWidget channels={settings?.contactChannels ?? []} />

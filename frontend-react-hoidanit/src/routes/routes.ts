@@ -10,6 +10,7 @@ export const ROUTES = {
   ORDERS: '/orders',
   ORDER_DETAIL: '/orders/:id',
   PROFILE: '/profile',
+  ACCOUNT_SECURITY: '/account-security',
   ADMIN_ROLES: '/admin/roles',
   ADMIN_USERS: '/admin/users',
   ADMIN_CATEGORIES: '/admin/categories',

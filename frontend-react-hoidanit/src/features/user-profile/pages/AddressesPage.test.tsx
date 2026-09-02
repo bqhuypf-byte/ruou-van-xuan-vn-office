@@ -52,6 +52,7 @@ describe('AddressesPage', () => {
     render(<AddressesPage />);
 
     expect(screen.getByText('Địa Chỉ Của Tôi')).toBeInTheDocument();
+    expect(screen.queryByText('Đổi Mật Khẩu')).not.toBeInTheDocument();
     expect(screen.getByText('123 ABC, HCM')).toBeInTheDocument();
     expect(screen.getByText('456 XYZ, Hanoi')).toBeInTheDocument();
     expect(screen.getAllByText('Mặc Định').length).toBeGreaterThan(0);
