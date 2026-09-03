@@ -1,4 +1,4 @@
-import { useRef, type ReactNode } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 export interface ProductCarouselProps {
@@ -8,6 +8,21 @@ export interface ProductCarouselProps {
 
 export const ProductCarousel = ({ children, showControls = true }: ProductCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [canScroll, setCanScroll] = useState(false);
+
+  useEffect(() => {
+    const el = scrollRef.current;
+    if (!el) return;
+
+    const updateCanScroll = () => {
+      setCanScroll(el.scrollWidth > el.clientWidth + 1);
+    };
+
+    updateCanScroll();
+    const resizeObserver = new ResizeObserver(updateCanScroll);
+    resizeObserver.observe(el);
+    return () => resizeObserver.disconnect();
+  }, [children]);
 
   const scrollByAmount = (direction: 'left' | 'right') => {
     const el = scrollRef.current;
@@ -24,7 +39,7 @@ export const ProductCarousel = ({ children, showControls = true }: ProductCarous
       >
         {children}
       </div>
-      {showControls && (
+      {showControls && canScroll && (
         <>
           <button
             type="button"

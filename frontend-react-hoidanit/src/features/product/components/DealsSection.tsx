@@ -53,7 +53,11 @@ export const DealsSection = ({ title, deals, layout = 'grid' }: DealsSectionProp
         {layout === 'carousel' ? (
           <ProductCarousel>
             {previewDeals.map((deal) => (
-              <div key={deal.product.id} className="snap-start shrink-0 w-[227px]">
+              <div
+                key={deal.product.id}
+                className="snap-start shrink-0"
+                style={{ width: 'calc(25% - 15px)' }}
+              >
                 <DealCard deal={deal} className="w-full" />
               </div>
             ))}
