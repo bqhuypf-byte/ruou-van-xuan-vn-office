@@ -79,6 +79,11 @@ export const VoucherTable = ({ vouchers, isLoading, onEdit, onDelete }: VoucherT
                     <span className="mt-1 block font-sans text-[11px] font-medium text-slate-400">
                       Ưu tiên {voucher.sortOrder}
                     </span>
+                    {voucher.newMemberOnly && (
+                      <span className="mt-1 block font-sans text-[11px] font-semibold text-brand-600">
+                        Thành viên mới
+                      </span>
+                    )}
                   </td>
                   <td className="py-4 px-6">
                     <p className="font-medium text-slate-900 dark:text-white line-clamp-1">

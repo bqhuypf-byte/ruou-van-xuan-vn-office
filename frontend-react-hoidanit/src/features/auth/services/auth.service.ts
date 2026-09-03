@@ -7,6 +7,7 @@ import type {
   LoginResult,
   RefreshResult,
   RegisterInput,
+  RegisterResult,
   UpdateProfileInput,
 } from '../types/auth.types';
 
@@ -16,8 +17,8 @@ const unwrap = <T,>(data: ApiResponse<T> | T): T =>
     : (data as T);
 
 export const authService = {
-  register: async (input: RegisterInput): Promise<AuthUser> => {
-    const response = await axiosInstance.post<ApiResponse<AuthUser> | AuthUser>(
+  register: async (input: RegisterInput): Promise<RegisterResult> => {
+    const response = await axiosInstance.post<ApiResponse<RegisterResult> | RegisterResult>(
       '/auth/register',
       input,
     );

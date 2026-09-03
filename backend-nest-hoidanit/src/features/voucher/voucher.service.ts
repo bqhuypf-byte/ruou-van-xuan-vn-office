@@ -8,6 +8,9 @@ import { VoucherRepository } from './repositories/voucher.repository';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { Voucher } from './entities/voucher.entity';
+import { InjectRepository } from '@nestjs/typeorm';
+import { EntityManager, IsNull, Repository } from 'typeorm';
+import { UserVoucher } from './entities/user-voucher.entity';
 
 export interface VoucherValidationResult {
   code: string;
@@ -22,7 +25,11 @@ export interface VoucherValidationResult {
 
 @Injectable()
 export class VoucherService {
-  constructor(private readonly voucherRepository: VoucherRepository) {}
+  constructor(
+    private readonly voucherRepository: VoucherRepository,
+    @InjectRepository(UserVoucher)
+    private readonly userVoucherRepository: Repository<UserVoucher>,
+  ) {}
 
   private validateDiscountValue(
     type: 'percent' | 'fixed',
@@ -38,8 +45,38 @@ export class VoucherService {
     }
   }
 
-  findActive(): Promise<Voucher[]> {
-    return this.voucherRepository.findActiveSorted();
+  async findActive(userId?: number): Promise<Voucher[]> {
+    const vouchers = await this.voucherRepository.findActiveSorted();
+    if (!userId) return vouchers.filter((voucher) => !voucher.newMemberOnly);
+    const grants = await this.userVoucherRepository.find({
+      where: { userId, redeemedOrderId: IsNull() },
+    });
+    const grantedIds = new Set(grants.map((grant) => grant.voucherId));
+    return vouchers.filter((voucher) => !voucher.newMemberOnly || grantedIds.has(voucher.id));
+  }
+
+  async findWelcomeVoucher(): Promise<Voucher | null> {
+    const vouchers = await this.voucherRepository.findActiveSorted();
+    return vouchers.find((voucher) => voucher.newMemberOnly) ?? null;
+  }
+
+  async grantWelcomeVoucher(userId: number): Promise<Voucher | null> {
+    const voucher = await this.findWelcomeVoucher();
+    if (!voucher) return null;
+    const existing = await this.userVoucherRepository.findOne({
+      where: { userId, voucherId: voucher.id },
+    });
+    if (!existing) {
+      await this.userVoucherRepository.save(
+        this.userVoucherRepository.create({
+          userId,
+          voucherId: voucher.id,
+          redeemedOrderId: null,
+          redeemedAt: null,
+        }),
+      );
+    }
+    return voucher;
   }
 
   findAll(): Promise<Voucher[]> {
@@ -75,6 +112,7 @@ export class VoucherService {
       endDate: dto.endDate ?? null,
       sortOrder: dto.sortOrder ?? 0,
       isActive: dto.isActive ?? true,
+      newMemberOnly: dto.newMemberOnly ?? false,
     });
     return this.voucherRepository.save(voucher);
   }
@@ -110,6 +148,7 @@ export class VoucherService {
     if (dto.endDate !== undefined) voucher.endDate = dto.endDate;
     if (dto.sortOrder !== undefined) voucher.sortOrder = dto.sortOrder;
     if (dto.isActive !== undefined) voucher.isActive = dto.isActive;
+    if (dto.newMemberOnly !== undefined) voucher.newMemberOnly = dto.newMemberOnly;
 
     return this.voucherRepository.save(voucher);
   }
@@ -117,6 +156,7 @@ export class VoucherService {
   async validate(
     code: string,
     orderAmount: number,
+    userId?: number,
   ): Promise<VoucherValidationResult> {
     const normalizedCode = code.trim().toUpperCase();
     const voucher = await this.voucherRepository.findByCode(normalizedCode);
@@ -125,6 +165,18 @@ export class VoucherService {
       throw new BadRequestException(
         'Mã khuyến mãi không hợp lệ hoặc đã ngừng áp dụng',
       );
+    }
+
+    if (voucher.newMemberOnly) {
+      if (!userId) {
+        throw new BadRequestException('Mã này chỉ dành cho thành viên mới');
+      }
+      const grant = await this.userVoucherRepository.findOne({
+        where: { userId, voucherId: voucher.id, redeemedOrderId: IsNull() },
+      });
+      if (!grant) {
+        throw new BadRequestException('Mã thành viên mới chỉ áp dụng cho đơn hàng đầu tiên');
+      }
     }
 
     const today = new Date().toISOString().slice(0, 10);
@@ -168,6 +220,20 @@ export class VoucherService {
       discountAmount,
       finalAmount: Math.round((orderAmount - discountAmount) * 100) / 100,
     };
+  }
+
+  async redeem(code: string, userId: number, orderId: number, manager: EntityManager): Promise<void> {
+    const voucher = await this.voucherRepository.findByCode(code.trim().toUpperCase());
+    if (!voucher?.newMemberOnly) return;
+    const repository = manager.getRepository(UserVoucher);
+    const grant = await repository.findOne({
+      where: { userId, voucherId: voucher.id, redeemedOrderId: IsNull() },
+      lock: { mode: 'pessimistic_write' },
+    });
+    if (!grant) throw new BadRequestException('Mã thành viên mới đã được sử dụng');
+    grant.redeemedOrderId = orderId;
+    grant.redeemedAt = new Date();
+    await repository.save(grant);
   }
 
   async remove(id: number): Promise<void> {

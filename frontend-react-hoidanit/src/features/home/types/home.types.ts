@@ -129,6 +129,11 @@ export interface SiteSettings {
   checkoutPaymentNote: string | null;
   checkoutSummaryNote: string | null;
   contactChannels: ContactChannel[];
+  ageGateEnabled: boolean;
+  ageGateTitle: string;
+  ageGateDescription: string | null;
+  ageGateConfirmLabel: string;
+  ageGateRejectLabel: string;
 }
 
 export type UpdateSiteSettingsInput = Partial<
@@ -189,6 +194,7 @@ export interface Voucher {
   endDate: string | null;
   sortOrder: number;
   isActive: boolean;
+  newMemberOnly?: boolean;
 }
 
 export interface CreateVoucherInput {
@@ -203,6 +209,7 @@ export interface CreateVoucherInput {
   endDate?: string;
   sortOrder?: number;
   isActive?: boolean;
+  newMemberOnly?: boolean;
 }
 
 export type UpdateVoucherInput = Omit<

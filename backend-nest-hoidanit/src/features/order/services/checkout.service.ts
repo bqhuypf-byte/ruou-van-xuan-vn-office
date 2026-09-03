@@ -34,7 +34,7 @@ export class CheckoutService {
       0,
     );
     const voucher = dto.voucherCode
-      ? await this.voucherService.validate(dto.voucherCode, itemsTotal)
+      ? await this.voucherService.validate(dto.voucherCode, itemsTotal, userId)
       : null;
     const freeShippingThreshold = Number(settings.freeShippingThreshold);
     const isFreeShipping =
@@ -75,6 +75,15 @@ export class CheckoutService {
         pickupStoreAddress: pickupStore?.address ?? null,
       });
       const savedOrder = await queryRunner.manager.save(order);
+
+      if (dto.voucherCode) {
+        await this.voucherService.redeem(
+          dto.voucherCode,
+          userId,
+          savedOrder.id,
+          queryRunner.manager,
+        );
+      }
 
       const items = dto.items.map((item) =>
         queryRunner.manager.create(OrderItem, {

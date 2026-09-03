@@ -65,4 +65,8 @@ export class UpdateVoucherDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  newMemberOnly?: boolean;
 }

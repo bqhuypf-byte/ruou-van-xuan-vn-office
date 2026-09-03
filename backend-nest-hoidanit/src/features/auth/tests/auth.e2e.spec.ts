@@ -17,6 +17,7 @@ import { AuthService } from '../auth.service';
 import { RefreshToken } from '../entities/refresh-token.entity';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { JwtStrategy } from '../strategies/jwt.strategy';
+import { VoucherService } from '../../voucher/voucher.service';
 
 jest.mock('bcrypt', () => ({
   hash: jest.fn().mockResolvedValue('hashed-password'),
@@ -106,6 +107,10 @@ describe('Auth (E2E Integration)', () => {
           useValue: mockRefreshTokenRepoProvider,
         },
         { provide: ConfigService, useValue: mockConfigService },
+        {
+          provide: VoucherService,
+          useValue: { grantWelcomeVoucher: jest.fn().mockResolvedValue(null) },
+        },
       ],
     }).compile();
 
@@ -167,6 +172,7 @@ describe('Auth (E2E Integration)', () => {
         email: 'new@example.com',
         fullName: 'New User',
         role: 'customer',
+        welcomeVoucher: null,
       });
     });
 

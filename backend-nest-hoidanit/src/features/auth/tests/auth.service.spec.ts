@@ -10,6 +10,7 @@ import { UsersService } from '../../users/users.service';
 import { AuthService } from '../auth.service';
 import { RefreshTokenRepository } from '../repositories/refresh-token.repository';
 import { RefreshToken } from '../entities/refresh-token.entity';
+import { VoucherService } from '../../voucher/voucher.service';
 
 jest.mock('bcrypt', () => ({
   compare: jest.fn(),
@@ -81,6 +82,10 @@ describe('AuthService', () => {
     }),
   };
 
+  const mockVoucherService = {
+    grantWelcomeVoucher: jest.fn().mockResolvedValue(null),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -93,6 +98,7 @@ describe('AuthService', () => {
         },
         { provide: JwtService, useValue: mockJwtService },
         { provide: ConfigService, useValue: mockConfigService },
+        { provide: VoucherService, useValue: mockVoucherService },
       ],
     }).compile();
 
@@ -143,6 +149,7 @@ describe('AuthService', () => {
         email: 'jane@example.com',
         fullName: 'Jane Doe',
         role: 'customer',
+        welcomeVoucher: null,
       });
     });
   });

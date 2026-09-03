@@ -14,16 +14,18 @@ export const RegisterPage = () => {
   const registerMutation = useRegister();
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [welcomeVoucher, setWelcomeVoucher] = useState<{ code: string; title: string } | null>(null);
 
   const handleSubmit = async (data: RegisterFormData) => {
     setErrorMessage(null);
     try {
-      await registerMutation.mutateAsync({
+      const result = await registerMutation.mutateAsync({
         ...data,
         phone: data.phone || undefined,
       });
+      setWelcomeVoucher(result.welcomeVoucher);
       setIsSuccess(true);
-      setTimeout(() => navigate(ROUTES.LOGIN), 1500);
+      setTimeout(() => navigate(ROUTES.LOGIN), result.welcomeVoucher ? 4000 : 1500);
     } catch (err: unknown) {
       setErrorMessage(getApiErrorMessage(err, t('auth.register.error')));
     }
@@ -39,6 +41,19 @@ export const RegisterPage = () => {
         <p className="text-sm text-slate-500 dark:text-slate-400">
           {t('auth.register.redirecting')}
         </p>
+        {welcomeVoucher && (
+          <div className="rounded-xl border border-brand-200 bg-brand-50 p-4 text-left dark:border-brand-900 dark:bg-brand-950/40">
+            <p className="text-sm font-semibold text-brand-900 dark:text-brand-200">
+              Ưu đãi thành viên mới: {welcomeVoucher.title}
+            </p>
+            <p className="mt-2 font-mono text-lg font-bold tracking-wider text-brand-700 dark:text-brand-300">
+              {welcomeVoucher.code}
+            </p>
+            <p className="mt-1 text-xs text-brand-800/80 dark:text-brand-300/80">
+              Mã chỉ dùng cho đơn hàng đầu tiên. Hãy lưu lại để sử dụng sau khi đăng nhập.
+            </p>
+          </div>
+        )}
       </div>
     );
   }

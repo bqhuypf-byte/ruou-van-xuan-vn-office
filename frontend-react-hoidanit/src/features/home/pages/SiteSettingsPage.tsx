@@ -84,6 +84,11 @@ const settingsSchema = z.object({
   trustBadges: z.array(trustBadgeSchema).max(20, 'Tối đa 20 mục'),
   paymentMethodIcons: z.array(paymentMethodIconSchema).max(20, 'Tối đa 20 mục'),
   contactChannels: z.array(contactChannelSchema).max(20, 'Tối đa 20 mục'),
+  ageGateEnabled: z.boolean(),
+  ageGateTitle: z.string().min(1, 'Bắt buộc').max(150, 'Tối đa 150 ký tự'),
+  ageGateDescription: z.string().max(2000, 'Tối đa 2000 ký tự'),
+  ageGateConfirmLabel: z.string().min(1, 'Bắt buộc').max(80, 'Tối đa 80 ký tự'),
+  ageGateRejectLabel: z.string().min(1, 'Bắt buộc').max(80, 'Tối đa 80 ký tự'),
 });
 
 type SettingsFormData = z.infer<typeof settingsSchema>;
@@ -119,6 +124,11 @@ const emptyValues: SettingsFormData = {
   trustBadges: [],
   paymentMethodIcons: [],
   contactChannels: [],
+  ageGateEnabled: true,
+  ageGateTitle: '',
+  ageGateDescription: '',
+  ageGateConfirmLabel: '',
+  ageGateRejectLabel: '',
 };
 
 interface ContactChannelLocationsEditorProps {
@@ -242,6 +252,11 @@ export const SiteSettingsPage = () => {
         trustBadges: settings.trustBadges,
         paymentMethodIcons: settings.paymentMethodIcons,
         contactChannels: settings.contactChannels,
+        ageGateEnabled: settings.ageGateEnabled,
+        ageGateTitle: settings.ageGateTitle,
+        ageGateDescription: settings.ageGateDescription ?? '',
+        ageGateConfirmLabel: settings.ageGateConfirmLabel,
+        ageGateRejectLabel: settings.ageGateRejectLabel,
       });
     }
   }, [settings, reset]);
@@ -317,6 +332,28 @@ export const SiteSettingsPage = () => {
         </div>
       ) : (
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+          <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm space-y-4 dark:border-slate-800 dark:bg-slate-900">
+            <div>
+              <h2 className="font-semibold text-slate-900 dark:text-white">Xác Nhận Độ Tuổi</h2>
+              <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                Hiển thị ở lần đầu khách truy cập trên mỗi trình duyệt.
+              </p>
+            </div>
+            <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+              <input type="checkbox" className="rounded border-slate-300 text-brand-600" {...register('ageGateEnabled')} />
+              Bật yêu cầu xác nhận đủ 18 tuổi
+            </label>
+            <Input label="Tiêu đề" error={errors.ageGateTitle?.message} {...register('ageGateTitle')} />
+            <div className="space-y-1.5">
+              <label className="text-sm font-medium text-slate-700 dark:text-slate-300">Nội dung thông báo</label>
+              <textarea rows={4} className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900 dark:text-white" {...register('ageGateDescription')} />
+              {errors.ageGateDescription && <p className="text-xs text-rose-600">{errors.ageGateDescription.message}</p>}
+            </div>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Input label="Nhãn nút từ chối" error={errors.ageGateRejectLabel?.message} {...register('ageGateRejectLabel')} />
+              <Input label="Nhãn nút xác nhận" error={errors.ageGateConfirmLabel?.message} {...register('ageGateConfirmLabel')} />
+            </div>
+          </div>
           <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
             <h2 className="font-semibold text-slate-900 dark:text-white">Thương hiệu</h2>
             <div className="grid sm:grid-cols-2 gap-4">

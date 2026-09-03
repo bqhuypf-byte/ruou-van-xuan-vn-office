@@ -78,6 +78,12 @@ const DEFAULT_SETTINGS: Omit<SiteSettings, 'id' | 'updatedAt'> = {
   checkoutSummaryNote:
     "Please double-check your details before ordering. We'll confirm your order by phone.",
   contactChannels: [],
+  ageGateEnabled: true,
+  ageGateTitle: 'Chào Mừng Bạn Đến Với Rượu Vạn Xuân',
+  ageGateDescription:
+    'Theo quy định pháp luật, chúng tôi không bán hoặc cung cấp thông tin về rượu bia cho người chưa đủ 18 tuổi. Vui lòng xác nhận bạn đã đủ 18 tuổi để tiếp tục.',
+  ageGateConfirmLabel: 'Tôi Trên 18 Tuổi',
+  ageGateRejectLabel: 'Chưa Đủ 18 Tuổi',
 };
 
 @Injectable()
@@ -87,6 +93,23 @@ export class SiteSettingsService {
   private async findOrCreate(): Promise<SiteSettings> {
     const existing = await this.repository.findById(SITE_SETTINGS_ID);
     if (existing) {
+      let needsSave = false;
+      for (const key of [
+        'ageGateTitle',
+        'ageGateDescription',
+        'ageGateConfirmLabel',
+        'ageGateRejectLabel',
+      ] as const) {
+        if (!existing[key]) {
+          existing[key] = DEFAULT_SETTINGS[key] as never;
+          needsSave = true;
+        }
+      }
+      if (existing.ageGateEnabled === null || existing.ageGateEnabled === undefined) {
+        existing.ageGateEnabled = true;
+        needsSave = true;
+      }
+      if (needsSave) return this.repository.save(existing);
       return existing;
     }
     const settings = this.repository.create({

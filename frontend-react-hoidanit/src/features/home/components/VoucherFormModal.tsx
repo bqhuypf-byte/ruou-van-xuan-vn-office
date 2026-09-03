@@ -37,6 +37,7 @@ const voucherSchema = z
         'Phải là số nguyên từ 0 trở lên',
       ),
     isActive: z.boolean(),
+    newMemberOnly: z.boolean(),
   })
   .superRefine((data, ctx) => {
     if (data.discountType === 'percent' && Number(data.discountValue) > 100) {
@@ -69,6 +70,7 @@ export interface VoucherFormSubmitData {
   endDate?: string | null;
   sortOrder?: number;
   isActive: boolean;
+  newMemberOnly: boolean;
 }
 
 export interface VoucherFormModalProps {
@@ -91,6 +93,7 @@ const emptyValues: VoucherFormData = {
   endDate: '',
   sortOrder: '0',
   isActive: true,
+  newMemberOnly: false,
 };
 
 export const VoucherFormModal = ({
@@ -131,6 +134,7 @@ export const VoucherFormModal = ({
           endDate: voucherToEdit.endDate ?? '',
           sortOrder: String(voucherToEdit.sortOrder),
           isActive: voucherToEdit.isActive,
+          newMemberOnly: voucherToEdit.newMemberOnly ?? false,
         });
       } else {
         reset(emptyValues);
@@ -159,6 +163,7 @@ export const VoucherFormModal = ({
         endDate: data.endDate || (isEditing ? null : undefined),
         sortOrder: data.sortOrder ? Number(data.sortOrder) : 0,
         isActive: data.isActive,
+        newMemberOnly: data.newMemberOnly,
       });
       onClose();
     } catch {
@@ -276,6 +281,15 @@ export const VoucherFormModal = ({
           Khi bật, voucher được hiển thị công khai. Giỏ hàng sẽ tự động áp voucher hợp lệ giúp khách
           tiết kiệm nhiều nhất; khách vẫn có thể nhập mã khác để thay thế.
         </div>
+
+        <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <input
+            type="checkbox"
+            className="rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+            {...register('newMemberOnly')}
+          />
+          Chỉ dành cho thành viên mới (chỉ dùng ở đơn hàng đầu tiên)
+        </label>
 
         <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
           <input

@@ -12,6 +12,7 @@ import '@/shared/i18n/config'
 import { queryClient } from '@/shared/lib/queryClient'
 import { AuthProvider } from '@/features/auth'
 import { SiteMetaSync } from '@/features/home'
+import { AgeGate } from '@/features/home/components/AgeGate'
 import { router } from '@/routes'
 
 createRoot(document.getElementById('root')!).render(
@@ -19,7 +20,9 @@ createRoot(document.getElementById('root')!).render(
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
         <SiteMetaSync />
-        <RouterProvider router={router} />
+        <AgeGate>
+          <RouterProvider router={router} />
+        </AgeGate>
       </AuthProvider>
     </QueryClientProvider>
   </StrictMode>,

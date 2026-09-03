@@ -296,6 +296,36 @@ export class SiteSettings {
   @Column({ type: 'json', name: 'contact_channels', nullable: true })
   contactChannels: ContactChannel[] | null;
 
+  @Column({ type: 'boolean', name: 'age_gate_enabled', default: true })
+  ageGateEnabled: boolean;
+
+  @Column({
+    type: 'varchar',
+    length: 150,
+    name: 'age_gate_title',
+    default: 'Chào Mừng Bạn Đến Với Rượu Vạn Xuân',
+  })
+  ageGateTitle: string;
+
+  @Column({ type: 'text', name: 'age_gate_description', nullable: true })
+  ageGateDescription: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 80,
+    name: 'age_gate_confirm_label',
+    default: 'Tôi Trên 18 Tuổi',
+  })
+  ageGateConfirmLabel: string;
+
+  @Column({
+    type: 'varchar',
+    length: 80,
+    name: 'age_gate_reject_label',
+    default: 'Chưa Đủ 18 Tuổi',
+  })
+  ageGateRejectLabel: string;
+
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt: Date;
 }

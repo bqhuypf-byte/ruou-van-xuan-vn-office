@@ -28,7 +28,7 @@ describe('useRegister', () => {
   beforeEach(() => vi.clearAllMocks());
 
   it('calls authService.register with the given input', async () => {
-    vi.mocked(authService.register).mockResolvedValue(mockUser);
+    vi.mocked(authService.register).mockResolvedValue({ ...mockUser, welcomeVoucher: null });
     const { result } = renderHook(() => useRegister(), { wrapper });
 
     const input = { email: 'jane@example.com', password: 'password123', fullName: 'Jane Doe' };
@@ -36,7 +36,7 @@ describe('useRegister', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(authService.register).toHaveBeenCalledWith(input);
-    expect(result.current.data).toEqual(mockUser);
+    expect(result.current.data).toEqual({ ...mockUser, welcomeVoucher: null });
   });
 
   it('surfaces an error when the API call fails', async () => {

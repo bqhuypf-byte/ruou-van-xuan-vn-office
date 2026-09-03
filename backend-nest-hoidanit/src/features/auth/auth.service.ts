@@ -17,6 +17,7 @@ import { RegisterDto } from './dto/register.dto';
 import { UpdateProfileDto } from './dto/update-profile.dto';
 import { RefreshTokenRepository } from './repositories/refresh-token.repository';
 import { JwtPayload } from './types/jwt-payload.type';
+import { VoucherService } from '../voucher/voucher.service';
 
 const SALT_ROUNDS = 10;
 const DEFAULT_ROLE_NAME = 'customer';
@@ -32,6 +33,10 @@ export interface AuthUserResponse {
   email: string;
   fullName: string;
   role: string;
+}
+
+export interface RegisterResponse extends AuthUserResponse {
+  welcomeVoucher: { code: string; title: string } | null;
 }
 
 export interface LoginResult {
@@ -53,6 +58,7 @@ export class AuthService {
     private readonly refreshTokenRepository: RefreshTokenRepository,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly voucherService: VoucherService,
   ) {}
 
   private async resolveRoleName(roleId: number | null): Promise<string> {
@@ -98,17 +104,21 @@ export class AuthService {
     return rawToken;
   }
 
-  async register(dto: RegisterDto): Promise<AuthUserResponse> {
+  async register(dto: RegisterDto): Promise<RegisterResponse> {
     const customerRole = await this.rolesService.findByName(DEFAULT_ROLE_NAME);
     const created = await this.usersService.create({
       ...dto,
       roleId: customerRole?.id,
     });
+    const welcomeVoucher = await this.voucherService.grantWelcomeVoucher(created.id);
     return {
       id: created.id,
       email: created.email,
       fullName: created.fullName,
       role: customerRole?.name ?? DEFAULT_ROLE_NAME,
+      welcomeVoucher: welcomeVoucher
+        ? { code: welcomeVoucher.code, title: welcomeVoucher.title }
+        : null,
     };
   }
 

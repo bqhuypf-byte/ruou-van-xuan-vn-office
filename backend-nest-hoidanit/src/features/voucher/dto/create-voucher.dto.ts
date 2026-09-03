@@ -61,4 +61,8 @@ export class CreateVoucherDto {
   @IsOptional()
   @IsBoolean()
   isActive?: boolean;
+
+  @IsOptional()
+  @IsBoolean()
+  newMemberOnly?: boolean;
 }

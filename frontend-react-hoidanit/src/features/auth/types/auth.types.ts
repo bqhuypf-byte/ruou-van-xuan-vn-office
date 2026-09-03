@@ -17,6 +17,10 @@ export interface RegisterInput {
   phone?: string;
 }
 
+export interface RegisterResult extends AuthUser {
+  welcomeVoucher: { code: string; title: string } | null;
+}
+
 export interface UpdateProfileInput {
   fullName?: string;
   phone?: string;

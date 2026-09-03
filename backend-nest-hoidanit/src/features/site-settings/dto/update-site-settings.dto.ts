@@ -330,4 +330,28 @@ export class UpdateSiteSettingsDto {
   @ValidateNested({ each: true })
   @Type(() => ContactChannelDto)
   contactChannels?: ContactChannelDto[];
+
+  @IsOptional()
+  @IsBoolean()
+  ageGateEnabled?: boolean;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  ageGateTitle?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(2000)
+  ageGateDescription?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  ageGateConfirmLabel?: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(80)
+  ageGateRejectLabel?: string;
 }

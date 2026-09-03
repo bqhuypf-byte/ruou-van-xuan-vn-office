@@ -63,6 +63,9 @@ export class Voucher {
   @Column({ type: 'boolean', name: 'is_active', default: true })
   isActive: boolean;
 
+  @Column({ type: 'boolean', name: 'new_member_only', default: false })
+  newMemberOnly: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 

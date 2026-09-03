@@ -8,7 +8,9 @@ import {
   Patch,
   Post,
   UseGuards,
+  Req,
 } from '@nestjs/common';
+import type { Request } from 'express';
 import { Roles } from '../../shared/decorators/roles.decorator';
 import { JwtAuthGuard } from '../../shared/guards/jwt-auth.guard';
 import { RolesGuard } from '../../shared/guards/roles.guard';
@@ -16,19 +18,27 @@ import { VoucherService } from './voucher.service';
 import { CreateVoucherDto } from './dto/create-voucher.dto';
 import { UpdateVoucherDto } from './dto/update-voucher.dto';
 import { ValidateVoucherDto } from './dto/validate-voucher.dto';
+import { OptionalJwtAuthGuard } from '../../shared/guards/optional-jwt-auth.guard';
+import type { AuthenticatedUser } from '../auth/types/jwt-payload.type';
 
 @Controller()
 export class VoucherController {
   constructor(private readonly voucherService: VoucherService) {}
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Get('vouchers')
-  findActive() {
-    return this.voucherService.findActive();
+  findActive(@Req() req: Request) {
+    return this.voucherService.findActive((req.user as AuthenticatedUser | undefined)?.id);
   }
 
+  @UseGuards(OptionalJwtAuthGuard)
   @Post('vouchers/validate')
-  validate(@Body() dto: ValidateVoucherDto) {
-    return this.voucherService.validate(dto.code, dto.orderAmount);
+  validate(@Body() dto: ValidateVoucherDto, @Req() req: Request) {
+    return this.voucherService.validate(
+      dto.code,
+      dto.orderAmount,
+      (req.user as AuthenticatedUser | undefined)?.id,
+    );
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

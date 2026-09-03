@@ -41,7 +41,13 @@ describe('RegisterPage', () => {
   it('shows a success state and redirects to login after registering', async () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     const user = userEvent.setup();
-    const mutateAsync = vi.fn().mockResolvedValue(undefined);
+    const mutateAsync = vi.fn().mockResolvedValue({
+      id: 1,
+      email: 'jane@example.com',
+      fullName: 'Jane Doe',
+      role: 'customer',
+      welcomeVoucher: null,
+    });
     vi.mocked(useRegister).mockReturnValue({ mutateAsync, isPending: false } as unknown as ReturnType<typeof useRegister>);
 
     render(<RegisterPage />);

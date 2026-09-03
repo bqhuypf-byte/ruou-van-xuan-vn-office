@@ -45,6 +45,7 @@ describe('CheckoutService', () => {
       validate: jest
         .fn()
         .mockResolvedValue({ discountAmount: 50000, code: 'GIAM50K' }),
+      redeem: jest.fn().mockResolvedValue(undefined),
     };
     const service = new CheckoutService(
       dataSource as never,
@@ -69,7 +70,7 @@ describe('CheckoutService', () => {
       ],
     });
 
-    expect(voucherService.validate).toHaveBeenCalledWith('GIAM50K', 200000);
+    expect(voucherService.validate).toHaveBeenCalledWith('GIAM50K', 200000, 7);
     expect(manager.create).toHaveBeenCalledWith(
       Order,
       expect.objectContaining({
