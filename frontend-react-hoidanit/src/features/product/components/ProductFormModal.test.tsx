@@ -67,6 +67,7 @@ describe('ProductFormModal', () => {
     );
 
     await user.type(screen.getByLabelText(/Tên sản phẩm/i), 'iPhone 15');
+    await user.clear(screen.getByLabelText(/Slug/i));
     await user.type(screen.getByLabelText(/Slug/i), 'iphone-15');
     await user.selectOptions(screen.getByLabelText(/Danh Mục/i), '2');
     await user.click(screen.getByRole('button', { name: 'Tạo Mới' }));
@@ -77,6 +78,7 @@ describe('ProductFormModal', () => {
         name: 'iPhone 15',
         slug: 'iphone-15',
         description: undefined,
+        shortDescription: null,
         thumbnailUrl: undefined,
         isActive: true,
         isFeaturedDeal: false,

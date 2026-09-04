@@ -36,6 +36,11 @@ export class UpdateProductDto {
   @IsOptional()
   @IsString()
   @MaxLength(500)
+  shortDescription?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
   thumbnailUrl?: string;
 
   @IsOptional()

@@ -11,6 +11,7 @@ export interface Product {
   name: string;
   slug: string;
   description: string | null;
+  shortDescription: string | null;
   thumbnailUrl: string | null;
   isActive: boolean;
   isFeaturedDeal: boolean;
@@ -34,6 +35,7 @@ export interface CreateProductInput {
   name: string;
   slug: string;
   description?: string;
+  shortDescription?: string | null;
   thumbnailUrl?: string;
   isActive?: boolean;
   isFeaturedDeal?: boolean;
@@ -46,6 +48,7 @@ export interface UpdateProductInput {
   name?: string;
   slug?: string;
   description?: string;
+  shortDescription?: string | null;
   thumbnailUrl?: string;
   isActive?: boolean;
   isFeaturedDeal?: boolean;
@@ -63,4 +66,3 @@ export interface ProductFilterParams {
   page?: number;
   limit?: number;
 }
-

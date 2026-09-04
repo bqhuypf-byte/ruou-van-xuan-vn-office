@@ -42,6 +42,14 @@ export class Product {
   @Column({
     type: 'varchar',
     length: 500,
+    name: 'short_description',
+    nullable: true,
+  })
+  shortDescription: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 500,
     name: 'thumbnail_url',
     nullable: true,
   })

@@ -18,6 +18,7 @@ const mockDetail: ProductDetail = {
   name: 'iPhone 15',
   slug: 'iphone-15',
   description: null,
+  shortDescription: null,
   thumbnailUrl: null,
   isActive: true,
   isFeaturedDeal: false,

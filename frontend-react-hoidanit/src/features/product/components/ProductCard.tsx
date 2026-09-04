@@ -9,7 +9,6 @@ import type { Product } from '../types/product.types';
 import { ROUTES } from '@/routes/routes';
 import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { formatPrice } from '@/shared/utils/formatPrice';
-import { stripHtml } from '@/shared/utils/stripHtml';
 
 export interface ProductCardProps {
   product: Product;
@@ -99,9 +98,9 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
           )}
         </div>
 
-        {product.description && (
+        {product.shortDescription && (
           <p className="hidden text-sm text-slate-500 line-clamp-1 sm:block dark:text-slate-400">
-            {stripHtml(product.description)}
+            {product.shortDescription}
           </p>
         )}
 

@@ -83,6 +83,7 @@
 | category_id | BIGINT | FK → categories |
 | name | VARCHAR(255) | NOT NULL |
 | slug | VARCHAR(255) | NOT NULL, UNIQUE |
+| short_description | VARCHAR(500) | NULLABLE, plain text shown on product cards |
 | description | TEXT | NULLABLE |
 | thumbnail_url | VARCHAR(500) | NULLABLE |
 | is_active | BOOLEAN | DEFAULT TRUE |

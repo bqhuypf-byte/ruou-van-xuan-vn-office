@@ -25,6 +25,7 @@ export const productSchema = z.object({
     .max(255, 'Slug tối đa 255 ký tự')
     .regex(/^[a-z0-9-]+$/, 'Slug chỉ chứa chữ thường, số và dấu gạch ngang (-)'),
   description: z.string().optional(),
+  shortDescription: z.string().max(500, 'Mô tả ngắn tối đa 500 ký tự').optional(),
   thumbnailUrl: z.string().optional(),
   isActive: z.boolean(),
   isFeaturedDeal: z.boolean(),
@@ -41,6 +42,7 @@ export interface ProductFormSubmitData {
   name: string;
   slug: string;
   description?: string;
+  shortDescription?: string | null;
   thumbnailUrl?: string;
   isActive: boolean;
   isFeaturedDeal: boolean;
@@ -66,6 +68,7 @@ export const emptyProductFormValues = (): ProductFormData => ({
   name: '',
   slug: '',
   description: '',
+  shortDescription: '',
   thumbnailUrl: '',
   isActive: true,
   isFeaturedDeal: false,
@@ -82,6 +85,7 @@ export const productFormValuesFrom = (product: Product): ProductFormData => {
     name: product.name,
     slug: product.slug,
     description: product.description ?? '',
+    shortDescription: product.shortDescription ?? '',
     thumbnailUrl: product.thumbnailUrl ?? '',
     isActive: product.isActive,
     isFeaturedDeal: product.isFeaturedDeal,
@@ -125,6 +129,7 @@ export const buildProductSubmitPayload = (data: ProductFormData): ProductFormSub
     name: data.name,
     slug: data.slug,
     description: data.description || undefined,
+    shortDescription: data.shortDescription?.trim() || null,
     thumbnailUrl: data.thumbnailUrl || undefined,
     isActive: data.isActive,
     isFeaturedDeal: data.isFeaturedDeal,
@@ -366,18 +371,57 @@ export interface ProductDescriptionFieldProps {
 }
 
 export const ProductDescriptionField = ({ control, errors }: ProductDescriptionFieldProps) => (
-  <Controller
-    name="description"
-    control={control}
-    render={({ field }) => (
-      <RichTextEditor
-        label="Mô Tả Chi Tiết"
-        value={field.value ?? ''}
-        onChange={field.onChange}
-        error={errors.description?.message}
-      />
-    )}
-  />
+  <div className="space-y-5">
+    <Controller
+      name="shortDescription"
+      control={control}
+      render={({ field }) => (
+        <div className="w-full space-y-1.5">
+          <label
+            htmlFor="shortDescription"
+            className="block text-sm font-medium text-slate-700 dark:text-slate-300"
+          >
+            Mô Tả Ngắn
+          </label>
+          <textarea
+            id="shortDescription"
+            rows={3}
+            maxLength={500}
+            placeholder="Nội dung ngắn hiển thị trên thẻ sản phẩm..."
+            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            value={field.value ?? ''}
+            onChange={field.onChange}
+          />
+          <div className="flex items-start justify-between gap-3">
+            <p className="text-xs text-slate-500 dark:text-slate-400">
+              Chỉ nội dung này được hiển thị ở danh sách sản phẩm.
+            </p>
+            <span className="shrink-0 text-xs text-slate-400">
+              {(field.value ?? '').length}/500
+            </span>
+          </div>
+          {errors.shortDescription && (
+            <p className="text-xs text-rose-600 dark:text-rose-400">
+              {errors.shortDescription.message}
+            </p>
+          )}
+        </div>
+      )}
+    />
+
+    <Controller
+      name="description"
+      control={control}
+      render={({ field }) => (
+        <RichTextEditor
+          label="Mô Tả Chi Tiết"
+          value={field.value ?? ''}
+          onChange={field.onChange}
+          error={errors.description?.message}
+        />
+      )}
+    />
+  </div>
 );
 
 export interface ProductClassificationFieldsProps {

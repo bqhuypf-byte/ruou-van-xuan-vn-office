@@ -39,7 +39,7 @@ type TabKey = 'info' | 'description' | 'images' | 'variants';
 
 const TABS: { key: TabKey; label: string }[] = [
   { key: 'info', label: 'Thông Tin Sản Phẩm' },
-  { key: 'description', label: 'Mô Tả Chi Tiết' },
+  { key: 'description', label: 'Mô Tả' },
   { key: 'images', label: 'Hình Ảnh' },
   { key: 'variants', label: 'Biến Thể Sản Phẩm' },
 ];

@@ -19,8 +19,8 @@ vi.mock('../hooks/useCategories');
 vi.mock('../hooks/useProductMutations');
 
 const mockProducts: Product[] = [
-  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, thumbnailUrl: null, isActive: true, isFeaturedDeal: false, dealSortOrder: 0 },
-  { id: 2, categoryId: 2, name: 'iPhone 14', slug: 'iphone-14', description: null, thumbnailUrl: null, isActive: false, isFeaturedDeal: false, dealSortOrder: 0 },
+  { id: 1, categoryId: 2, name: 'iPhone 15', slug: 'iphone-15', description: null, shortDescription: null, thumbnailUrl: null, isActive: true, isFeaturedDeal: false, dealSortOrder: 0 },
+  { id: 2, categoryId: 2, name: 'iPhone 14', slug: 'iphone-14', description: null, shortDescription: null, thumbnailUrl: null, isActive: false, isFeaturedDeal: false, dealSortOrder: 0 },
 ];
 
 const mockCategories: FlatCategory[] = [
