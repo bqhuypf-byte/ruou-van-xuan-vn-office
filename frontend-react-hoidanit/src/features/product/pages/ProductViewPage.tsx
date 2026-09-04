@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
   AlertCircle,
+  Check,
   ChevronRight,
   Minus,
   Plus,
@@ -27,6 +28,7 @@ import { useProductCacheStore } from '../stores/productCache.store';
 import type { ProductVariant } from '../types/variant.types';
 import type { ProductDetail } from '../services/product.service';
 import type { FlatCategory } from '../hooks/useCategories';
+import { findVariantForAttributes, getAttributeOptionImage } from '../utils/variantImage.utils';
 
 export const ProductViewPage = () => {
   const { t } = useTranslation();
@@ -107,7 +109,9 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
   );
   const [quantity, setQuantity] = useState(1);
   const [activeImage, setActiveImage] = useState<string | null>(
-    product.thumbnailUrl ?? product.images[0]?.imageUrl ?? null,
+    product.thumbnailUrl ??
+      product.images.slice().sort((a, b) => a.sortOrder - b.sortOrder)[0]?.imageUrl ??
+      null,
   );
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
@@ -122,15 +126,27 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
     limit: 5,
   });
 
+  const findVariant = (attributes: Record<string, string | null>) =>
+    findVariantForAttributes(product.variants, attributeNames, attributeOptions, attributes);
+
   const selectedVariant: ProductVariant | null =
-    product.variants.find((v) =>
-      attributeNames.every(
-        (name) =>
-          (attributeOptions[name]?.length ?? 0) === 0 || v.attributes?.[name] === selectedAttributes[name],
-      ),
-    ) ??
+    findVariant(selectedAttributes) ??
     product.variants[0] ??
     null;
+
+  const getOptionImage = (name: string, value: string): string | null => {
+    return getAttributeOptionImage(product, name, value);
+  };
+
+  const handleSelectAttribute = (name: string, value: string) => {
+    const nextAttributes = { ...selectedAttributes, [name]: value };
+    setSelectedAttributes(nextAttributes);
+    setQuantity(1);
+
+    const nextVariant = findVariant(nextAttributes);
+    const nextImage = getOptionImage(name, value) ?? nextVariant?.imageUrl;
+    if (nextImage) setActiveImage(nextImage);
+  };
 
   const handleAddToCart = async () => {
     if (!selectedVariant) return;
@@ -162,12 +178,18 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
 
   const breadcrumb = buildBreadcrumb(product.categoryId, allCategories);
   const gallery = [
-    product.thumbnailUrl,
-    ...product.images
-      .slice()
-      .sort((a, b) => a.sortOrder - b.sortOrder)
-      .map((i) => i.imageUrl),
-  ].filter((url): url is string => !!url);
+    ...new Set(
+      [
+        product.thumbnailUrl,
+        ...product.images
+          .slice()
+          .sort((a, b) => a.sortOrder - b.sortOrder)
+          .map((image) => image.imageUrl),
+        ...(product.variantAttributes ?? []).flatMap((group) => Object.values(group.images ?? {})),
+        ...product.variants.map((variant) => variant.imageUrl),
+      ].filter((url): url is string => !!url),
+    ),
+  ];
 
   return (
     <div className="bg-white dark:bg-slate-950 pb-20 sm:pb-0">
@@ -197,7 +219,12 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
           <div className="flex flex-col gap-3">
             <div className="aspect-square rounded-2xl overflow-hidden flex items-center justify-center bg-slate-100 dark:bg-slate-800">
               {activeImage ? (
-                <img src={activeImage} alt={product.name} className="w-full h-full object-contain" />
+                <img
+                  key={activeImage}
+                  src={activeImage}
+                  alt={product.name}
+                  className="w-full h-full object-contain animate-in fade-in zoom-in-95 duration-300"
+                />
               ) : (
                 <div
                   className="w-full h-full flex items-center justify-center text-white/85"
@@ -263,19 +290,37 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 <div key={name} className="space-y-2.5 pt-1">
                   <p className="text-sm text-slate-500 dark:text-slate-400">{name}</p>
                   <div className="flex flex-wrap gap-2.5">
-                    {attributeOptions[name].map((value) => (
-                      <button
-                        key={value}
-                        onClick={() => setSelectedAttributes((prev) => ({ ...prev, [name]: value }))}
-                        className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors ${
-                          selectedAttributes[name] === value
-                            ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900'
-                            : 'bg-slate-100 text-slate-600 hover:bg-slate-200 dark:bg-slate-800 dark:text-slate-300 dark:hover:bg-slate-700'
-                        }`}
-                      >
-                        {value}
-                      </button>
-                    ))}
+                    {attributeOptions[name].map((value) => {
+                      const optionImage = getOptionImage(name, value);
+                      const isSelected = selectedAttributes[name] === value;
+                      return (
+                        <button
+                          key={value}
+                          onClick={() => handleSelectAttribute(name, value)}
+                          className={`relative inline-flex min-h-10 items-center gap-2 border bg-white text-sm font-medium text-slate-800 transition-all duration-200 dark:bg-slate-900 dark:text-slate-200 ${
+                            optionImage ? 'py-1 pl-1 pr-3' : 'px-4 py-2'
+                          } ${
+                            isSelected
+                              ? 'rounded-xl border-slate-900 shadow-sm dark:border-white'
+                              : 'rounded-md border-slate-200 hover:border-slate-400 dark:border-slate-700 dark:hover:border-slate-500'
+                          }`}
+                        >
+                          {optionImage && (
+                            <img
+                              src={optionImage}
+                              alt=""
+                              className="h-8 w-8 rounded border border-slate-100 bg-white object-contain dark:border-slate-700"
+                            />
+                          )}
+                          {value}
+                          {isSelected && (
+                            <span className="absolute bottom-0 right-0 h-4 w-4 overflow-hidden rounded-br-[10px] bg-slate-900 [clip-path:polygon(100%_0,100%_100%,0_100%)] dark:bg-white">
+                              <Check className="absolute bottom-0 right-0 h-2.5 w-2.5 text-white dark:text-slate-900" strokeWidth={3} />
+                            </span>
+                          )}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
