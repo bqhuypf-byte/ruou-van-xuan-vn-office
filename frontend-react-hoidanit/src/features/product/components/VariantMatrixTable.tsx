@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ImageOff, Save } from 'lucide-react';
+import { ImageOff } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import { generateVariantSku } from '@/shared/utils/generateSku';
 import type { VariantAttributeGroup } from '../types/product.types';
@@ -37,9 +37,30 @@ const buildRows = (
   groups: VariantAttributeGroup[],
   variants: ProductVariant[],
   productSlug: string,
-): MatrixRow[] =>
-  cartesian(groups).map((attributes) => {
-    const variant = variants.find((v) => groups.every((g) => v.attributes?.[g.name] === attributes[g.name]));
+): MatrixRow[] => {
+  const combinations = cartesian(groups);
+  const usedVariantIds = new Set<number>();
+
+  return combinations.map((attributes, combinationIndex) => {
+    const exactVariant = variants.find(
+      (candidate) =>
+        !usedVariantIds.has(candidate.id) &&
+        groups.every((group) => candidate.attributes?.[group.name] === attributes[group.name]),
+    );
+    const sameValuesVariant = variants.find((candidate) => {
+      const attributeValues = Object.values(candidate.attributes ?? {});
+      return (
+        !usedVariantIds.has(candidate.id) &&
+        attributeValues.length === groups.length &&
+        attributeValues.every((value, index) => value === attributes[groups[index]?.name])
+      );
+    });
+    const positionalVariant =
+      combinations.length === variants.length && !usedVariantIds.has(variants[combinationIndex]?.id)
+        ? variants[combinationIndex]
+        : undefined;
+    const variant = exactVariant ?? sameValuesVariant ?? positionalVariant;
+    if (variant) usedVariantIds.add(variant.id);
     const key = groups.map((g) => attributes[g.name]).join('__');
     return {
       key,
@@ -52,6 +73,7 @@ const buildRows = (
       stockQuantity: variant ? String(variant.stockQuantity) : '0',
     };
   });
+};
 
 /** Resolves each group-1 value's thumbnail: prefers the image configured on the product's "Phân loại 1"
  * options (set from the product edit form), falling back to whatever image an existing variant already has. */
@@ -82,13 +104,18 @@ export interface VariantMatrixSaveRow {
   imageUrl?: string;
 }
 
+export interface VariantMatrixChangeState {
+  rows: VariantMatrixSaveRow[];
+  hasChanges: boolean;
+  hasInvalidRows: boolean;
+}
+
 export interface VariantMatrixTableProps {
   productName: string;
   productSlug: string;
   groups: VariantAttributeGroup[];
   variants: ProductVariant[];
-  isSaving?: boolean;
-  onSaveAll: (rows: VariantMatrixSaveRow[]) => Promise<void>;
+  onChangeState: (state: VariantMatrixChangeState) => void;
 }
 
 export const VariantMatrixTable = ({
@@ -96,8 +123,7 @@ export const VariantMatrixTable = ({
   productSlug,
   groups,
   variants,
-  isSaving = false,
-  onSaveAll,
+  onChangeState,
 }: VariantMatrixTableProps) => {
   const variantsSignature = useMemo(
     () =>
@@ -139,23 +165,31 @@ export const VariantMatrixTable = ({
     );
   };
 
-  const handleSave = async () => {
+  useEffect(() => {
     const dirtyRows: VariantMatrixSaveRow[] = [];
+    let hasChanges = false;
+    let hasInvalidRows = false;
+
     for (const row of rows) {
       const originalVariant = variants.find((v) => v.id === row.variantId);
       const imageUrl = groups[0] ? groupImages[row.groupValue] : undefined;
-      const price = Number(row.price);
-      if (!row.price || Number.isNaN(price) || price <= 0) continue;
-
       const changed =
         !originalVariant ||
         originalVariant.sku !== row.sku ||
         originalVariant.price !== row.price ||
         (originalVariant.salePrice ?? '') !== row.salePrice ||
         String(originalVariant.stockQuantity) !== row.stockQuantity ||
-        (originalVariant.imageUrl ?? '') !== (imageUrl ?? '');
+        (originalVariant.imageUrl ?? '') !== (imageUrl ?? '') ||
+        JSON.stringify(originalVariant.attributes ?? {}) !== JSON.stringify(row.attributes);
 
       if (!changed) continue;
+      hasChanges = true;
+
+      const price = Number(row.price);
+      if (!row.price || Number.isNaN(price) || price <= 0) {
+        hasInvalidRows = true;
+        continue;
+      }
 
       dirtyRows.push({
         variantId: row.variantId,
@@ -168,25 +202,25 @@ export const VariantMatrixTable = ({
       });
     }
 
-    if (dirtyRows.length === 0) return;
-    await onSaveAll(dirtyRows);
-  };
+    onChangeState({ rows: dirtyRows, hasChanges, hasInvalidRows });
+    // groupsSignature/variantsSignature intentionally represent the array inputs;
+    // depending on the arrays directly would re-run forever because the form
+    // derives a fresh groups array on every parent render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [groupImages, groupsSignature, onChangeState, rows, variantsSignature]);
 
   let lastGroupValue: string | null = null;
 
   return (
     <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-sm">
-      <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-slate-200 dark:border-slate-800">
+      <div className="px-5 py-3 border-b border-slate-200 dark:border-slate-800">
         <div>
           <p className="text-sm font-semibold text-slate-900 dark:text-white">Danh sách phân loại hàng</p>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Điền giá và tồn kho cho từng tổ hợp, rồi bấm Lưu để áp dụng tất cả cùng lúc. Ảnh lấy từ mục
+            Điền giá và tồn kho cho từng tổ hợp. Nút Lưu Thay Đổi chung bên dưới sẽ lưu tất cả cùng lúc. Ảnh lấy từ mục
             "Phân Loại Hàng" ở trên.
           </p>
         </div>
-        <Button size="sm" onClick={handleSave} isLoading={isSaving} leftIcon={<Save className="w-4 h-4" />}>
-          Lưu Tất Cả
-        </Button>
       </div>
       <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
         <div className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 bg-white dark:bg-slate-900">

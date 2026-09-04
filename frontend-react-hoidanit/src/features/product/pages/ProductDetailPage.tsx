@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useParams, Link } from 'react-router';
 import { useForm, useWatch } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -9,7 +9,7 @@ import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { slugify } from '@/shared/utils/slugify';
 import { VariantTable } from '../components/VariantTable';
 import { VariantMatrixTable } from '../components/VariantMatrixTable';
-import type { VariantMatrixSaveRow } from '../components/VariantMatrixTable';
+import type { VariantMatrixChangeState, VariantMatrixSaveRow } from '../components/VariantMatrixTable';
 import { VariantFormModal } from '../components/VariantFormModal';
 import type { VariantFormSubmitData } from '../components/VariantFormModal';
 import {
@@ -79,20 +79,36 @@ export const ProductDetailPage = () => {
   // remounts the form (fresh useForm + defaultValues) instead of relying on an
   // imperative reset()-after-mount, which in this codebase has repeatedly proven
   // unreliable at actually refreshing already-rendered input DOM nodes.
-  return <ProductEditForm key={product.id} product={product} allCategories={allCategories} />;
+  return (
+    <ProductEditForm
+      key={product.id}
+      product={product}
+      allCategories={allCategories}
+      onRefetch={async () => (await refetch()).data}
+    />
+  );
 };
 
 interface ProductEditFormProps {
   product: ProductDetail;
   allCategories: FlatCategory[];
+  onRefetch: () => Promise<ProductDetail | undefined>;
 }
 
-const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
+const EMPTY_MATRIX_STATE: VariantMatrixChangeState = {
+  rows: [],
+  hasChanges: false,
+  hasInvalidRows: false,
+};
+
+const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormProps) => {
   const [activeTab, setActiveTab] = useState<TabKey>('info');
   const [isVariantFormOpen, setIsVariantFormOpen] = useState(false);
   const [isImageAddOpen, setIsImageAddOpen] = useState(false);
   const [selectedVariant, setSelectedVariant] = useState<ProductVariant | null>(null);
   const [isSavingMatrix, setIsSavingMatrix] = useState(false);
+  const [matrixChangeState, setMatrixChangeState] =
+    useState<VariantMatrixChangeState>(EMPTY_MATRIX_STATE);
   const [deletingImageId, setDeletingImageId] = useState<number | null>(null);
   const [feedback, setFeedback] = useState<{
     type: 'success' | 'error';
@@ -110,9 +126,10 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
     register: registerProduct,
     control: productControl,
     handleSubmit: handleProductSubmit,
+    reset: resetProduct,
     setValue: setProductValue,
     watch: watchProduct,
-    formState: { errors: productErrors },
+    formState: { errors: productErrors, isDirty: isProductDirty },
   } = useForm<ProductFormData>({
     resolver: zodResolver(productSchema),
     defaultValues: productFormValuesFrom(product),
@@ -139,19 +156,6 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
     group2: watchedGroup2 ?? { name: '', values: [] },
   });
 
-  const handleSaveProductInfo = async (data: ProductFormData) => {
-    setFeedback(null);
-    try {
-      await updateProduct.mutateAsync({ id: product.id, input: buildProductSubmitPayload(data) });
-      setFeedback({ type: 'success', message: 'Đã cập nhật thông tin sản phẩm.' });
-    } catch (err) {
-      setFeedback({
-        type: 'error',
-        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi lưu sản phẩm.'),
-      });
-    }
-  };
-
   const handleOpenCreateVariant = () => {
     setSelectedVariant(null);
     setIsVariantFormOpen(true);
@@ -162,8 +166,7 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
     setIsVariantFormOpen(true);
   };
 
-  const handleSaveMatrix = async (rows: VariantMatrixSaveRow[]) => {
-    setFeedback(null);
+  const saveMatrixRows = async (rows: VariantMatrixSaveRow[]) => {
     setIsSavingMatrix(true);
     try {
       const results = await Promise.allSettled(
@@ -173,6 +176,7 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
                 id: row.variantId,
                 input: {
                   sku: row.sku,
+                  attributes: row.attributes,
                   price: row.price,
                   salePrice: row.salePrice,
                   stockQuantity: row.stockQuantity,
@@ -193,17 +197,55 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
         ),
       );
       const failedCount = results.filter((r) => r.status === 'rejected').length;
-      const succeededCount = rows.length - failedCount;
-      if (failedCount === 0) {
-        setFeedback({ type: 'success', message: `Đã lưu ${succeededCount} biến thể thành công.` });
-      } else {
-        setFeedback({
-          type: 'error',
-          message: `Đã lưu ${succeededCount} biến thể, ${failedCount} biến thể thất bại.`,
-        });
+      if (failedCount > 0) {
+        throw new Error(`Không thể lưu ${failedCount}/${rows.length} biến thể.`);
       }
     } finally {
       setIsSavingMatrix(false);
+    }
+  };
+
+  const handleMatrixChangeState = useCallback((state: VariantMatrixChangeState) => {
+    setMatrixChangeState(state);
+  }, []);
+
+  const handleSaveAllChanges = async (data: ProductFormData) => {
+    if (!isProductDirty && !matrixChangeState.hasChanges) return;
+
+    if (matrixChangeState.hasInvalidRows) {
+      setFeedback({
+        type: 'error',
+        message: 'Vui lòng nhập giá lớn hơn 0 cho tất cả phân loại đã thay đổi.',
+      });
+      setActiveTab('variants');
+      return;
+    }
+
+    setFeedback(null);
+    try {
+      if (isProductDirty) {
+        await updateProduct.mutateAsync({
+          id: product.id,
+          input: buildProductSubmitPayload(data),
+        });
+      }
+      if (matrixChangeState.rows.length > 0) {
+        await saveMatrixRows(matrixChangeState.rows);
+      }
+
+      const refreshedProduct = await onRefetch();
+      if (refreshedProduct) {
+        resetProduct(productFormValuesFrom(refreshedProduct));
+      } else {
+        resetProduct(data);
+      }
+      setMatrixChangeState(EMPTY_MATRIX_STATE);
+      setFeedback({ type: 'success', message: 'Đã cập nhật toàn bộ thay đổi của sản phẩm.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi lưu thay đổi sản phẩm.'),
+      });
     }
   };
 
@@ -284,6 +326,12 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
   const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
   const formGroupsSignature = JSON.stringify(formVariantGroups);
   const hasUnsavedGroups = hasVariantGroups && formGroupsSignature !== savedGroupsSignature;
+  const hasChanges = isProductDirty || matrixChangeState.hasChanges;
+  const isSavingChanges = updateProduct.isPending || isSavingMatrix;
+
+  useEffect(() => {
+    if (!hasVariantGroups) setMatrixChangeState(EMPTY_MATRIX_STATE);
+  }, [hasVariantGroups]);
 
   return (
     <div className="space-y-6 max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
@@ -331,7 +379,7 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
           ))}
         </div>
 
-        <form onSubmit={handleProductSubmit(handleSaveProductInfo)}>
+        <form onSubmit={handleProductSubmit(handleSaveAllChanges)}>
           <div className="p-4 sm:p-6">
             {activeTab === 'info' && (
               <div className="space-y-5">
@@ -390,8 +438,8 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
                   </div>
                   {hasUnsavedGroups && (
                     <p className="text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/40 border border-amber-200 dark:border-amber-800 rounded-lg px-3 py-2">
-                      Bảng bên dưới đang xem trước theo phân loại vừa nhập. Bấm "Lưu Chỉnh Sửa" để lưu phân
-                      loại, sau đó bấm "Lưu Tất Cả" để lưu giá/tồn kho.
+                      Bảng bên dưới đang xem trước theo phân loại vừa nhập. Nút "Lưu Thay Đổi" sẽ lưu cả
+                      cấu hình phân loại và giá/tồn kho trong cùng một lần.
                     </p>
                   )}
                   {hasVariantGroups ? (
@@ -400,8 +448,7 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
                       productSlug={product.slug}
                       groups={formVariantGroups}
                       variants={product.variants}
-                      isSaving={isSavingMatrix}
-                      onSaveAll={handleSaveMatrix}
+                      onChangeState={handleMatrixChangeState}
                     />
                   ) : (
                     <VariantTable variants={product.variants} isLoading={false} onEdit={handleOpenEditVariant} />
@@ -412,8 +459,13 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
           </div>
 
           <div className="flex justify-end px-4 sm:px-6 py-4 border-t border-slate-100 dark:border-slate-800">
-            <Button type="submit" isLoading={updateProduct.isPending} leftIcon={<Save className="w-4 h-4" />}>
-              Lưu Chỉnh Sửa
+            <Button
+              type="submit"
+              disabled={!hasChanges}
+              isLoading={isSavingChanges}
+              leftIcon={<Save className="w-4 h-4" />}
+            >
+              Lưu Thay Đổi
             </Button>
           </div>
         </form>

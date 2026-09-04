@@ -78,7 +78,7 @@ describe('ProductDetailPage', () => {
       isLoading: false,
       isError: false,
       error: null,
-      refetch: vi.fn(),
+      refetch: vi.fn().mockResolvedValue({ data: mockDetail }),
     } as unknown as ReturnType<typeof useProductDetail>);
 
     vi.mocked(useCategories).mockReturnValue({
@@ -181,6 +181,66 @@ describe('ProductDetailPage', () => {
     expect(screen.getByRole('columnheader', { name: 'Giá' })).toBeInTheDocument();
     // "Thêm Biến Thể" (old empty-state action) is hidden once the matrix takes over
     expect(screen.queryByRole('button', { name: /Thêm Biến Thể/i })).not.toBeInTheDocument();
+  });
+
+  it('enables one save button only after changes and updates renamed classification attributes', async () => {
+    const classifiedProduct: ProductDetail = {
+      ...mockDetail,
+      variantAttributes: [{ name: 'Độ', values: ['30 độ'] }],
+      variants: [
+        {
+          ...mockDetail.variants[0],
+          attributes: { Độ: '30 độ' },
+        },
+      ],
+    };
+    const updateProductMutation = baseMutation();
+    const updateVariantMutation = baseMutation();
+    vi.mocked(useProductDetail).mockReturnValue({
+      data: classifiedProduct,
+      isLoading: false,
+      isError: false,
+      error: null,
+      refetch: vi.fn().mockResolvedValue({ data: classifiedProduct }),
+    } as unknown as ReturnType<typeof useProductDetail>);
+    vi.mocked(useUpdateProduct).mockReturnValue(
+      updateProductMutation as unknown as ReturnType<typeof useUpdateProduct>,
+    );
+    vi.mocked(useUpdateVariant).mockReturnValue(
+      updateVariantMutation as unknown as ReturnType<typeof useUpdateVariant>,
+    );
+
+    const user = userEvent.setup();
+    renderPage();
+
+    const saveButton = screen.getByRole('button', { name: 'Lưu Thay Đổi' });
+    expect(saveButton).toBeDisabled();
+
+    await user.click(screen.getByRole('button', { name: 'Biến Thể Sản Phẩm' }));
+    const groupNameInput = screen.getByPlaceholderText('Ví dụ: Màu sắc');
+    await user.clear(groupNameInput);
+    await user.type(groupNameInput, 'Nồng độ');
+
+    expect(saveButton).toBeEnabled();
+    expect(screen.queryByRole('button', { name: 'Lưu Tất Cả' })).not.toBeInTheDocument();
+    await user.click(saveButton);
+
+    await waitFor(() =>
+      expect(updateProductMutation.mutateAsync).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: 1,
+          input: expect.objectContaining({
+            variantAttributes: [{ name: 'Nồng độ', values: ['30 độ'] }],
+          }),
+        }),
+      ),
+    );
+    await waitFor(() =>
+      expect(updateVariantMutation.mutateAsync).toHaveBeenCalledWith({
+        id: 10,
+        input: expect.objectContaining({ attributes: { 'Nồng độ': '30 độ' } }),
+      }),
+    );
   });
 
   it('adds a new image via the add image modal', async () => {

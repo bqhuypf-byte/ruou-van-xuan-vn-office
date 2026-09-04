@@ -471,12 +471,12 @@ export const ProductClassificationFields = ({
         register={register}
         setValue={setValue}
         onRemove={() => {
-          setValue('hasGroup2', false);
-          setValue('group2', emptyGroup());
+          setValue('hasGroup2', false, { shouldDirty: true });
+          setValue('group2', emptyGroup(), { shouldDirty: true });
         }}
       />
     ) : (
-      <Button type="button" variant="outline" size="sm" onClick={() => setValue('hasGroup2', true)} leftIcon={<Plus className="w-3.5 h-3.5" />}>
+      <Button type="button" variant="outline" size="sm" onClick={() => setValue('hasGroup2', true, { shouldDirty: true })} leftIcon={<Plus className="w-3.5 h-3.5" />}>
         Thêm Phân Loại 2
       </Button>
     )}
