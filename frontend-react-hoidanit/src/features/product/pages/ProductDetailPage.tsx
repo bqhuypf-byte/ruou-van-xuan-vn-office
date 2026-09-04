@@ -29,7 +29,7 @@ import { useCategories } from '../hooks/useCategories';
 import type { FlatCategory } from '../hooks/useCategories';
 import { useUpdateProduct } from '../hooks/useProductMutations';
 import { useCreateVariant, useUpdateVariant } from '../hooks/useVariantMutations';
-import { useAddImages, useDeleteImage } from '../hooks/useImageMutations';
+import { useAddImages, useDeleteImage, useReorderImages } from '../hooks/useImageMutations';
 import type { ProductVariant } from '../types/variant.types';
 import type { ProductImage } from '../types/image.types';
 import type { ProductDetail } from '../services/product.service';
@@ -104,6 +104,7 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
   const updateProduct = useUpdateProduct();
   const addImages = useAddImages();
   const deleteImage = useDeleteImage();
+  const reorderImages = useReorderImages();
 
   const {
     register: registerProduct,
@@ -262,6 +263,23 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
     }
   };
 
+  const handleReorderImages = async (imageIds: number[]) => {
+    setFeedback(null);
+    try {
+      await reorderImages.mutateAsync({
+        productId: product.id,
+        input: { imageIds },
+      });
+      setFeedback({ type: 'success', message: 'Đã cập nhật thứ tự hình ảnh.' });
+    } catch (err) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(err, 'Không thể lưu thứ tự hình ảnh.'),
+      });
+      throw err;
+    }
+  };
+
   const hasVariantGroups = formVariantGroups.length > 0;
   const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
   const formGroupsSignature = JSON.stringify(formVariantGroups);
@@ -344,7 +362,9 @@ const ProductEditForm = ({ product, allCategories }: ProductEditFormProps) => {
                   images={product.images}
                   isLoading={false}
                   onDelete={handleDeleteImage}
+                  onReorder={handleReorderImages}
                   deletingId={deletingImageId}
+                  isReordering={reorderImages.isPending}
                 />
               </div>
             )}

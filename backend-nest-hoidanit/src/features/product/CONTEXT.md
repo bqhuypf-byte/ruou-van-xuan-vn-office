@@ -23,6 +23,7 @@ All per `01-share-docs/DATABASE.md`.
 | POST | `/admin/products/:id/variants` | Create variant | Admin |
 | PATCH | `/admin/variants/:id` | Update variant | Admin |
 | POST | `/admin/products/:id/images` | Add images | Admin |
+| PATCH | `/admin/products/:id/images/order` | Reorder all product images | Admin |
 | DELETE | `/admin/images/:id` | Delete image | Admin |
 
 ## Important deviations from API_SPEC.md

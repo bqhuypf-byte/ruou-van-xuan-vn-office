@@ -7,7 +7,7 @@ import { useProductDetail } from '../hooks/useProductDetail';
 import { useCategories } from '../hooks/useCategories';
 import { useCreateVariant, useUpdateVariant } from '../hooks/useVariantMutations';
 import { useUpdateProduct } from '../hooks/useProductMutations';
-import { useAddImages, useDeleteImage } from '../hooks/useImageMutations';
+import { useAddImages, useDeleteImage, useReorderImages } from '../hooks/useImageMutations';
 import type { ProductDetail } from '../services/product.service';
 
 vi.mock('../hooks/useProductDetail');
@@ -15,6 +15,20 @@ vi.mock('../hooks/useCategories');
 vi.mock('../hooks/useVariantMutations');
 vi.mock('../hooks/useProductMutations');
 vi.mock('../hooks/useImageMutations');
+vi.mock('../components/MultiImageDropzone', () => ({
+  MultiImageDropzone: ({
+    onUploadedUrlsChange,
+  }: {
+    onUploadedUrlsChange: (urls: string[]) => void;
+  }) => (
+    <button
+      type="button"
+      onClick={() => onUploadedUrlsChange(['https://example.com/b.jpg'])}
+    >
+      Chọn ảnh kiểm thử
+    </button>
+  ),
+}));
 
 const mockDetail: ProductDetail = {
   id: 1,
@@ -85,6 +99,9 @@ describe('ProductDetailPage', () => {
     );
     vi.mocked(useDeleteImage).mockReturnValue(
       baseMutation() as unknown as ReturnType<typeof useDeleteImage>,
+    );
+    vi.mocked(useReorderImages).mockReturnValue(
+      baseMutation() as unknown as ReturnType<typeof useReorderImages>,
     );
   });
 
@@ -178,9 +195,8 @@ describe('ProductDetailPage', () => {
 
     await user.click(screen.getByRole('button', { name: 'Hình Ảnh' }));
     await user.click(screen.getByRole('button', { name: /Thêm Ảnh/i }));
-    await user.type(screen.getByLabelText(/URL Hình Ảnh/i), 'https://example.com/b.jpg');
-    const submitButtons = screen.getAllByRole('button', { name: 'Thêm Ảnh' });
-    await user.click(submitButtons[submitButtons.length - 1]);
+    await user.click(screen.getByRole('button', { name: 'Chọn ảnh kiểm thử' }));
+    await user.click(screen.getByRole('button', { name: 'Thêm 1 Ảnh' }));
 
     await waitFor(() =>
       expect(mutateAsync).toHaveBeenCalledWith({

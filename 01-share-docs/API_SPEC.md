@@ -212,6 +212,7 @@ Types: image/jpeg, image/png, image/webp
 | POST | `/admin/products/:id/variants` | Create variant | Admin |
 | PATCH | `/admin/variants/:id` | Update variant | Admin |
 | POST | `/admin/products/:id/images` | Upload images | Admin |
+| PATCH | `/admin/products/:id/images/order` | Reorder product images | Admin |
 | DELETE | `/admin/images/:id` | Delete image | Admin |
 
 ### Cart Feature

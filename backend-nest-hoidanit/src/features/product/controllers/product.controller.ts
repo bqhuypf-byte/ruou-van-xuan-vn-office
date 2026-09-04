@@ -20,6 +20,7 @@ import { CreateProductDto } from '../dto/create-product.dto';
 import { UpdateProductDto } from '../dto/update-product.dto';
 import { QueryProductDto } from '../dto/query-product.dto';
 import { AddImagesDto } from '../dto/add-images.dto';
+import { ReorderImagesDto } from '../dto/reorder-images.dto';
 
 @Controller()
 export class ProductController {
@@ -78,6 +79,16 @@ export class ProductController {
   @Post('admin/products/:id/images')
   addImages(@Param('id', ParseIntPipe) id: number, @Body() dto: AddImagesDto) {
     return this.productService.addImages(id, dto.images);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Patch('admin/products/:id/images/order')
+  reorderImages(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ReorderImagesDto,
+  ) {
+    return this.productService.reorderImages(id, dto.imageIds);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

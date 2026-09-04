@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   NotFoundException,
@@ -246,14 +247,48 @@ export class ProductService {
   ): Promise<ProductImage[]> {
     await this.getById(productId);
 
-    const images = imageDtos.map((dto) =>
+    const existingImages = await this.imageRepository.findByProductId(productId);
+    const nextSortOrder =
+      existingImages.length === 0
+        ? 0
+        : Math.max(...existingImages.map((image) => image.sortOrder)) + 1;
+
+    const images = imageDtos.map((dto, index) =>
       this.imageRepository.create({
         productId,
         imageUrl: dto.imageUrl,
-        sortOrder: dto.sortOrder ?? 0,
+        sortOrder: dto.sortOrder ?? nextSortOrder + index,
       }),
     );
     return this.imageRepository.save(images);
+  }
+
+  async reorderImages(
+    productId: number,
+    imageIds: number[],
+  ): Promise<ProductImage[]> {
+    await this.getById(productId);
+    const images = await this.imageRepository.findByProductId(productId);
+    const existingIds = new Set(images.map((image) => image.id));
+
+    if (
+      imageIds.length !== images.length ||
+      imageIds.some((imageId) => !existingIds.has(imageId))
+    ) {
+      throw new BadRequestException(
+        'Danh sách sắp xếp phải chứa đầy đủ hình ảnh của sản phẩm',
+      );
+    }
+
+    const imagesById = new Map(images.map((image) => [image.id, image]));
+    const reorderedImages = imageIds.map((imageId, index) => {
+      const image = imagesById.get(imageId)!;
+      image.sortOrder = index;
+      return image;
+    });
+
+    await this.imageRepository.save(reorderedImages);
+    return reorderedImages;
   }
 
   async removeImage(id: number): Promise<void> {

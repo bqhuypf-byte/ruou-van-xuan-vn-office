@@ -1,5 +1,5 @@
 import { axiosInstance } from '@/shared/lib/axios';
-import type { AddImagesInput, ProductImage } from '../types/image.types';
+import type { AddImagesInput, ProductImage, ReorderImagesInput } from '../types/image.types';
 
 export const imageService = {
   addImages: async (
@@ -15,5 +15,16 @@ export const imageService = {
 
   deleteImage: async (id: number): Promise<void> => {
     await axiosInstance.delete(`/admin/images/${id}`);
+  },
+
+  reorderImages: async (
+    productId: number,
+    input: ReorderImagesInput,
+  ): Promise<ProductImage[]> => {
+    const response = await axiosInstance.patch<{ data: ProductImage[] }>(
+      `/admin/products/${productId}/images/order`,
+      input,
+    );
+    return response.data.data;
   },
 };

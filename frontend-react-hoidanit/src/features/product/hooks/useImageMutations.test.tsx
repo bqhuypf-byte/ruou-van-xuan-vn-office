@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { renderHook, waitFor } from '@testing-library/react';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { createTestQueryClient } from '@/test/test-utils';
-import { useAddImages, useDeleteImage } from './useImageMutations';
+import { useAddImages, useDeleteImage, useReorderImages } from './useImageMutations';
 import { imageService } from '../services/image.service';
 import type { ProductImage } from '../types/image.types';
 
@@ -10,6 +10,7 @@ vi.mock('../services/image.service', () => ({
   imageService: {
     addImages: vi.fn(),
     deleteImage: vi.fn(),
+    reorderImages: vi.fn(),
   },
 }));
 
@@ -50,5 +51,24 @@ describe('useDeleteImage', () => {
 
     await waitFor(() => expect(result.current.isSuccess).toBe(true));
     expect(imageService.deleteImage).toHaveBeenCalledWith(1);
+  });
+});
+
+describe('useReorderImages', () => {
+  beforeEach(() => vi.clearAllMocks());
+
+  it('calls imageService.reorderImages with the full ordered id list', async () => {
+    vi.mocked(imageService.reorderImages).mockResolvedValue(mockImages);
+    const { result } = renderHook(() => useReorderImages(), { wrapper });
+
+    result.current.mutate({
+      productId: 1,
+      input: { imageIds: [2, 1] },
+    });
+
+    await waitFor(() => expect(result.current.isSuccess).toBe(true));
+    expect(imageService.reorderImages).toHaveBeenCalledWith(1, {
+      imageIds: [2, 1],
+    });
   });
 });

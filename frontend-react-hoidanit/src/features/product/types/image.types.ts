@@ -8,3 +8,7 @@ export interface ProductImage {
 export interface AddImagesInput {
   images: { imageUrl: string; sortOrder?: number }[];
 }
+
+export interface ReorderImagesInput {
+  imageIds: number[];
+}

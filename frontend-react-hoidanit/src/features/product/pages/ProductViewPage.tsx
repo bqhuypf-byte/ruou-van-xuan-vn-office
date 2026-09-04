@@ -163,7 +163,10 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
   const breadcrumb = buildBreadcrumb(product.categoryId, allCategories);
   const gallery = [
     product.thumbnailUrl,
-    ...product.images.map((i) => i.imageUrl),
+    ...product.images
+      .slice()
+      .sort((a, b) => a.sortOrder - b.sortOrder)
+      .map((i) => i.imageUrl),
   ].filter((url): url is string => !!url);
 
   return (
