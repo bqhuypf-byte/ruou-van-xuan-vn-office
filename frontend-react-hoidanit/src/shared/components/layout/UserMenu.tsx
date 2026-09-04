@@ -33,7 +33,7 @@ export const UserMenu = () => {
         onClick={() => setIsOpen((open) => !open)}
         className="flex items-center gap-2 pl-2 ml-1 py-1.5 pr-2 rounded-full border-l border-slate-200 dark:border-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
       >
-        <div className="w-8 h-8 rounded-full bg-brand-600 text-white flex items-center justify-center text-sm font-semibold shrink-0">
+        <div className="w-8 h-8 rounded-full bg-gold-500 text-brand-950 flex items-center justify-center text-sm font-semibold shrink-0">
           {initial}
         </div>
         <span className="hidden sm:inline text-sm font-medium text-slate-700 dark:text-slate-300">

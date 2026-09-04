@@ -20,11 +20,11 @@ export const FaqAccordion = () => {
                 onClick={() => setOpenIndex(isOpen ? null : index)}
                 className="w-full flex items-center justify-between gap-4 text-left"
               >
-                <span className="font-semibold text-slate-900 dark:text-white">
+                <span className="font-semibold text-gold-900 dark:text-gold-100">
                   {faq.question}
                 </span>
                 <ChevronDown
-                  className={`w-5 h-5 shrink-0 text-slate-400 transition-transform ${
+                  className={`w-5 h-5 shrink-0 text-gold-600 transition-transform ${
                     isOpen ? 'rotate-180' : ''
                   }`}
                 />

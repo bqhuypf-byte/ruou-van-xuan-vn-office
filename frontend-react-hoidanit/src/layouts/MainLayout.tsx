@@ -46,25 +46,25 @@ export const MainLayout = () => {
   return (
     <div className="min-h-screen flex flex-col">
       <ScrollToTop />
-      <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 shadow-xs border-t-2 border-brand-600">
-        <div className="hidden md:block text-xs text-brand-600 dark:text-brand-400 bg-slate-50 dark:bg-slate-950 border-b border-slate-100 dark:border-slate-800">
+      <header className="sticky top-0 z-30 bg-white dark:bg-slate-900 shadow-xs border-t-2 border-gold-500">
+        <div className="hidden md:block text-xs text-gold-200 bg-brand-950 border-b border-brand-900">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-9 flex items-center justify-between">
             <span>{settings?.topBarMessage ?? DEFAULT_TOP_BAR_MESSAGE}</span>
             <div className="flex items-center gap-5">
               <span className="flex items-center gap-1.5">
-                <MapPin className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                <MapPin className="w-3.5 h-3.5 text-gold-300" />
                 {settings?.deliverToText ?? DEFAULT_DELIVER_TO_TEXT}
               </span>
-              <Link to={ROUTES.ORDERS} className="flex items-center gap-1.5 hover:text-brand-800 dark:hover:text-brand-300 transition-colors">
-                <Truck className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+              <Link to={ROUTES.ORDERS} className="flex items-center gap-1.5 hover:text-gold-50 transition-colors">
+                <Truck className="w-3.5 h-3.5 text-gold-300" />
                 {t('header.trackOrder')}
               </Link>
               <button
                 type="button"
                 onClick={() => setIsVoucherPopupOpen(true)}
-                className="flex items-center gap-1.5 hover:text-brand-800 dark:hover:text-brand-300 transition-colors"
+                className="flex items-center gap-1.5 hover:text-gold-50 transition-colors"
               >
-                <Tag className="w-3.5 h-3.5 text-brand-600 dark:text-brand-400" />
+                <Tag className="w-3.5 h-3.5 text-gold-300" />
                 {t('header.allOffers')}
               </button>
             </div>
@@ -76,16 +76,16 @@ export const MainLayout = () => {
             <button
               type="button"
               onClick={() => setIsMobileMenuOpen(true)}
-              className="md:hidden p-2 -ml-2 rounded-lg text-brand-600 hover:bg-slate-100 dark:text-brand-400 dark:hover:bg-slate-800"
+              className="md:hidden p-2 -ml-2 rounded-lg text-gold-700 hover:bg-gold-50 dark:text-gold-300 dark:hover:bg-slate-800"
               aria-label="Mở danh mục"
             >
               <Menu className="w-5 h-5" />
             </button>
-            <Link to={ROUTES.HOME} className="flex min-w-0 items-center gap-2 sm:gap-2.5 font-bold text-lg text-brand-600 dark:text-white shrink-0">
+            <Link to={ROUTES.HOME} className="flex min-w-0 items-center gap-2 sm:gap-2.5 font-bold text-lg text-gold-700 dark:text-gold-200 shrink-0">
               {settings?.logoUrl ? (
                 <img src={settings.logoUrl} alt={siteName} className="h-9 object-contain" />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
+                <div className="w-9 h-9 rounded-xl bg-gold-500 flex items-center justify-center text-brand-950 text-xs font-bold">
                   VX
                 </div>
               )}
@@ -95,8 +95,8 @@ export const MainLayout = () => {
             <form onSubmit={handleSearchSubmit} className="hidden md:block flex-1 max-w-xl">
               <Input
                 placeholder={t('header.searchPlaceholder')}
-                leftIcon={<Search className="w-4 h-4 text-brand-600 dark:text-brand-400" />}
-                rightIcon={<List className="w-4 h-4 text-brand-600 dark:text-brand-400" />}
+                leftIcon={<Search className="w-4 h-4 text-gold-700 dark:text-gold-300" />}
+                rightIcon={<List className="w-4 h-4 text-gold-700 dark:text-gold-300" />}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="rounded-lg bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"
@@ -107,7 +107,7 @@ export const MainLayout = () => {
               <button
                 type="button"
                 onClick={() => setIsMobileSearchOpen((open) => !open)}
-                className="md:hidden p-2 rounded-lg text-brand-600 hover:bg-slate-100 dark:text-brand-400 dark:hover:bg-slate-800"
+                className="md:hidden p-2 rounded-lg text-gold-700 hover:bg-gold-50 dark:text-gold-300 dark:hover:bg-slate-800"
                 aria-label={t('header.searchPlaceholder')}
                 aria-expanded={isMobileSearchOpen}
               >
@@ -122,9 +122,9 @@ export const MainLayout = () => {
                 <>
                   <Link
                     to={ROUTES.LOGIN}
-                    className="flex items-center gap-1.5 p-2 sm:p-0 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-brand-600 dark:hover:text-brand-400"
+                    className="flex items-center gap-1.5 p-2 sm:p-0 text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-gold-700 dark:hover:text-gold-300"
                   >
-                    <LogIn className="w-5 h-5 text-brand-600 dark:text-brand-400" />
+                    <LogIn className="w-5 h-5 text-gold-700 dark:text-gold-300" />
                     <span className="hidden sm:inline">{t('header.signInSignUp')}</span>
                   </Link>
                   <span className="hidden sm:block h-6 w-px bg-slate-200 dark:bg-slate-700" />
@@ -140,7 +140,7 @@ export const MainLayout = () => {
             <Input
               autoFocus
               placeholder={t('header.searchPlaceholder')}
-              leftIcon={<Search className="w-4 h-4 text-brand-600 dark:text-brand-400" />}
+              leftIcon={<Search className="w-4 h-4 text-gold-700 dark:text-gold-300" />}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700"

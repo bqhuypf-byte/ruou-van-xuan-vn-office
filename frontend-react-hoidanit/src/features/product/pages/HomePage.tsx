@@ -8,6 +8,14 @@ import { DealsSection } from '../components/DealsSection';
 import { useHomepageSections, toSectionDeal } from '../hooks/useHomepageSections';
 import type { FeaturedDeal } from '../hooks/useFeaturedDeals';
 
+const hasDarkBackground = (color?: string | null) => {
+  if (!color || !/^#[0-9a-f]{6}$/i.test(color)) return false;
+  const red = Number.parseInt(color.slice(1, 3), 16);
+  const green = Number.parseInt(color.slice(3, 5), 16);
+  const blue = Number.parseInt(color.slice(5, 7), 16);
+  return (red * 299 + green * 587 + blue * 114) / 1000 < 145;
+};
+
 export const HomePage = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
@@ -19,6 +27,7 @@ export const HomePage = () => {
 
   const heroBanners = banners ?? [];
   const banner = heroBanners[activeBanner];
+  const isDarkHero = hasDarkBackground(banner?.bgColor);
 
   const handleBannerCta = () => {
     if (!banner?.ctaLink) return;
@@ -45,21 +54,33 @@ export const HomePage = () => {
             />
             <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
               {banner.subtitle && (
-                <p className="text-brand-700 font-semibold text-sm uppercase tracking-wide">
+                <p
+                  className={`font-semibold text-sm uppercase tracking-wide ${
+                    isDarkHero ? 'text-gold-300' : 'text-gold-800'
+                  }`}
+                >
                   {banner.subtitle}
                 </p>
               )}
-              <h1 className="mt-3 text-2xl sm:text-5xl font-bold text-brand-900 leading-[1.1]">
+              <h1
+                className={`mt-3 text-2xl sm:text-5xl font-bold leading-[1.1] ${
+                  isDarkHero ? 'text-gold-100' : 'text-gold-900'
+                }`}
+              >
                 {banner.title}
               </h1>
               {banner.badgeText && (
-                <p className="mt-4 text-sm sm:text-base text-brand-800/80 max-w-sm">
+                <p
+                  className={`mt-4 text-sm sm:text-base max-w-sm ${
+                    isDarkHero ? 'text-gold-50/85' : 'text-gold-900/80'
+                  }`}
+                >
                   {banner.badgeText}
                 </p>
               )}
               {banner.ctaLink && (
                 <Button
-                  className="mt-6 min-h-11 rounded-full px-7 bg-brand-600 hover:bg-brand-700 text-white"
+                  className="mt-6 min-h-11 rounded-full px-7 bg-gold-500 hover:bg-gold-600 text-brand-950"
                   onClick={handleBannerCta}
                 >
                   {t('home.shopNow')}
@@ -79,14 +100,14 @@ export const HomePage = () => {
                   onClick={() =>
                     setActiveBanner((i) => (i - 1 + heroBanners.length) % heroBanners.length)
                   }
-                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gold-800 flex items-center justify-center"
                   aria-label={t('home.prevBanner')}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setActiveBanner((i) => (i + 1) % heroBanners.length)}
-                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/80 hover:bg-white text-gold-800 flex items-center justify-center"
                   aria-label={t('home.nextBanner')}
                 >
                   <ChevronRight className="w-5 h-5" />
@@ -97,7 +118,7 @@ export const HomePage = () => {
                       key={b.id}
                       onClick={() => setActiveBanner(i)}
                       className={`h-1.5 rounded-full transition-all ${
-                        i === activeBanner ? 'w-6 bg-brand-700' : 'w-1.5 bg-brand-700/40'
+                        i === activeBanner ? 'w-6 bg-gold-500' : 'w-1.5 bg-gold-500/45'
                       }`}
                       aria-label={t('home.viewBanner', { n: i + 1 })}
                     />
