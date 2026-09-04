@@ -37,8 +37,8 @@ export const TrustBadgeStrip = ({ badges }: TrustBadgeStripProps) => {
           const Icon = ICON_MAP[badge.icon] ?? CheckCircle;
           return (
             <div key={`${badge.title}-${index}`} className="flex flex-col items-center text-center gap-2">
-              <Icon className="w-8 h-8 text-gold-600 dark:text-gold-300" />
-              <p className="font-semibold text-gold-900 dark:text-gold-100">{badge.title}</p>
+              <Icon className="w-8 h-8 text-brand-600 dark:text-brand-400" />
+              <p className="font-semibold text-slate-900 dark:text-white">{badge.title}</p>
               <p className="text-sm text-slate-500 dark:text-slate-400">{badge.description}</p>
             </div>
           );

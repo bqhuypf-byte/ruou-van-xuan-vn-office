@@ -132,7 +132,7 @@ export const ContactWidget = ({ channels }: ContactWidgetProps) => {
         <button
           onClick={() => setIsOpen((open) => !open)}
           aria-label={t('contactWidget.toggle')}
-          className={`relative flex items-center justify-center gap-1.5 min-h-10 px-3 sm:min-h-14 sm:gap-2 sm:pl-4 sm:pr-5 rounded-full bg-brand-600 hover:bg-brand-700 text-gold-100 shadow-lg sm:shadow-xl transition-colors ${
+          className={`relative flex items-center justify-center gap-1.5 min-h-10 px-3 sm:min-h-14 sm:gap-2 sm:pl-4 sm:pr-5 rounded-full bg-brand-600 hover:bg-brand-700 text-white shadow-lg sm:shadow-xl transition-colors ${
             isOpen ? '' : 'contact-widget-shake'
           }`}
         >

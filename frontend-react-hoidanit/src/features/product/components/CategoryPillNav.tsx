@@ -32,15 +32,15 @@ const CategoryPill = ({
         onMouseDown={hasChildren ? onToggle : undefined}
         className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
           isActive
-            ? 'bg-brand-600 border-brand-600 text-gold-100'
-            : 'bg-white border-slate-200 text-gold-800 hover:border-gold-400 hover:text-gold-700 dark:bg-slate-900 dark:border-slate-700 dark:text-gold-200'
+            ? 'bg-brand-600 border-brand-600 text-white'
+            : 'bg-white border-slate-200 text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300'
         }`}
       >
         {category.name}
         {hasChildren && (
           <ChevronDown
             className={`w-3.5 h-3.5 transition-transform ${
-              isActive ? 'text-gold-100' : 'text-gold-700 dark:text-gold-300'
+              isActive ? 'text-white' : 'text-brand-600 dark:text-brand-400'
             } ${isOpen ? 'rotate-180' : ''}`}
           />
         )}

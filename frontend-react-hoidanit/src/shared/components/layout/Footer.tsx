@@ -70,15 +70,15 @@ export const Footer = () => {
   ].filter((col) => col.links.length > 0);
 
   return (
-    <footer className="bg-brand-950 border-t border-brand-900">
+    <footer className="bg-white dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 space-y-8">
         <div className="grid gap-0 sm:gap-10 sm:grid-cols-2 lg:grid-cols-6">
           <div className="sm:col-span-2 lg:col-span-2 space-y-5">
-            <div className="flex items-center gap-2.5 font-bold text-lg text-gold-200">
+            <div className="flex items-center gap-2.5 font-bold text-lg text-brand-600 dark:text-white">
               {settings?.logoUrl ? (
                 <img src={settings.logoUrl} alt={siteName} className="h-9 object-contain" />
               ) : (
-                <div className="w-9 h-9 rounded-xl bg-gold-500 flex items-center justify-center text-brand-950 text-xs font-bold">
+                <div className="w-9 h-9 rounded-xl bg-brand-600 flex items-center justify-center text-white text-xs font-bold">
                   VX
                 </div>
               )}
@@ -86,7 +86,7 @@ export const Footer = () => {
             </div>
 
             {settings?.footerDescription && (
-              <p className="text-sm text-brand-100/75 max-w-xs">
+              <p className="text-sm text-slate-500 dark:text-slate-400 max-w-xs">
                 {settings.footerDescription}
               </p>
             )}
@@ -96,11 +96,11 @@ export const Footer = () => {
                 <div className="flex items-start gap-3">
                   <MapPin className="w-5 h-5 shrink-0 mt-0.5 text-slate-400" />
                   <div className="space-y-1">
-                    <p className="text-brand-200/65">{t('footer.address')}</p>
+                    <p className="text-slate-400">{t('footer.address')}</p>
                     {settings.contactAddresses.map((item, index) => (
                       <p
                         key={index}
-                        className="font-semibold text-gold-100"
+                        className="font-semibold text-slate-800 dark:text-slate-200"
                       >
                         {item.label ? `${item.label}: ${item.address}` : item.address}
                       </p>
@@ -112,8 +112,8 @@ export const Footer = () => {
                 <div className="flex items-center gap-3">
                   <Phone className="w-5 h-5 shrink-0 text-slate-400" />
                   <div>
-                    <p className="text-brand-200/65">{t('footer.hotline')}</p>
-                    <p className="font-semibold text-gold-100">
+                    <p className="text-slate-400">{t('footer.hotline')}</p>
+                    <p className="font-semibold text-slate-800 dark:text-slate-200">
                       {settings.contactPhone}
                     </p>
                   </div>
@@ -123,7 +123,7 @@ export const Footer = () => {
 
             {settings?.paymentMethodIcons && settings.paymentMethodIcons.length > 0 && (
               <div className="space-y-2">
-                <p className="text-sm font-bold text-gold-200">
+                <p className="text-sm font-bold text-slate-900 dark:text-white">
                   {t('footer.acceptedPayments')}
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
@@ -163,7 +163,7 @@ export const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label={label}
-                className="w-9 h-9 rounded-full bg-brand-900 flex items-center justify-center text-gold-300 hover:bg-gold-500 hover:text-brand-950 transition-colors"
+                className="w-9 h-9 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-slate-500 hover:bg-brand-600 hover:text-white transition-colors"
               >
                 <Icon className="w-[18px] h-[18px]" />
               </a>
@@ -172,7 +172,7 @@ export const Footer = () => {
         )}
       </div>
 
-      <div className="border-t border-white/10">
+      <div className="border-t border-slate-200 dark:border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
           {bottomLinks.length > 0 && (
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
@@ -180,14 +180,14 @@ export const Footer = () => {
                 <Link
                   key={link.label}
                   to={link.url}
-                  className="text-xs font-medium text-brand-100/70 hover:text-gold-200 transition-colors"
+                  className="text-xs font-medium text-slate-600 dark:text-slate-400 hover:text-brand-600 transition-colors"
                 >
                   {link.label}
                 </Link>
               ))}
             </div>
           )}
-          <p className="text-xs text-brand-100/60 text-center">{copyrightText}</p>
+          <p className="text-xs text-slate-500 text-center">{copyrightText}</p>
         </div>
       </div>
     </footer>
@@ -202,15 +202,15 @@ const FooterLinkColumn = ({
   links: { label: string; url: string }[];
 }) => (
   <>
-    <details className="group border-t border-white/10 sm:hidden">
-      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-3 text-sm font-bold text-gold-200 [&::-webkit-details-marker]:hidden">
+    <details className="group border-t border-slate-200 sm:hidden dark:border-slate-800">
+      <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between py-3 text-sm font-bold text-slate-900 [&::-webkit-details-marker]:hidden dark:text-white">
         {title}
         <ChevronDown className="h-4 w-4 text-slate-500 transition-transform group-open:rotate-180" />
       </summary>
-      <ul className="space-y-2.5 pb-4 text-sm text-brand-100/70">
+      <ul className="space-y-2.5 pb-4 text-sm text-slate-500 dark:text-slate-400">
         {links.map((link) => (
           <li key={link.label}>
-            <Link to={link.url} className="hover:text-gold-200 transition-colors">
+            <Link to={link.url} className="hover:text-brand-600 transition-colors">
               {link.label}
             </Link>
           </li>
@@ -219,11 +219,11 @@ const FooterLinkColumn = ({
     </details>
 
     <div className="hidden sm:block">
-      <h3 className="text-sm font-bold text-gold-200">{title}</h3>
-      <ul className="mt-4 space-y-2.5 text-sm text-brand-100/70">
+      <h3 className="text-sm font-bold text-slate-900 dark:text-white">{title}</h3>
+      <ul className="mt-4 space-y-2.5 text-sm text-slate-500 dark:text-slate-400">
         {links.map((link) => (
           <li key={link.label}>
-            <Link to={link.url} className="hover:text-gold-200 transition-colors">
+            <Link to={link.url} className="hover:text-brand-600 transition-colors">
               {link.label}
             </Link>
           </li>

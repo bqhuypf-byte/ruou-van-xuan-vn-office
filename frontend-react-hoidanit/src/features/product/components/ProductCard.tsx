@@ -89,11 +89,11 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
 
       <div className="flex flex-col flex-1 gap-1.5 p-2.5 sm:p-4">
         <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-          <h3 className="w-full text-center text-sm font-semibold text-gold-900 line-clamp-2 transition-colors group-hover:text-gold-700 sm:text-left sm:text-base dark:text-gold-100 dark:group-hover:text-gold-300">
+          <h3 className="w-full text-center text-sm font-semibold text-slate-900 line-clamp-2 transition-colors group-hover:text-brand-600 sm:text-left sm:text-base dark:text-white dark:group-hover:text-brand-400">
             {product.name}
           </h3>
           {product.priceFrom != null && (
-            <span className="w-full shrink-0 text-center text-sm font-bold text-gold-800 sm:w-auto sm:text-right sm:text-base dark:text-gold-200">
+            <span className="w-full shrink-0 text-center text-sm font-bold text-brand-700 sm:w-auto sm:text-right sm:text-base sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
               {formatPrice(product.priceFrom)}
             </span>
           )}
@@ -113,7 +113,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
                   key={i}
                   className={`w-3.5 h-3.5 ${
                     i < Math.round(rating)
-                      ? 'fill-gold-400 text-gold-400'
+                      ? 'fill-brand-600 text-brand-600'
                       : 'fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700'
                   }`}
                 />

@@ -1,20 +1,5 @@
 # Design Tokens — Storefront Redesign
 
-## 2026-09 pass — gold typography accent
-
-The storefront keeps `brand-600` (`#003D29`) as its primary interactive color and adds a restrained
-gold scale for brand typography and premium accents. Gold is not a replacement for the green brand
-color: green remains the structural color for navigation, controls, and interactive states.
-
-- `gold-500` (`#D6AD55`) is the core metallic-gold accent for CTA surfaces and badges that are not
-  promotional discounts.
-- `gold-100`/`gold-200` are used for headings and labels on dark green surfaces.
-- `gold-700`/`gold-900` provide accessible gold-toned text on white and cream surfaces.
-- `rose-600` remains reserved for discount and warning badges.
-- Hero copy selects a light or dark gold tone from the Admin-managed banner background color so an
-  existing banner remains readable without hardcoding its content or background.
-- Heading and body typography remains Be Vietnam Pro throughout the storefront and admin.
-
 ## 2026-08 pass — museshopcart.webflow.io reference (current)
 
 Reference: https://museshopcart.webflow.io/. User explicitly asked to rebrand the primary accent

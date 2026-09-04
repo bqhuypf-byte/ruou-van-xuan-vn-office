@@ -21,7 +21,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
   return (
     <Link
       to={ROUTES.PRODUCT_DETAIL.replace(':slug', product.slug)}
-      className={`group relative block min-w-0 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-gold-500 transition-all ${className}`}
+      className={`group relative block min-w-0 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 overflow-hidden shadow-sm hover:shadow-lg hover:-translate-y-0.5 hover:border-brand-600 transition-all ${className}`}
     >
       {badgeText ? (
         <span className="absolute top-0 right-0 z-10 bg-rose-600 text-white text-xs font-semibold px-3 py-1 rounded-bl-2xl">
@@ -66,7 +66,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
       </div>
 
       <div className="space-y-1.5 rounded-b-2xl bg-white p-2.5 sm:p-4 dark:bg-slate-900">
-        <p className="min-h-[2.5em] text-center text-sm font-semibold text-gold-900 line-clamp-2 sm:text-left sm:text-[16px] dark:text-gold-100">
+        <p className="min-h-[2.5em] text-center text-sm font-semibold text-slate-900 line-clamp-2 sm:text-left sm:text-[16px] dark:text-white">
           {product.name}
         </p>
         {reviewCount > 0 && (
@@ -77,7 +77,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
                   key={i}
                   className={`w-3.5 h-3.5 ${
                     i < Math.round(rating)
-                      ? 'fill-gold-400 text-gold-400'
+                      ? 'fill-brand-600 text-brand-600'
                       : 'fill-slate-200 text-slate-200 dark:fill-slate-700 dark:text-slate-700'
                   }`}
                 />
@@ -87,7 +87,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
           </div>
         )}
         <div className="flex items-baseline justify-center gap-2 sm:justify-start">
-          <span className="text-sm font-bold text-gold-800 sm:text-[16px] dark:text-gold-200">
+          <span className="text-sm font-bold text-brand-700 sm:text-[16px] sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
             {formatPrice(price)}
           </span>
           {originalPrice !== null && (
@@ -101,7 +101,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
             {t('productCard.savings', { amount: formatPrice(savings) })}
           </p>
         )}
-        <span className="mt-2 hidden rounded-full border border-gold-600 py-1.5 text-center text-xs font-semibold text-gold-700 transition-colors group-hover:bg-gold-500 group-hover:text-brand-950 sm:block dark:border-gold-400 dark:text-gold-300">
+        <span className="mt-2 hidden rounded-full border border-brand-600 py-1.5 text-center text-xs font-semibold text-brand-600 transition-colors group-hover:bg-brand-600 group-hover:text-white sm:block dark:border-brand-400 dark:text-brand-400">
           {t('productCard.viewProduct')}
         </span>
       </div>
