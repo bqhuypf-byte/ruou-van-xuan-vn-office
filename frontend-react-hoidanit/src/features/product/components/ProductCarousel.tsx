@@ -40,7 +40,7 @@ export const ProductCarousel = ({
     <div className="relative group/carousel">
       <div
         ref={scrollRef}
-        className={`flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${contentClassName}`}
+        className={`-my-2 flex gap-5 overflow-x-auto py-2 snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${contentClassName}`}
       >
         {children}
       </div>
