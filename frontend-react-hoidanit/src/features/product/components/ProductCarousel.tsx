@@ -4,9 +4,14 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 export interface ProductCarouselProps {
   children: ReactNode;
   showControls?: boolean;
+  contentClassName?: string;
 }
 
-export const ProductCarousel = ({ children, showControls = true }: ProductCarouselProps) => {
+export const ProductCarousel = ({
+  children,
+  showControls = true,
+  contentClassName = '',
+}: ProductCarouselProps) => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const [canScroll, setCanScroll] = useState(false);
 
@@ -35,7 +40,7 @@ export const ProductCarousel = ({ children, showControls = true }: ProductCarous
     <div className="relative group/carousel">
       <div
         ref={scrollRef}
-        className="flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden"
+        className={`flex gap-5 overflow-x-auto snap-x snap-mandatory scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${contentClassName}`}
       >
         {children}
       </div>

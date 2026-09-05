@@ -51,7 +51,7 @@ export const DealsSection = ({ title, deals, layout = 'grid' }: DealsSectionProp
 
       <div className="hidden lg:block">
         {layout === 'carousel' ? (
-          <ProductCarousel>
+          <ProductCarousel contentClassName={previewDeals.length < 4 ? 'justify-center' : ''}>
             {previewDeals.map((deal) => (
               <div
                 key={deal.product.id}
@@ -63,9 +63,15 @@ export const DealsSection = ({ title, deals, layout = 'grid' }: DealsSectionProp
             ))}
           </ProductCarousel>
         ) : (
-          <div className="grid grid-cols-4 gap-5">
+          <div className="flex justify-center gap-5">
             {previewDeals.map((deal) => (
-              <DealCard key={deal.product.id} deal={deal} className="w-full" />
+              <div
+                key={deal.product.id}
+                className="min-w-0"
+                style={{ width: 'calc(25% - 15px)' }}
+              >
+                <DealCard deal={deal} className="w-full" />
+              </div>
             ))}
           </div>
         )}
