@@ -19,7 +19,11 @@ import { Product } from '../entities/product.entity';
 import { ProductVariant } from '../entities/product-variant.entity';
 import { ProductImage } from '../entities/product-image.entity';
 import { PaginationMeta } from '../../../shared/types/pagination.type';
-import { matchesVariantAttributes } from '../utils/variant-attributes.util';
+import {
+  findLowestPricedVariant,
+  getDisplayedVariantPrice,
+  matchesVariantAttributes,
+} from '../utils/variant-attributes.util';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -67,25 +71,28 @@ export class ProductService {
       this.ratingRepository.findByProductIds(productIds),
     ]);
 
-    const cheapestVariantByProduct = new Map<
-      number,
-      (typeof variants)[number]
-    >();
+    const variantsByProduct = new Map<number, (typeof variants)[number][]>();
     for (const variant of variants) {
-      if (!cheapestVariantByProduct.has(variant.productId)) {
-        cheapestVariantByProduct.set(variant.productId, variant);
-      }
+      const productVariants = variantsByProduct.get(variant.productId) ?? [];
+      productVariants.push(variant);
+      variantsByProduct.set(variant.productId, productVariants);
     }
     const ratingByProduct = new Map(
       ratings.map((rating) => [rating.productId, rating]),
     );
 
     const enrichedItems: ProductListItem[] = items.map((item) => {
-      const cheapestVariant = cheapestVariantByProduct.get(item.id);
+      const cheapestVariant = findLowestPricedVariant(
+        variantsByProduct.get(item.id) ?? [],
+        item.variantAttributes ?? [],
+      );
+      const priceFrom = cheapestVariant
+        ? getDisplayedVariantPrice(cheapestVariant)
+        : null;
       const rating = ratingByProduct.get(item.id);
       return {
         ...item,
-        priceFrom: cheapestVariant ? Number(cheapestVariant.price) : null,
+        priceFrom,
         defaultVariantId: cheapestVariant?.id ?? null,
         rating: rating ? rating.avgRating : null,
         reviewCount: rating?.reviewCount ?? 0,
@@ -142,26 +149,30 @@ export class ProductService {
       this.ratingRepository.findByProductIds(ids),
     ]);
 
-    const cheapestVariantByProduct = new Map<
-      number,
-      (typeof variants)[number]
-    >();
+    const variantsByProduct = new Map<number, (typeof variants)[number][]>();
     for (const variant of variants) {
-      if (!cheapestVariantByProduct.has(variant.productId)) {
-        cheapestVariantByProduct.set(variant.productId, variant);
-      }
+      const productVariants = variantsByProduct.get(variant.productId) ?? [];
+      productVariants.push(variant);
+      variantsByProduct.set(variant.productId, productVariants);
     }
     const ratingByProduct = new Map(
       ratings.map((rating) => [rating.productId, rating]),
     );
 
     return products.map((product) => {
-      const variant = cheapestVariantByProduct.get(product.id);
+      const variant = findLowestPricedVariant(
+        variantsByProduct.get(product.id) ?? [],
+        product.variantAttributes ?? [],
+      );
+      const validSalePrice =
+        variant?.salePrice && Number(variant.salePrice) < Number(variant.price)
+          ? Number(variant.salePrice)
+          : null;
       const rating = ratingByProduct.get(product.id);
       return {
         ...product,
         price: variant ? Number(variant.price) : null,
-        salePrice: variant?.salePrice ? Number(variant.salePrice) : null,
+        salePrice: validSalePrice,
         rating: rating ? rating.avgRating : null,
         reviewCount: rating?.reviewCount ?? 0,
       };
