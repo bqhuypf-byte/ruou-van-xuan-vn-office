@@ -272,7 +272,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
 
             {price !== null && (
               <div className="flex items-center gap-3 pb-5 border-b border-slate-200 dark:border-slate-800">
-                <span className="text-3xl font-bold text-slate-900 dark:text-white">
+                <span className="text-3xl font-bold text-rose-600 dark:text-rose-500">
                   {formatPrice(price)}
                 </span>
                 {originalPrice !== null && (
