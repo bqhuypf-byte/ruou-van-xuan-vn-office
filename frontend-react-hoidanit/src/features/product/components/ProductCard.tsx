@@ -98,12 +98,6 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
           )}
         </div>
 
-        {product.shortDescription && (
-          <p className="hidden text-sm text-slate-500 line-clamp-1 sm:block dark:text-slate-400">
-            {product.shortDescription}
-          </p>
-        )}
-
         {reviewCount > 0 && (
           <div className="hidden items-center gap-1.5 sm:flex">
             <div className="flex items-center gap-0.5">

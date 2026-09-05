@@ -21,6 +21,7 @@ import { useAddCartItem } from '@/features/cart';
 import { ReviewList, StarRating, useProductReviews } from '@/features/review';
 import { ROUTES } from '@/routes/routes';
 import { ProductCard } from '../components/ProductCard';
+import { ProductSeo } from '../components/ProductSeo';
 import { useProductDetail } from '../hooks/useProductDetail';
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
@@ -70,7 +71,12 @@ export const ProductViewPage = () => {
     );
   }
 
-  return <ProductPurchasePanel key={product.id} product={product} />;
+  return (
+    <>
+      <ProductSeo product={product} />
+      <ProductPurchasePanel key={product.id} product={product} />
+    </>
+  );
 };
 
 const buildBreadcrumb = (
