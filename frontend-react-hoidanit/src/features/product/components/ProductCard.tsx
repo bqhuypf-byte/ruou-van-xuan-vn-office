@@ -92,7 +92,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
             {product.name}
           </h3>
           {product.priceFrom != null && (
-            <span className="w-full shrink-0 text-center text-sm font-bold text-brand-700 sm:w-auto sm:text-right sm:text-base sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
+            <span className="w-full shrink-0 text-center text-sm font-bold text-rose-600 sm:w-auto sm:text-right sm:text-base dark:text-rose-400">
               {formatPrice(product.priceFrom)}
             </span>
           )}
