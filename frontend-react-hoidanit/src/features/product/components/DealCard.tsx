@@ -87,7 +87,7 @@ export const DealCard = ({ deal, className = '' }: DealCardProps) => {
           </div>
         )}
         <div className="flex items-baseline justify-center gap-2 sm:justify-start">
-          <span className="text-sm font-bold text-brand-700 sm:text-[16px] sm:text-slate-900 dark:text-brand-400 sm:dark:text-white">
+          <span className="text-sm font-bold text-rose-600 sm:text-[16px] dark:text-rose-400">
             {formatPrice(price)}
           </span>
           {originalPrice !== null && (
