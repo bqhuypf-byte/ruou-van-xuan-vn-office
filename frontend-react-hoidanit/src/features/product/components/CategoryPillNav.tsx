@@ -1,154 +1,55 @@
-import { useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
-import { ChevronDown, Minus, Plus } from 'lucide-react';
-import { useClickOutside } from '@/shared/hooks/useClickOutside';
 import { ROUTES } from '@/routes/routes';
 import { useCategories } from '../hooks/useCategories';
-import type { Category } from '../types/category.types';
 
-const CategoryPill = ({
-  category,
-  isActive,
-  isOpen,
-  onToggle,
-  onClose,
+export const CategoryPillNav = ({
+  variant = 'desktop',
+  onNavigate,
 }: {
-  category: Category;
-  isActive: boolean;
-  isOpen: boolean;
-  onToggle: () => void;
-  onClose: () => void;
+  variant?: 'desktop' | 'mobile';
+  onNavigate?: () => void;
 }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
-  useClickOutside(containerRef, onClose, isOpen);
-
-  const hasChildren = category.children.length > 0;
-
-  return (
-    <div className="relative shrink-0" ref={containerRef}>
-      <Link
-        to={ROUTES.CATEGORY.replace(':slug', category.slug)}
-        onClick={hasChildren ? (e) => e.preventDefault() : undefined}
-        onMouseDown={hasChildren ? onToggle : undefined}
-        className={`flex items-center gap-1.5 px-3.5 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors ${
-          isActive
-            ? 'bg-brand-600 border-brand-600 text-white'
-            : 'bg-white border-slate-200 text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:bg-slate-900 dark:border-slate-700 dark:text-slate-300'
-        }`}
-      >
-        {category.name}
-        {hasChildren && (
-          <ChevronDown
-            className={`w-3.5 h-3.5 transition-transform ${
-              isActive ? 'text-white' : 'text-brand-600 dark:text-brand-400'
-            } ${isOpen ? 'rotate-180' : ''}`}
-          />
-        )}
-      </Link>
-
-      {hasChildren && isOpen && (
-        <div className="absolute left-0 mt-2 w-56 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl overflow-hidden z-50 p-2">
-          {category.children.map((child) => (
-            <Link
-              key={child.id}
-              to={ROUTES.CATEGORY.replace(':slug', child.slug)}
-              onClick={onClose}
-              className="block px-3 py-2 rounded-xl text-sm text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
-            >
-              {child.name}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-const MobileCategoryItem = ({
-  category,
-  isActive,
-  isOpen,
-  onToggle,
-  onClose,
-}: {
-  category: Category;
-  isActive: boolean;
-  isOpen: boolean;
-  onToggle: () => void;
-  onClose: () => void;
-}) => {
-  const hasChildren = category.children.length > 0;
-
-  return (
-    <div className="border-b border-slate-100 last:border-0">
-      <div className="flex items-center gap-2 py-1">
-        <Link
-          to={ROUTES.CATEGORY.replace(':slug', category.slug)}
-          onClick={onClose}
-          className={`flex-1 rounded-xl px-3 py-3 text-sm font-semibold transition-colors ${
-            isActive ? 'bg-brand-50 text-brand-700' : 'text-slate-800 hover:bg-slate-50'
-          }`}
-        >
-          {category.name}
-        </Link>
-        {hasChildren && (
-          <button
-            type="button"
-            onClick={onToggle}
-            aria-expanded={isOpen}
-            aria-label={`${isOpen ? 'Thu gọn' : 'Mở rộng'} ${category.name}`}
-            className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-brand-600 hover:bg-brand-50"
-          >
-            {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
-          </button>
-        )}
-      </div>
-      {hasChildren && isOpen && (
-        <div className="ml-3 mb-2 border-l border-brand-200 pl-3">
-          {category.children.map((child) => (
-            <Link
-              key={child.id}
-              to={ROUTES.CATEGORY.replace(':slug', child.slug)}
-              onClick={onClose}
-              className="block rounded-lg px-3 py-2.5 text-sm text-slate-600 hover:bg-slate-50 hover:text-brand-700"
-            >
-              {child.name}
-            </Link>
-          ))}
-        </div>
-      )}
-    </div>
-  );
-};
-
-export const CategoryPillNav = ({ variant = 'desktop', onNavigate }: { variant?: 'desktop' | 'mobile'; onNavigate?: () => void }) => {
   const { tree } = useCategories();
   const { slug: activeSlug } = useParams<{ slug: string }>();
-  const [openId, setOpenId] = useState<number | null>(null);
 
   if (tree.length === 0) return null;
-
-  const closeItem = (id: number) => {
-    setOpenId((open) => (open === id ? null : open));
-    onNavigate?.();
-  };
 
   if (variant === 'mobile') {
     return (
       <nav className="flex flex-col">
         {tree.map((category) => (
-          <MobileCategoryItem
+          <Link
             key={category.id}
-            category={category}
-            isActive={category.slug === activeSlug}
-            isOpen={openId === category.id}
-            onToggle={() => setOpenId((id) => (id === category.id ? null : category.id))}
-            onClose={() => closeItem(category.id)}
-          />
+            to={ROUTES.CATEGORY.replace(':slug', category.slug)}
+            onClick={onNavigate}
+            className={`border-b border-slate-100 px-3 py-3 text-sm font-semibold transition-colors last:border-0 ${
+              category.slug === activeSlug
+                ? 'bg-brand-50 text-brand-700'
+                : 'text-slate-800 hover:bg-slate-50'
+            }`}
+          >
+            {category.name}
+          </Link>
         ))}
       </nav>
     );
   }
 
-  return <nav className="flex items-center justify-center flex-wrap gap-2.5">{tree.map((category) => <CategoryPill key={category.id} category={category} isActive={category.slug === activeSlug} isOpen={openId === category.id} onToggle={() => setOpenId((id) => (id === category.id ? null : category.id))} onClose={() => setOpenId((id) => (id === category.id ? null : id))} />)}</nav>;
+  return (
+    <nav className="flex flex-wrap items-center justify-center gap-2.5">
+      {tree.map((category) => (
+        <Link
+          key={category.id}
+          to={ROUTES.CATEGORY.replace(':slug', category.slug)}
+          className={`shrink-0 whitespace-nowrap rounded-full border px-3.5 py-2 text-sm font-medium transition-colors ${
+            category.slug === activeSlug
+              ? 'border-brand-600 bg-brand-600 text-white'
+              : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300'
+          }`}
+        >
+          {category.name}
+        </Link>
+      ))}
+    </nav>
+  );
 };
