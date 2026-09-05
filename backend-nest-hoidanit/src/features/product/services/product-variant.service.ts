@@ -36,6 +36,15 @@ export class ProductVariantService {
 
     const existing = await this.variantRepository.findBySku(dto.sku);
     if (existing) {
+      if (existing.productId === productId && !existing.isActive) {
+        existing.attributes = dto.attributes ?? null;
+        existing.price = dto.price.toFixed(2);
+        existing.salePrice = dto.salePrice?.toFixed(2) ?? null;
+        existing.stockQuantity = dto.stockQuantity ?? 0;
+        existing.imageUrl = dto.imageUrl ?? null;
+        existing.isActive = true;
+        return this.variantRepository.save(existing);
+      }
       throw new ConflictException(`SKU "${dto.sku}" already exists`);
     }
 
@@ -60,6 +69,7 @@ export class ProductVariantService {
 
     const { price, salePrice, ...rest } = dto;
     assignDefined(variant, rest);
+    variant.isActive = true;
     if (price !== undefined) {
       variant.price = price.toFixed(2);
     }

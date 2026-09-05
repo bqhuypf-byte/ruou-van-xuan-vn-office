@@ -39,6 +39,9 @@ export class ProductVariant {
   @Column({ type: 'int', name: 'stock_quantity', default: 0 })
   stockQuantity: number;
 
+  @Column({ type: 'boolean', name: 'is_active', default: true })
+  isActive: boolean;
+
   @Column({
     type: 'varchar',
     length: 500,

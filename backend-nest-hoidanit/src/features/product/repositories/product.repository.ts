@@ -24,7 +24,14 @@ export class ProductRepository {
   ): Promise<PaginatedProducts> {
     const qb = this.repository
       .createQueryBuilder('product')
-      .leftJoin('product.variants', 'variant');
+      .leftJoin(
+        'product.variants',
+        'variant',
+        'variant.isActive = :variantIsActive',
+        {
+          variantIsActive: true,
+        },
+      );
 
     if (query.search) {
       qb.andWhere('(product.name LIKE :search OR product.slug LIKE :search)', {

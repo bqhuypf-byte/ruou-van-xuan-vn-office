@@ -19,6 +19,7 @@ import { Product } from '../entities/product.entity';
 import { ProductVariant } from '../entities/product-variant.entity';
 import { ProductImage } from '../entities/product-image.entity';
 import { PaginationMeta } from '../../../shared/types/pagination.type';
+import { matchesVariantAttributes } from '../utils/variant-attributes.util';
 
 const DEFAULT_PAGE = 1;
 const DEFAULT_LIMIT = 10;
@@ -105,9 +106,15 @@ export class ProductService {
       throw new NotFoundException(`Product "${slug}" not found`);
     }
 
-    const [rating] = await this.ratingRepository.findByProductIds([
-      product.id,
-    ]);
+    const configuredGroups = product.variantAttributes ?? [];
+    product.variants = product.variants.filter(
+      (variant) =>
+        variant.isActive &&
+        (configuredGroups.length === 0 ||
+          matchesVariantAttributes(variant.attributes, configuredGroups)),
+    );
+
+    const [rating] = await this.ratingRepository.findByProductIds([product.id]);
     return {
       ...product,
       rating: rating ? rating.avgRating : null,
@@ -170,8 +177,14 @@ export class ProductService {
   }
 
   async findVariants(productId: number): Promise<ProductVariant[]> {
-    await this.getById(productId);
-    return this.variantRepository.findByProductId(productId);
+    const product = await this.getById(productId);
+    const variants = await this.variantRepository.findByProductId(productId);
+    const configuredGroups = product.variantAttributes ?? [];
+    return configuredGroups.length === 0
+      ? variants
+      : variants.filter((variant) =>
+          matchesVariantAttributes(variant.attributes, configuredGroups),
+        );
   }
 
   async create(dto: CreateProductDto): Promise<Product> {
@@ -207,7 +220,22 @@ export class ProductService {
     }
 
     assignDefined(product, dto);
-    return this.productRepository.save(product);
+    const savedProduct = await this.productRepository.save(product);
+
+    if (dto.variantAttributes && dto.variantAttributes.length > 0) {
+      const configuredGroups = dto.variantAttributes;
+      const activeVariants = await this.variantRepository.findByProductId(id);
+      const staleVariantIds = activeVariants
+        .filter(
+          (variant) =>
+            !matchesVariantAttributes(variant.attributes, configuredGroups),
+        )
+        .map((variant) => variant.id);
+
+      await this.variantRepository.deactivateByIds(id, staleVariantIds);
+    }
+
+    return savedProduct;
   }
 
   async softDelete(id: number): Promise<void> {
@@ -247,7 +275,8 @@ export class ProductService {
   ): Promise<ProductImage[]> {
     await this.getById(productId);
 
-    const existingImages = await this.imageRepository.findByProductId(productId);
+    const existingImages =
+      await this.imageRepository.findByProductId(productId);
     const nextSortOrder =
       existingImages.length === 0
         ? 0

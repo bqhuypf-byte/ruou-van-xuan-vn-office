@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { ProductVariant } from '../entities/product-variant.entity';
 
 @Injectable()
@@ -11,7 +11,7 @@ export class ProductVariantRepository {
   ) {}
 
   findByProductId(productId: number): Promise<ProductVariant[]> {
-    return this.repository.find({ where: { productId } });
+    return this.repository.find({ where: { productId, isActive: true } });
   }
 
   findByProductIds(productIds: number[]): Promise<ProductVariant[]> {
@@ -19,6 +19,7 @@ export class ProductVariantRepository {
     return this.repository
       .createQueryBuilder('variant')
       .where('variant.productId IN (:...productIds)', { productIds })
+      .andWhere('variant.isActive = :isActive', { isActive: true })
       .orderBy('variant.price', 'ASC')
       .getMany();
   }
@@ -37,5 +38,13 @@ export class ProductVariantRepository {
 
   save(variant: ProductVariant): Promise<ProductVariant> {
     return this.repository.save(variant);
+  }
+
+  async deactivateByIds(productId: number, ids: number[]): Promise<void> {
+    if (ids.length === 0) return;
+    await this.repository.update(
+      { productId, id: In(ids) },
+      { isActive: false },
+    );
   }
 }
