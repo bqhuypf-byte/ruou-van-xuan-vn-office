@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { findVariantForAttributes, getAttributeOptionImage } from '../utils/variantImage.utils';
+import {
+  findVariantForAttributes,
+  getAttributeOptionImage,
+  getConfiguredAttributeOptions,
+} from '../utils/variantImage.utils';
 import type { ProductDetail } from '../services/product.service';
 
 const product: ProductDetail = {
@@ -64,5 +68,13 @@ describe('product variant image selection', () => {
     expect(getAttributeOptionImage(product, 'Màu sắc', 'Black')).toBe(
       'https://example.com/black.jpg',
     );
+  });
+
+  it('uses only the option values configured in Admin', () => {
+    expect(
+      getConfiguredAttributeOptions([
+        { name: 'Độ(Vol)', values: ['30 độ', '40 độ', '50 độ', '40 độ', ''] },
+      ]),
+    ).toEqual({ 'Độ(Vol)': ['30 độ', '40 độ', '50 độ'] });
   });
 });

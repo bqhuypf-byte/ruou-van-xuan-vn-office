@@ -1,5 +1,16 @@
 import type { ProductDetail } from '../services/product.service';
+import type { VariantAttributeGroup } from '../types/product.types';
 import type { ProductVariant } from '../types/variant.types';
+
+export const getConfiguredAttributeOptions = (
+  groups: VariantAttributeGroup[],
+): Record<string, string[]> =>
+  Object.fromEntries(
+    groups.map((group) => [
+      group.name,
+      [...new Set(group.values.map((value) => value.trim()).filter(Boolean))],
+    ]),
+  );
 
 export const findVariantForAttributes = (
   variants: ProductVariant[],

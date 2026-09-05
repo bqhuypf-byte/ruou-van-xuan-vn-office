@@ -29,7 +29,11 @@ import { useProductCacheStore } from '../stores/productCache.store';
 import type { ProductVariant } from '../types/variant.types';
 import type { ProductDetail } from '../services/product.service';
 import type { FlatCategory } from '../hooks/useCategories';
-import { findVariantForAttributes, getAttributeOptionImage } from '../utils/variantImage.utils';
+import {
+  findVariantForAttributes,
+  getAttributeOptionImage,
+  getConfiguredAttributeOptions,
+} from '../utils/variantImage.utils';
 
 export const ProductViewPage = () => {
   const { t } = useTranslation();
@@ -100,14 +104,8 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
 
   const attributeNames = useMemo(() => (product.variantAttributes ?? []).map((g) => g.name), [product.variantAttributes]);
   const attributeOptions = useMemo(
-    () =>
-      Object.fromEntries(
-        attributeNames.map((name) => [
-          name,
-          [...new Set(product.variants.map((v) => v.attributes?.[name]).filter((v): v is string => !!v))],
-        ]),
-      ),
-    [attributeNames, product.variants],
+    () => getConfiguredAttributeOptions(product.variantAttributes ?? []),
+    [product.variantAttributes],
   );
 
   const [selectedAttributes, setSelectedAttributes] = useState<Record<string, string | null>>(() =>
