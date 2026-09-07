@@ -23,6 +23,19 @@ export interface HomepageSectionItemRowProps {
 
 const toInputValue = (value: number | null): string => (value === null ? '' : String(value));
 
+const calculateDiscountBadge = (priceValue: string, originalPriceValue: string): string => {
+  if (priceValue.trim() === '' || originalPriceValue.trim() === '') return '';
+
+  const price = Number(priceValue);
+  const originalPrice = Number(originalPriceValue);
+  if (!Number.isFinite(price) || !Number.isFinite(originalPrice) || price < 0 || originalPrice <= price) {
+    return '';
+  }
+
+  const percent = Math.round(((originalPrice - price) / originalPrice) * 100);
+  return percent > 0 ? `-${percent}%` : '';
+};
+
 export const HomepageSectionItemRow = ({
   item,
   position,
@@ -42,7 +55,22 @@ export const HomepageSectionItemRow = ({
   const [overrideOriginalPrice, setOverrideOriginalPrice] = useState(
     toInputValue(item.overrideOriginalPrice),
   );
-  const [badgeText, setBadgeText] = useState(item.badgeText ?? '');
+  const [badgeText, setBadgeText] = useState(
+    calculateDiscountBadge(
+      toInputValue(item.overridePrice),
+      toInputValue(item.overrideOriginalPrice),
+    ) || item.badgeText || '',
+  );
+
+  const handlePriceChange = (value: string) => {
+    setOverridePrice(value);
+    setBadgeText(calculateDiscountBadge(value, overrideOriginalPrice));
+  };
+
+  const handleOriginalPriceChange = (value: string) => {
+    setOverrideOriginalPrice(value);
+    setBadgeText(calculateDiscountBadge(overridePrice, value));
+  };
 
   const isDirty =
     overridePrice !== toInputValue(item.overridePrice) ||
@@ -121,21 +149,22 @@ export const HomepageSectionItemRow = ({
           type="number"
           placeholder="Giá bán (ghi đè)"
           value={overridePrice}
-          onChange={(e) => setOverridePrice(e.target.value)}
+          onChange={(e) => handlePriceChange(e.target.value)}
           className="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-1.5 px-2.5 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
         />
         <input
           type="number"
           placeholder="Giá gạch (ghi đè)"
           value={overrideOriginalPrice}
-          onChange={(e) => setOverrideOriginalPrice(e.target.value)}
+          onChange={(e) => handleOriginalPriceChange(e.target.value)}
           className="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-1.5 px-2.5 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
         />
         <input
           type="text"
-          placeholder="Nhãn (VD: HOT, -20%)"
+          placeholder="Tự tính % theo giá"
           value={badgeText}
           onChange={(e) => setBadgeText(e.target.value)}
+          title="Phần trăm tự tính khi giá thay đổi; vẫn có thể sửa nhãn thủ công"
           maxLength={50}
           className="w-full rounded-lg border border-slate-300 dark:border-slate-700 dark:bg-slate-900 dark:text-white text-sm py-1.5 px-2.5 focus:outline-none focus:ring-2 focus:border-brand-500 focus:ring-brand-500/20"
         />
