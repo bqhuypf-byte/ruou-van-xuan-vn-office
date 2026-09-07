@@ -2,6 +2,7 @@ export * from './pages/CategoriesPage';
 export * from './pages/ProductsPage';
 export * from './pages/ProductListPage';
 export * from './pages/ProductDetailPage';
+export * from './pages/ProductCreatePage';
 export * from './pages/HomePage';
 export * from './pages/ProductViewPage';
 export * from './pages/CategoryPage';

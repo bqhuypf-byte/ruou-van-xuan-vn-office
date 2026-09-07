@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   Plus,
   Search,
@@ -11,11 +11,11 @@ import {
   Trash2,
   XOctagon,
 } from 'lucide-react';
+import { useNavigate } from 'react-router';
 import { Button, Input } from '@/shared/components/ui';
+import { ROUTES } from '@/routes/routes';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { ProductTable } from '../components/ProductTable';
-import { ProductFormModal } from '../components/ProductFormModal';
-import type { ProductFormSubmitData } from '../components/ProductFormModal';
 import { ProductDeleteModal } from '../components/ProductDeleteModal';
 import { ProductHardDeleteModal } from '../components/ProductHardDeleteModal';
 import { ProductBulkDeleteModal } from '../components/ProductBulkDeleteModal';
@@ -23,7 +23,6 @@ import { ProductBulkHardDeleteModal } from '../components/ProductBulkHardDeleteM
 import { useProducts } from '../hooks/useProducts';
 import { useCategories } from '../hooks/useCategories';
 import {
-  useCreateProduct,
   useDeleteProduct,
   useHardDeleteProduct,
   useUpdateProduct,
@@ -31,11 +30,11 @@ import {
 import type { Product } from '../types/product.types';
 
 export const ProductsPage = () => {
+  const navigate = useNavigate();
   const [search, setSearch] = useState('');
   const [page, setPage] = useState(1);
   const [categoryFilter, setCategoryFilter] = useState('');
   const [statusFilter, setStatusFilter] = useState<'' | 'active' | 'inactive'>('');
-  const [isFormOpen, setIsFormOpen] = useState(false);
   const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const [isHardDeleteOpen, setIsHardDeleteOpen] = useState(false);
   const [isBulkDeleteOpen, setIsBulkDeleteOpen] = useState(false);
@@ -55,14 +54,16 @@ export const ProductsPage = () => {
   });
   const { allCategories } = useCategories();
 
-  const createMutation = useCreateProduct();
   const updateMutation = useUpdateProduct();
   const deleteMutation = useDeleteProduct();
   const hardDeleteMutation = useHardDeleteProduct();
 
-  useEffect(() => {
+  const selectionScope = `${search}-${page}-${categoryFilter}-${statusFilter}`;
+  const [previousSelectionScope, setPreviousSelectionScope] = useState(selectionScope);
+  if (selectionScope !== previousSelectionScope) {
+    setPreviousSelectionScope(selectionScope);
     setSelectedIds(new Set());
-  }, [search, page, categoryFilter, statusFilter]);
+  }
 
   const handleToggleSelect = (id: number) => {
     setSelectedIds((prev) => {
@@ -85,7 +86,7 @@ export const ProductsPage = () => {
   };
 
   const handleOpenCreate = () => {
-    setIsFormOpen(true);
+    navigate(ROUTES.ADMIN_PRODUCT_CREATE);
   };
 
   const handleOpenDelete = (product: Product) => {
@@ -96,22 +97,6 @@ export const ProductsPage = () => {
   const handleOpenHardDelete = (product: Product) => {
     setSelectedProduct(product);
     setIsHardDeleteOpen(true);
-  };
-
-  const handleSaveForm = async (data: ProductFormSubmitData) => {
-    setFeedback(null);
-    try {
-      await createMutation.mutateAsync(data);
-      setFeedback({
-        type: 'success',
-        message: `Đã tạo sản phẩm "${data.name}" thành công.`,
-      });
-    } catch (err) {
-      setFeedback({
-        type: 'error',
-        message: getApiErrorMessage(err, 'Có lỗi xảy ra khi lưu sản phẩm.'),
-      });
-    }
   };
 
   const handleDeleteConfirm = async () => {
@@ -403,15 +388,6 @@ export const ProductsPage = () => {
           </div>
         </div>
       )}
-
-      <ProductFormModal
-        key={String(isFormOpen)}
-        isOpen={isFormOpen}
-        onClose={() => setIsFormOpen(false)}
-        onSubmit={handleSaveForm}
-        categoryOptions={allCategories}
-        isLoading={createMutation.isPending}
-      />
 
       <ProductDeleteModal
         isOpen={isDeleteOpen}

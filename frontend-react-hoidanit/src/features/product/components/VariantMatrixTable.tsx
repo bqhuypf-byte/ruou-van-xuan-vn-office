@@ -75,6 +75,29 @@ const buildRows = (
   });
 };
 
+const reconcileRows = (
+  currentRows: MatrixRow[],
+  groups: VariantAttributeGroup[],
+  variants: ProductVariant[],
+  productSlug: string,
+): MatrixRow[] => {
+  const nextRows = buildRows(groups, variants, productSlug);
+  const currentByKey = new Map(currentRows.map((row) => [row.key, row]));
+
+  return nextRows.map((nextRow) => {
+    const currentRow = currentByKey.get(nextRow.key);
+    if (!currentRow) return nextRow;
+
+    return {
+      ...nextRow,
+      sku: currentRow.sku,
+      price: currentRow.price,
+      salePrice: currentRow.salePrice,
+      stockQuantity: currentRow.stockQuantity,
+    };
+  });
+};
+
 /** Resolves each group-1 value's thumbnail: prefers the image configured on the product's "Phân loại 1"
  * options (set from the product edit form), falling back to whatever image an existing variant already has. */
 const buildGroupImages = (groups: VariantAttributeGroup[], variants: ProductVariant[]): Record<string, string> => {
@@ -141,11 +164,13 @@ export const VariantMatrixTable = ({
     const signature = `${variantsSignature}|${groupsSignature}`;
     if (signatureRef.current !== signature) {
       signatureRef.current = signature;
-      setRows(buildRows(groups, variants, productSlug));
+      setRows((currentRows) => reconcileRows(currentRows, groups, variants, productSlug));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [variantsSignature, groupsSignature]);
 
+  // The signatures intentionally stabilize form-derived arrays to avoid a render loop.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const groupImages = useMemo(() => buildGroupImages(groups, variants), [groupsSignature, variantsSignature]);
 
   const updateRow = (key: string, patch: Partial<MatrixRow>) => {

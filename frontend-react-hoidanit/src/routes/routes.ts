@@ -24,6 +24,7 @@ export const ROUTES = {
   ADMIN_SITE_SETTINGS: '/admin/site-settings',
   ADMIN_CHECKOUT_SETTINGS: '/admin/checkout-settings',
   ADMIN_PRODUCTS: '/admin/products',
+  ADMIN_PRODUCT_CREATE: '/admin/products/new',
   ADMIN_PRODUCT_DETAIL: '/admin/products/:slug',
   ADMIN_ORDERS: '/admin/orders',
 } as const;
