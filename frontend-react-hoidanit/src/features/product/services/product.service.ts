@@ -25,6 +25,7 @@ export const productService = {
       params: {
         search: params?.search,
         categoryId: params?.categoryId,
+        variantValue: params?.variantValue,
         isActive: params?.isActive,
         isFeaturedDeal: params?.isFeaturedDeal,
         minPrice: params?.minPrice,

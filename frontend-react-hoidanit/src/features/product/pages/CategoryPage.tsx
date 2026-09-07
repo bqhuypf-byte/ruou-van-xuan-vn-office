@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Link, useParams } from 'react-router';
+import { useState } from 'react';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ChevronRight, PackageSearch, SlidersHorizontal, X, RotateCcw } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
@@ -16,18 +16,24 @@ import { formatPrice } from '@/shared/utils/formatPrice';
 export const CategoryPage = () => {
   const { t } = useTranslation();
   const { slug = '' } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const variantValue = searchParams.get('variant') || undefined;
 
   const [page, setPage] = useState(1);
   const [minPrice, setMinPrice] = useState<number | undefined>(undefined);
   const [maxPrice, setMaxPrice] = useState<number | undefined>(undefined);
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
 
-  // Reset page and filters when slug changes
-  useEffect(() => {
+  const navigationKey = `${slug}-${variantValue ?? ''}`;
+  const [previousNavigation, setPreviousNavigation] = useState({ key: navigationKey, slug });
+  if (navigationKey !== previousNavigation.key) {
+    setPreviousNavigation({ key: navigationKey, slug });
     setPage(1);
-    setMinPrice(undefined);
-    setMaxPrice(undefined);
-  }, [slug]);
+    if (slug !== previousNavigation.slug) {
+      setMinPrice(undefined);
+      setMaxPrice(undefined);
+    }
+  }
 
   const {
     data: category,
@@ -41,6 +47,7 @@ export const CategoryPage = () => {
     page,
     limit: 12,
     categoryId: category?.id,
+    variantValue,
     minPrice,
     maxPrice,
     isActive: true,

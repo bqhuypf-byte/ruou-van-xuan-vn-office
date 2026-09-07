@@ -19,6 +19,10 @@ export class QueryProductDto {
   categoryId?: number;
 
   @IsOptional()
+  @IsString()
+  variantValue?: string;
+
+  @IsOptional()
   @Transform(({ value }) =>
     value === undefined ? value : value === true || value === 'true',
   )

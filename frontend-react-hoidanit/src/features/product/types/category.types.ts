@@ -11,6 +11,8 @@ export interface Category {
   showInProductSections: boolean;
   homeSectionTitle: string | null;
   homeDisplayStyle: CategoryHomeDisplayStyle;
+  /** Unique volume options aggregated from active products in this category tree. */
+  variantValues?: string[];
   children: Category[];
 }
 

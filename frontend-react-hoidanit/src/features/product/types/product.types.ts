@@ -59,6 +59,7 @@ export interface UpdateProductInput {
 export interface ProductFilterParams {
   search?: string;
   categoryId?: number;
+  variantValue?: string;
   isActive?: boolean;
   isFeaturedDeal?: boolean;
   minPrice?: number;

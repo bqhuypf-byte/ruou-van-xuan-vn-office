@@ -41,6 +41,12 @@ export class ProductRepository {
     if (categoryIds !== undefined) {
       qb.andWhere('product.categoryId IN (:...categoryIds)', { categoryIds });
     }
+    if (query.variantValue) {
+      qb.andWhere(
+        "JSON_SEARCH(variant.attributes, 'one', :variantValue, NULL, '$.*') IS NOT NULL",
+        { variantValue: query.variantValue },
+      );
+    }
     if (query.isActive !== undefined) {
       qb.andWhere('product.isActive = :isActive', { isActive: query.isActive });
     }
@@ -88,6 +94,10 @@ export class ProductRepository {
       where: { categoryId: In(categoryIds), isActive: true },
       order: { createdAt: 'DESC' },
     });
+  }
+
+  findAllActive(): Promise<Product[]> {
+    return this.repository.find({ where: { isActive: true } });
   }
 
   findBySlug(slug: string): Promise<Product | null> {

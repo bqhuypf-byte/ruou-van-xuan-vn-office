@@ -25,19 +25,52 @@ export class CategoryService {
 
   private buildTree(
     categories: Category[],
+    products: Product[],
     parentId: number | null = null,
   ): CategoryTreeNode[] {
     return categories
       .filter((category) => category.parentId === parentId)
-      .map((category) => ({
-        ...category,
-        children: this.buildTree(categories, category.id),
-      }));
+      .map((category) => {
+        const children = this.buildTree(categories, products, category.id);
+        const ownVariantValues = products
+          .filter((product) => product.categoryId === category.id)
+          .flatMap((product) =>
+            (product.variantAttributes ?? [])
+              .filter((group) => this.isVolumeGroup(group.name))
+              .flatMap((group) => group.values),
+          );
+        const variantValues = Array.from(
+          new Map(
+            [
+              ...ownVariantValues,
+              ...children.flatMap((child) => child.variantValues),
+            ]
+              .map((value) => value.trim())
+              .filter(Boolean)
+              .map((value) => [value.toLocaleLowerCase('vi-VN'), value]),
+          ).values(),
+        );
+
+        return { ...category, children, variantValues };
+      });
+  }
+
+  private isVolumeGroup(name: string): boolean {
+    const normalizedName = name
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLocaleLowerCase('vi-VN');
+    return ['dung tich', 'the tich', 'capacity', 'volume', 'size'].some(
+      (keyword) => normalizedName.includes(keyword),
+    );
   }
 
   async findTree(): Promise<CategoryTreeNode[]> {
-    const categories = await this.categoryRepository.findAll();
-    return this.buildTree(categories);
+    const [categories, products] = await Promise.all([
+      this.categoryRepository.findAll(),
+      this.productRepository.findAllActive(),
+    ]);
+    return this.buildTree(categories, products);
   }
 
   async findBySlug(

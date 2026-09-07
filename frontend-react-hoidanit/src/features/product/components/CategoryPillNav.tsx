@@ -1,5 +1,5 @@
 import { ChevronDown } from 'lucide-react';
-import { Link, useParams } from 'react-router';
+import { Link, useParams, useSearchParams } from 'react-router';
 import { ROUTES } from '@/routes/routes';
 import { useCategories } from '../hooks/useCategories';
 import type { Category } from '../types/category.types';
@@ -57,6 +57,8 @@ export const CategoryPillNav = ({
 }) => {
   const { tree } = useCategories();
   const { slug: activeSlug } = useParams<{ slug: string }>();
+  const [searchParams] = useSearchParams();
+  const activeVariantValue = searchParams.get('variant');
 
   if (tree.length === 0) return null;
 
@@ -75,7 +77,13 @@ export const CategoryPillNav = ({
   return (
     <nav className="flex flex-wrap items-center justify-center gap-2.5">
       {tree.map((category) => {
-        const hasChildren = category.children.length > 0;
+        const childNames = new Set(
+          category.children.map((child) => child.name.toLocaleLowerCase('vi-VN')),
+        );
+        const variantValues = (category.variantValues ?? []).filter(
+          (value) => !childNames.has(value.toLocaleLowerCase('vi-VN')),
+        );
+        const hasOptions = category.children.length > 0 || variantValues.length > 0;
         const isActive = containsActiveCategory(category, activeSlug);
 
         return (
@@ -89,7 +97,7 @@ export const CategoryPillNav = ({
               }`}
             >
               {category.name}
-              {hasChildren && (
+              {hasOptions && (
                 <ChevronDown
                   aria-hidden="true"
                   className="h-3.5 w-3.5 transition-transform duration-150 group-hover:rotate-180 group-focus-within:rotate-180"
@@ -97,7 +105,7 @@ export const CategoryPillNav = ({
               )}
             </Link>
 
-            {hasChildren && (
+            {hasOptions && (
               <div className="invisible absolute left-1/2 top-full z-50 w-max max-w-[min(32rem,calc(100vw-2rem))] -translate-x-1/2 pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                 <nav
                   aria-label={`Phân loại ${category.name}`}
@@ -114,6 +122,19 @@ export const CategoryPillNav = ({
                       }`}
                     >
                       {child.name}
+                    </Link>
+                  ))}
+                  {variantValues.map((value) => (
+                    <Link
+                      key={value}
+                      to={`${getCategoryPath(category.slug)}?variant=${encodeURIComponent(value)}`}
+                      className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        category.slug === activeSlug && activeVariantValue === value
+                          ? 'border-brand-600 bg-brand-600 text-white'
+                          : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-700 dark:hover:text-brand-400'
+                      }`}
+                    >
+                      {value}
                     </Link>
                   ))}
                 </nav>
