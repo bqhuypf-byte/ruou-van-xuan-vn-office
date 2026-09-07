@@ -6,6 +6,7 @@ import { Product } from '../../features/product/entities/product.entity';
 import { seedOrders } from './orders.seed';
 import { seedProducts } from './products.seed';
 import { seedVanXuanProducts } from './van-xuan-products.seed';
+import { assertReviewSeedAllowed } from './review-seed-environment.guard';
 
 const FIVE_STAR_COMMENTS = [
   'Rượu rất thơm, uống êm, đúng chuẩn truyền thống!',
@@ -26,6 +27,8 @@ export async function seedReviews(
   dataSource: DataSource,
   maxReviewsPerProduct = 6,
 ) {
+  assertReviewSeedAllowed();
+
   await seedProducts(dataSource);
   await seedVanXuanProducts(dataSource);
   await seedOrders(dataSource);
