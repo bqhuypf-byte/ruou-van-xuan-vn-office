@@ -17,9 +17,16 @@ export interface ReviewFormProps {
   productName: string;
   variantIds: number[];
   reviews: Review[];
+  mode?: 'card' | 'modal';
 }
 
-export const ReviewForm = ({ productId, productName, variantIds, reviews }: ReviewFormProps) => {
+export const ReviewForm = ({
+  productId,
+  productName,
+  variantIds,
+  reviews,
+  mode = 'card',
+}: ReviewFormProps) => {
   const { t, i18n } = useTranslation();
   const user = useAuthStore((state) => state.user);
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
@@ -125,13 +132,23 @@ export const ReviewForm = ({ productId, productName, variantIds, reviews }: Revi
   }
 
   return (
-    <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900">
-      <div className="mb-5">
-        <h3 className="text-lg font-bold text-slate-900 dark:text-white">{t('review.writeTitle')}</h3>
-        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          {t('review.reviewingProduct', { product: productName })}
-        </p>
-      </div>
+    <div
+      className={
+        mode === 'card'
+          ? 'rounded-2xl border border-slate-200 bg-white p-5 shadow-sm sm:p-6 dark:border-slate-800 dark:bg-slate-900'
+          : ''
+      }
+    >
+      {mode === 'card' && (
+        <div className="mb-5">
+          <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+            {t('review.writeTitle')}
+          </h3>
+          <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+            {t('review.reviewingProduct', { product: productName })}
+          </p>
+        </div>
+      )}
 
       <div className="space-y-5">
         <div>

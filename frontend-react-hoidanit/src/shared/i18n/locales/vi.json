@@ -225,6 +225,8 @@
     "emptySubtitle": "Hãy là người đầu tiên đánh giá sản phẩm này.",
     "starsOf5": "{{rating}} trên 5 sao",
     "writeAction": "Viết đánh giá của bạn",
+    "sendAction": "Gửi đánh giá của bạn",
+    "modalTitle": "Đánh Giá Sản Phẩm",
     "writeTitle": "Gửi Đánh Giá Của Bạn",
     "reviewingProduct": "Đánh giá sản phẩm: {{product}}",
     "loginRequired": "Đăng nhập để gửi đánh giá từ đơn hàng đã mua.",

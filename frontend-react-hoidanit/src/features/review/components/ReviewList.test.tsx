@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { ReviewList } from './ReviewList';
 import type { Review } from '../types/review.types';
 
@@ -19,6 +19,21 @@ describe('ReviewList', () => {
     render(<ReviewList reviews={[]} isLoading={false} />);
 
     expect(screen.getByText('Chưa có đánh giá nào')).toBeInTheDocument();
+  });
+
+  it('opens the review form from the empty state action', () => {
+    const onWriteReview = vi.fn();
+    render(
+      <ReviewList
+        reviews={[]}
+        isLoading={false}
+        onWriteReview={onWriteReview}
+      />,
+    );
+
+    fireEvent.click(screen.getByRole('button'));
+
+    expect(onWriteReview).toHaveBeenCalledOnce();
   });
 
   it('renders each review with reviewer name and comment', () => {

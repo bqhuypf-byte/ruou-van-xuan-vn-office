@@ -11,7 +11,7 @@ import {
   ShoppingCart,
   Truck,
 } from 'lucide-react';
-import { Badge, Button, RichTextContent, Spinner } from '@/shared/components/ui';
+import { Badge, Button, Modal, RichTextContent, Spinner } from '@/shared/components/ui';
 import { BottleIcon } from '@/shared/components/icons';
 import { PromoBand } from '@/shared/components/layout';
 import { formatPrice } from '@/shared/utils/formatPrice';
@@ -119,6 +119,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
   );
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
   const reviewSectionRef = useRef<HTMLDivElement>(null);
+  const [isReviewModalOpen, setIsReviewModalOpen] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const addCartItem = useAddCartItem();
@@ -492,14 +493,22 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 </p>
               )
             ) : (
-              <div className="space-y-8">
-                <ReviewForm
-                  productId={product.id}
-                  productName={product.name}
-                  variantIds={product.variants.map((variant) => variant.id)}
+              <div className="space-y-5">
+                {!reviewsLoading && reviews.length > 0 && (
+                  <div className="flex justify-end">
+                    <Button
+                      onClick={() => setIsReviewModalOpen(true)}
+                      className="rounded-full px-6"
+                    >
+                      {t('review.sendAction')}
+                    </Button>
+                  </div>
+                )}
+                <ReviewList
                   reviews={reviews}
+                  isLoading={reviewsLoading}
+                  onWriteReview={() => setIsReviewModalOpen(true)}
                 />
-                <ReviewList reviews={reviews} isLoading={reviewsLoading} />
               </div>
             )}
           </div>
@@ -524,6 +533,22 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
       </div>
 
       <PromoBand />
+
+      <Modal
+        isOpen={isReviewModalOpen}
+        onClose={() => setIsReviewModalOpen(false)}
+        title={t('review.modalTitle')}
+        description={t('review.reviewingProduct', { product: product.name })}
+        size="lg"
+      >
+        <ReviewForm
+          productId={product.id}
+          productName={product.name}
+          variantIds={product.variants.map((variant) => variant.id)}
+          reviews={reviews}
+          mode="modal"
+        />
+      </Modal>
 
       {/* Mobile Sticky Bottom Action Bar */}
       <div className="fixed inset-x-0 bottom-0 z-30 sm:hidden bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 p-3 pb-[calc(0.75rem+env(safe-area-inset-bottom))] shadow-[0_-4px_20px_rgba(0,0,0,0.08)]">

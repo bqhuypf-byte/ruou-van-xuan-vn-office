@@ -1,14 +1,16 @@
 import { useTranslation } from 'react-i18next';
 import { MessageSquareOff, User } from 'lucide-react';
+import { Button } from '@/shared/components/ui';
 import { StarRating } from './StarRating';
 import type { Review } from '../types/review.types';
 
 export interface ReviewListProps {
   reviews: Review[];
   isLoading: boolean;
+  onWriteReview?: () => void;
 }
 
-export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
+export const ReviewList = ({ reviews, isLoading, onWriteReview }: ReviewListProps) => {
   const { t, i18n } = useTranslation();
 
   if (isLoading) {
@@ -31,6 +33,11 @@ export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
           {t('review.emptySubtitle')}
         </p>
+        {onWriteReview && (
+          <Button onClick={onWriteReview} className="mt-5 rounded-full px-6">
+            {t('review.sendAction')}
+          </Button>
+        )}
       </div>
     );
   }

@@ -225,6 +225,8 @@
     "emptySubtitle": "Be the first to review this product.",
     "starsOf5": "{{rating}} out of 5 stars",
     "writeAction": "Write your review",
+    "sendAction": "Submit your review",
+    "modalTitle": "Review Product",
     "writeTitle": "Submit Your Review",
     "reviewingProduct": "Reviewing: {{product}}",
     "loginRequired": "Sign in to review a product from your purchase history.",
