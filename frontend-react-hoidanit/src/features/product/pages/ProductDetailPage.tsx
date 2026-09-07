@@ -155,6 +155,11 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
     hasGroup2,
     group2: watchedGroup2 ?? { name: '', values: [] },
   });
+  const hasVariantGroups = formVariantGroups.length > 0;
+  const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
+  const formGroupsSignature = JSON.stringify(formVariantGroups);
+  const hasUnsavedGroups = formGroupsSignature !== savedGroupsSignature;
+  const hasProductChanges = isProductDirty || hasUnsavedGroups;
 
   const handleOpenCreateVariant = () => {
     setSelectedVariant(null);
@@ -210,7 +215,7 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
   }, []);
 
   const handleSaveAllChanges = async (data: ProductFormData) => {
-    if (!isProductDirty && !matrixChangeState.hasChanges) return;
+    if (!hasProductChanges && !matrixChangeState.hasChanges) return;
 
     if (matrixChangeState.hasInvalidRows) {
       setFeedback({
@@ -223,7 +228,7 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
 
     setFeedback(null);
     try {
-      if (isProductDirty) {
+      if (hasProductChanges) {
         await updateProduct.mutateAsync({
           id: product.id,
           input: buildProductSubmitPayload(data),
@@ -322,11 +327,7 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
     }
   };
 
-  const hasVariantGroups = formVariantGroups.length > 0;
-  const savedGroupsSignature = JSON.stringify(product.variantAttributes ?? []);
-  const formGroupsSignature = JSON.stringify(formVariantGroups);
-  const hasUnsavedGroups = hasVariantGroups && formGroupsSignature !== savedGroupsSignature;
-  const hasChanges = isProductDirty || matrixChangeState.hasChanges;
+  const hasChanges = hasProductChanges || matrixChangeState.hasChanges;
   const isSavingChanges = updateProduct.isPending || isSavingMatrix;
 
   useEffect(() => {

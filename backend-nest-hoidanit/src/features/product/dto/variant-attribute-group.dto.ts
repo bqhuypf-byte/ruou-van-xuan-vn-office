@@ -1,6 +1,7 @@
 import {
   ArrayMaxSize,
   ArrayMinSize,
+  ArrayUnique,
   IsArray,
   IsNotEmpty,
   IsObject,
@@ -18,6 +19,7 @@ export class VariantAttributeGroupDto {
   @IsArray()
   @ArrayMinSize(1)
   @ArrayMaxSize(50)
+  @ArrayUnique((value: string) => value.trim().toLocaleLowerCase('vi-VN'))
   @IsString({ each: true })
   values: string[];
 

@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react';
-import { Controller, useFieldArray, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
+import { Controller, useFieldArray, useWatch, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 import { z } from 'zod';
 import { Loader2, Package, Link2, Plus, Tags, Trash2, Upload, X } from 'lucide-react';
 import { Button, ImageDropzone, Input, RichTextEditor } from '@/shared/components/ui';
@@ -98,15 +98,26 @@ export const productFormValuesFrom = (product: Product): ProductFormData => {
 
 const buildVariantGroup = (group: ProductFormData['group1']): VariantAttributeGroup | null => {
   const name = (group.name ?? '').trim();
+  const seenValues = new Set<string>();
   const values = (group.values ?? [])
     .map((v) => (v.value ?? '').trim())
-    .filter(Boolean);
+    .filter((value) => {
+      if (!value) return false;
+      const normalizedValue = value.toLocaleLowerCase('vi-VN');
+      if (seenValues.has(normalizedValue)) return false;
+      seenValues.add(normalizedValue);
+      return true;
+    });
   if (!name || values.length === 0) return null;
 
   const images: Record<string, string> = {};
-  for (const v of group.values) {
-    const trimmed = v.value.trim();
-    if (trimmed && v.imageUrl) images[trimmed] = v.imageUrl;
+  for (const value of values) {
+    const optionWithImage = group.values.find(
+      (option) =>
+        option.value.trim().toLocaleLowerCase('vi-VN') === value.toLocaleLowerCase('vi-VN') &&
+        option.imageUrl,
+    );
+    if (optionWithImage?.imageUrl) images[value] = optionWithImage.imageUrl;
   }
 
   return { name, values, ...(Object.keys(images).length > 0 ? { images } : {}) };
@@ -203,6 +214,11 @@ const ClassificationGroupEditor = ({
   onRemove,
 }: ClassificationGroupEditorProps) => {
   const { fields, append, remove } = useFieldArray({ control, name: `${namePrefix}.values` });
+  const watchedValues = useWatch({ control, name: `${namePrefix}.values` });
+  const normalizedValues = (watchedValues ?? [])
+    .map((option) => option.value.trim().toLocaleLowerCase('vi-VN'))
+    .filter(Boolean);
+  const hasDuplicateValues = new Set(normalizedValues).size !== normalizedValues.length;
 
   const handleValueChange = (index: number, value: string) => {
     const isLast = index === fields.length - 1;
@@ -272,6 +288,11 @@ const ClassificationGroupEditor = ({
           </div>
         ))}
       </div>
+      {hasDuplicateValues && (
+        <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
+          Giá trị phân loại đang bị trùng. Hệ thống sẽ chỉ giữ lại một giá trị khi lưu.
+        </p>
+      )}
     </div>
   );
 };

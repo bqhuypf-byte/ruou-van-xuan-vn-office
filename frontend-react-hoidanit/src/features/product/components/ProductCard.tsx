@@ -74,7 +74,7 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
           <img
             src={product.thumbnailUrl}
             alt={product.name}
-            className="w-full h-full object-contain p-3 sm:p-6 group-hover:scale-105 transition-transform duration-300"
+            className="block h-full w-full object-cover"
           />
         ) : (
           <div
@@ -87,16 +87,14 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
       </div>
 
       <div className="flex flex-col flex-1 gap-1.5 p-2.5 sm:p-4">
-        <div className="flex flex-col items-start gap-0.5 sm:flex-row sm:justify-between sm:gap-2">
-          <h3 className="w-full text-center text-sm font-semibold text-slate-900 line-clamp-2 transition-colors group-hover:text-brand-600 sm:text-left sm:text-base dark:text-white dark:group-hover:text-brand-400">
-            {product.name}
-          </h3>
-          {product.priceFrom != null && (
-            <span className="w-full shrink-0 text-center text-sm font-bold text-rose-600 sm:w-auto sm:text-right sm:text-base dark:text-rose-400">
-              {formatPrice(product.priceFrom)}
-            </span>
-          )}
-        </div>
+        <h3 className="w-full break-words text-center text-sm font-semibold leading-snug text-slate-900 transition-colors group-hover:text-brand-600 sm:text-left sm:text-base dark:text-white dark:group-hover:text-brand-400">
+          {product.name}
+        </h3>
+        {product.priceFrom != null && (
+          <span className="mt-0.5 w-full text-center text-sm font-bold text-rose-600 sm:text-left sm:text-base dark:text-rose-400">
+            {formatPrice(product.priceFrom)}
+          </span>
+        )}
 
         {reviewCount > 0 && (
           <div className="hidden items-center gap-1.5 sm:flex">
