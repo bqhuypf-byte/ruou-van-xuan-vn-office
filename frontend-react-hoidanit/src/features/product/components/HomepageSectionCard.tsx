@@ -52,6 +52,7 @@ export const HomepageSectionCard = ({
   onDragHandleEnd,
 }: HomepageSectionCardProps) => {
   const [isPickerOpen, setIsPickerOpen] = useState(false);
+  const [pickerAddedProductIds, setPickerAddedProductIds] = useState<number[]>([]);
   const [itemDragIndex, setItemDragIndex] = useState<number | null>(null);
   const [itemDragOverIndex, setItemDragOverIndex] = useState<number | null>(null);
 
@@ -65,8 +66,22 @@ export const HomepageSectionCard = ({
   const handlePickProduct = (productId: number) => {
     addItemMutation.mutate(
       { sectionId: section.id, input: { productId } },
-      { onSuccess: () => setIsPickerOpen(false) },
+      {
+        onSuccess: () => {
+          setPickerAddedProductIds((current) => [...current, productId]);
+        },
+      },
     );
+  };
+
+  const handleOpenPicker = () => {
+    setPickerAddedProductIds([]);
+    setIsPickerOpen(true);
+  };
+
+  const handleClosePicker = () => {
+    setIsPickerOpen(false);
+    setPickerAddedProductIds([]);
   };
 
   const handleSaveItem = (itemId: number, input: UpdateSectionItemInput) => {
@@ -184,7 +199,7 @@ export const HomepageSectionCard = ({
             size="sm"
             variant="outline"
             leftIcon={<Plus className="w-3.5 h-3.5" />}
-            onClick={() => setIsPickerOpen(true)}
+            onClick={handleOpenPicker}
           >
             Thêm sản phẩm
           </Button>
@@ -247,9 +262,11 @@ export const HomepageSectionCard = ({
 
       <HomepageSectionProductPickerModal
         isOpen={isPickerOpen}
-        onClose={() => setIsPickerOpen(false)}
+        onClose={handleClosePicker}
         onPick={handlePickProduct}
-        excludeProductIds={items.map((item) => item.productId)}
+        excludeProductIds={[
+          ...new Set([...items.map((item) => item.productId), ...pickerAddedProductIds]),
+        ]}
         isAdding={addItemMutation.isPending}
       />
     </div>

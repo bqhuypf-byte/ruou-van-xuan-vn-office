@@ -106,16 +106,16 @@ export const CategoryPillNav = ({
             </Link>
 
             {hasOptions && (
-              <div className="invisible absolute left-1/2 top-full z-50 w-52 max-w-[calc(100vw-2rem)] -translate-x-1/2 pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
+              <div className="invisible absolute left-1/2 top-full z-50 w-max max-w-[calc(100vw-2rem)] -translate-x-1/2 pt-2 opacity-0 transition-[opacity,visibility] duration-150 group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">
                 <nav
                   aria-label={`Phân loại ${category.name}`}
-                  className="flex flex-col items-stretch gap-1.5 rounded-2xl border border-slate-200 bg-white p-2.5 shadow-xl dark:border-slate-700 dark:bg-slate-900"
+                  className="flex flex-col items-start gap-1 rounded-xl border border-slate-200 bg-white p-2 shadow-xl dark:border-slate-700 dark:bg-slate-900"
                 >
                   {category.children.map((child) => (
                     <Link
                       key={child.id}
                       to={getCategoryPath(child.slug)}
-                      className={`w-full rounded-xl border px-3 py-2 text-left text-xs font-medium transition-colors ${
+                      className={`whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-left text-xs font-medium transition-colors ${
                         child.slug === activeSlug
                           ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-700 dark:hover:text-brand-400'
@@ -128,7 +128,7 @@ export const CategoryPillNav = ({
                     <Link
                       key={value}
                       to={`${getCategoryPath(category.slug)}?variant=${encodeURIComponent(value)}`}
-                      className={`w-full rounded-xl border px-3 py-2 text-left text-xs font-medium transition-colors ${
+                      className={`whitespace-nowrap rounded-lg border px-2.5 py-1.5 text-left text-xs font-medium transition-colors ${
                         category.slug === activeSlug && activeVariantValue === value
                           ? 'border-brand-600 bg-brand-600 text-white'
                           : 'border-slate-200 bg-white text-slate-700 hover:border-brand-300 hover:text-brand-700 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300 dark:hover:border-brand-700 dark:hover:text-brand-400'

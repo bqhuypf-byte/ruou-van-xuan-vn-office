@@ -31,7 +31,13 @@ export const HomepageSectionProductPickerModal = ({
   const availableProducts = products.filter((product) => !excludeSet.has(product.id));
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Chọn Sản Phẩm" size="lg">
+    <Modal
+      isOpen={isOpen}
+      onClose={onClose}
+      title="Chọn Sản Phẩm"
+      description="Có thể thêm liên tục nhiều sản phẩm trước khi hoàn tất."
+      size="lg"
+    >
       <div className="space-y-4">
         <Input
           placeholder="Tìm theo tên hoặc slug..."
@@ -88,6 +94,12 @@ export const HomepageSectionProductPickerModal = ({
               </div>
             ))
           )}
+        </div>
+
+        <div className="flex justify-end border-t border-slate-200 pt-4 dark:border-slate-800">
+          <Button type="button" variant="primary" onClick={onClose} disabled={isAdding}>
+            Xong
+          </Button>
         </div>
       </div>
     </Modal>

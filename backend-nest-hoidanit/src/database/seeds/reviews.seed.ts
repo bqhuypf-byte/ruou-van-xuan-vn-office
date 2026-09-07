@@ -34,12 +34,6 @@ export async function seedReviews(
   const productRepo = dataSource.getRepository(Product);
   const reviewRepo = dataSource.getRepository(Review);
 
-  const existingCount = await reviewRepo.count();
-  if (existingCount > 0) {
-    console.log('⏭ Reviews already seeded');
-    return;
-  }
-
   const products = await productRepo.find();
   const orders = await orderRepo.find();
   if (products.length === 0 || orders.length === 0) {
@@ -49,6 +43,8 @@ export async function seedReviews(
     return;
   }
 
+  const existingReviews = await reviewRepo.find();
+
   // One order per unique user, so a user never reviews the same product twice.
   const orderByUser = new Map<number, Order>();
   for (const order of orders) {
@@ -57,15 +53,31 @@ export async function seedReviews(
   const reviewerOrders = [...orderByUser.values()];
 
   const reviews: Review[] = [];
+  let seededProductCount = 0;
+  const cappedMaxReviews = Math.max(3, maxReviewsPerProduct);
+  const reviewCountRange = cappedMaxReviews - 2;
+
   for (const product of products) {
-    const reviewerCount = Math.min(
-      faker.number.int({ min: 3, max: maxReviewsPerProduct }),
-      reviewerOrders.length,
+    const productReviews = existingReviews.filter(
+      (review) => review.productId === product.id,
+    );
+    const existingReviewerIds = new Set(
+      productReviews.map((review) => review.userId),
+    );
+    const availableReviewerOrders = reviewerOrders.filter(
+      (order) => !existingReviewerIds.has(order.userId),
+    );
+    const targetReviewCount = 3 + (product.id % reviewCountRange);
+    const reviewsNeeded = Math.max(
+      0,
+      targetReviewCount - productReviews.length,
     );
     const reviewers = faker.helpers.arrayElements(
-      reviewerOrders,
-      reviewerCount,
+      availableReviewerOrders,
+      Math.min(reviewsNeeded, availableReviewerOrders.length),
     );
+
+    if (reviewers.length > 0) seededProductCount += 1;
 
     for (const order of reviewers) {
       reviews.push(
@@ -80,8 +92,13 @@ export async function seedReviews(
     }
   }
 
+  if (reviews.length === 0) {
+    console.log('⏭ Every product already has seeded reviews');
+    return;
+  }
+
   await reviewRepo.save(reviews);
   console.log(
-    `✓ Seeded ${reviews.length} reviews across ${products.length} products`,
+    `✓ Seeded ${reviews.length} reviews across ${seededProductCount} products`,
   );
 }
