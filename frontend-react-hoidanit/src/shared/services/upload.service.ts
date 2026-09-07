@@ -15,5 +15,6 @@ const uploadFile = async (endpoint: string, file: File): Promise<string> => {
 
 export const uploadService = {
   uploadImage: (file: File): Promise<string> => uploadFile('/admin/uploads/image', file),
+  uploadReviewImage: (file: File): Promise<string> => uploadFile('/uploads/review-image', file),
   uploadVideo: (file: File): Promise<string> => uploadFile('/admin/uploads/video', file),
 };

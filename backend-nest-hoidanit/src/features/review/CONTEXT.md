@@ -1,6 +1,6 @@
 # Feature: Review
 
-CRUD for the `reviews` table (per `01-share-docs/DATABASE.md`): `id`, `user_id` (FK), `product_id` (FK), `order_id` (FK), `rating` (1-5), `comment` (nullable), `created_at`. No relation decorators to `User`/`Product`/`Order` — plain FK columns, same pattern as every other cross-feature reference in this codebase.
+CRUD for the `reviews` table (per `01-share-docs/DATABASE.md`): `id`, `user_id` (FK), `product_id` (FK), `order_id` (FK), `rating` (1-5), `comment` (nullable), `image_urls` (nullable JSON, up to 3 images), `created_at`. No relation decorators to `User`/`Product`/`Order` — plain FK columns, same pattern as every other cross-feature reference in this codebase.
 
 ## Endpoints
 

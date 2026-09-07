@@ -29,6 +29,9 @@ export class Review {
   @Column({ type: 'text', nullable: true })
   comment: string | null;
 
+  @Column({ type: 'json', name: 'image_urls', nullable: true })
+  imageUrls: string[] | null;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 }

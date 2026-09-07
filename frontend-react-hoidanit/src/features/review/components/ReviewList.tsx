@@ -61,6 +61,19 @@ export const ReviewList = ({ reviews, isLoading }: ReviewListProps) => {
                   {review.comment}
                 </p>
               )}
+              {review.imageUrls?.length > 0 && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {review.imageUrls.map((imageUrl) => (
+                    <a key={imageUrl} href={imageUrl} target="_blank" rel="noreferrer">
+                      <img
+                        src={imageUrl}
+                        alt={t('review.customerImage')}
+                        className="h-20 w-20 rounded-lg border border-slate-200 object-cover dark:border-slate-700"
+                      />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         </div>

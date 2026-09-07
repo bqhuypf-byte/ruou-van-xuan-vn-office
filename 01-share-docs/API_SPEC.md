@@ -392,7 +392,8 @@ Types: image/jpeg, image/png, image/webp
 {
   "orderId": 100,
   "rating": 5,
-  "comment": "Great product!"
+  "comment": "Great product!",
+  "imageUrls": ["/uploads/review-photo.webp"]
 }
 
 // Response 201
@@ -402,6 +403,7 @@ Types: image/jpeg, image/png, image/webp
     "id": 50,
     "rating": 5,
     "comment": "Great product!",
+    "imageUrls": ["/uploads/review-photo.webp"],
     "createdAt": "2024-01-20T15:00:00Z",
     "user": {
       "id": 1,

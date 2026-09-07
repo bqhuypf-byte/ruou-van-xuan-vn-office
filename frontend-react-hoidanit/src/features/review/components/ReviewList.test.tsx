@@ -4,8 +4,8 @@ import { ReviewList } from './ReviewList';
 import type { Review } from '../types/review.types';
 
 const reviews: Review[] = [
-  { id: 1, rating: 5, comment: 'Sản phẩm rất tốt', createdAt: '2026-01-01T00:00:00Z', user: { id: 1, fullName: 'Nguyen Van A' } },
-  { id: 2, rating: 2, comment: null, createdAt: '2026-01-02T00:00:00Z', user: { id: 2, fullName: 'Tran Thi B' } },
+  { id: 1, rating: 5, comment: 'Sản phẩm rất tốt', imageUrls: ['/uploads/review.webp'], createdAt: '2026-01-01T00:00:00Z', user: { id: 1, fullName: 'Nguyen Van A' } },
+  { id: 2, rating: 2, comment: null, imageUrls: [], createdAt: '2026-01-02T00:00:00Z', user: { id: 2, fullName: 'Tran Thi B' } },
 ];
 
 describe('ReviewList', () => {
@@ -26,6 +26,10 @@ describe('ReviewList', () => {
 
     expect(screen.getByText('Nguyen Van A')).toBeInTheDocument();
     expect(screen.getByText('Sản phẩm rất tốt')).toBeInTheDocument();
+    expect(screen.getByAltText('Hình ảnh khách hàng gửi kèm đánh giá')).toHaveAttribute(
+      'src',
+      '/uploads/review.webp',
+    );
     expect(screen.getByText('Tran Thi B')).toBeInTheDocument();
   });
 

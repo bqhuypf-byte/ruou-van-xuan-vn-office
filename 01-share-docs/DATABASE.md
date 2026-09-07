@@ -166,6 +166,7 @@
 | order_id | BIGINT | FK → orders |
 | rating | TINYINT | 1-5 |
 | comment | TEXT | NULLABLE |
+| image_urls | JSON | NULLABLE, tối đa 3 URL ảnh đánh giá |
 | created_at | DATETIME | AUTO |
 
 ---

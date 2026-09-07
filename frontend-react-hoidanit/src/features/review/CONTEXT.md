@@ -1,12 +1,13 @@
-# Feature: Review (Read-only display)
+# Feature: Review
 
-Displays product reviews (`GET /products/:id/reviews`, public, per `01-share-docs/API_SPEC.md`). **Deliberately read-only** — no "write a review" UI. Creating a review requires `orderId` + purchase verification (backend's `REV_002`), and picking which of the user's orders/products is eligible to review is real UX scope beyond what was asked ("show reviews for products"); write support is a natural next step but out of scope here.
+Displays product reviews and lets authenticated customers submit one review for a product from an eligible, non-cancelled order. The form derives eligible orders from the product's variant IDs, pre-fills account and shipping-contact details, and submits `orderId`, `rating`, `comment`, and up to three uploaded images to the purchase-verified backend endpoint.
 
 ## Structure
 
-- `types/review.types.ts`, `services/review.service.ts` — thin, single-endpoint
+- `types/review.types.ts`, `services/review.service.ts` — list and create endpoints
 - `hooks/useProductReviews.ts` — fetches + computes `averageRating`/`reviewCount` client-side (no separate summary endpoint)
-- `components/StarRating.tsx`, `ReviewList.tsx`
+- `hooks/useCreateReview.ts` — submits and refreshes the review/product query caches
+- `components/StarRating.tsx`, `ReviewList.tsx`, `ReviewForm.tsx`
 
 ## Integration
 

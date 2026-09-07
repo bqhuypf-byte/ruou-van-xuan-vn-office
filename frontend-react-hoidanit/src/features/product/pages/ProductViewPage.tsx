@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams, Link, useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import {
@@ -18,7 +18,7 @@ import { formatPrice } from '@/shared/utils/formatPrice';
 import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { useAddCartItem } from '@/features/cart';
-import { ReviewList, StarRating, useProductReviews } from '@/features/review';
+import { ReviewForm, ReviewList, StarRating, useProductReviews } from '@/features/review';
 import { ROUTES } from '@/routes/routes';
 import { ProductCard } from '../components/ProductCard';
 import { ProductSeo } from '../components/ProductSeo';
@@ -118,6 +118,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
       null,
   );
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
+  const reviewSectionRef = useRef<HTMLDivElement>(null);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
 
   const addCartItem = useAddCartItem();
@@ -172,6 +173,13 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
     } catch (err) {
       setFeedback({ type: 'error', message: getApiErrorMessage(err, t('product.addToCartError')) });
     }
+  };
+
+  const handleWriteReview = () => {
+    setActiveTab('reviews');
+    window.requestAnimationFrame(() => {
+      reviewSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
   };
 
   const price = selectedVariant ? Number(selectedVariant.salePrice ?? selectedVariant.price) : null;
@@ -287,6 +295,18 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 )}
               </div>
             )}
+
+            <button
+              type="button"
+              onClick={handleWriteReview}
+              className="inline-flex flex-wrap items-center gap-3 text-sm font-medium text-slate-700 transition-colors hover:text-brand-700 dark:text-slate-300 dark:hover:text-brand-400"
+            >
+              <span>{t('review.writeAction')}</span>
+              <StarRating rating={0} size="md" />
+              <span className="text-brand-600 underline underline-offset-4 dark:text-brand-400">
+                {t('review.writeAction')}
+              </span>
+            </button>
 
             {attributeNames
               .filter((name) => (attributeOptions[name]?.length ?? 0) > 0)
@@ -435,7 +455,10 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
         </div>
 
         {/* Tabs */}
-        <div className="border-t border-slate-200 dark:border-slate-800">
+        <div
+          ref={reviewSectionRef}
+          className="scroll-mt-24 border-t border-slate-200 dark:border-slate-800"
+        >
           <div className="flex items-center gap-8 border-b border-slate-200 dark:border-slate-800">
             <button
               onClick={() => setActiveTab('details')}
@@ -469,7 +492,15 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 </p>
               )
             ) : (
-              <ReviewList reviews={reviews} isLoading={reviewsLoading} />
+              <div className="space-y-8">
+                <ReviewForm
+                  productId={product.id}
+                  productName={product.name}
+                  variantIds={product.variants.map((variant) => variant.id)}
+                  reviews={reviews}
+                />
+                <ReviewList reviews={reviews} isLoading={reviewsLoading} />
+              </div>
             )}
           </div>
         </div>

@@ -29,6 +29,7 @@ export class ReviewService {
       id: review.id,
       rating: review.rating,
       comment: review.comment,
+      imageUrls: review.imageUrls ?? [],
       createdAt: review.createdAt,
       user: { id: user.id, fullName: user.fullName },
     };
@@ -87,6 +88,7 @@ export class ReviewService {
       orderId: dto.orderId,
       rating: dto.rating,
       comment: dto.comment ?? null,
+      imageUrls: dto.imageUrls?.length ? dto.imageUrls : null,
     });
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);

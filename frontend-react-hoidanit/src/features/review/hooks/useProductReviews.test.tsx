@@ -13,8 +13,8 @@ vi.mock('../services/review.service', () => ({
 }));
 
 const mockReviews: Review[] = [
-  { id: 1, rating: 5, comment: 'Great!', createdAt: '2026-01-01T00:00:00Z', user: { id: 1, fullName: 'A' } },
-  { id: 2, rating: 3, comment: 'Okay', createdAt: '2026-01-02T00:00:00Z', user: { id: 2, fullName: 'B' } },
+  { id: 1, rating: 5, comment: 'Great!', imageUrls: [], createdAt: '2026-01-01T00:00:00Z', user: { id: 1, fullName: 'A' } },
+  { id: 2, rating: 3, comment: 'Okay', imageUrls: [], createdAt: '2026-01-02T00:00:00Z', user: { id: 2, fullName: 'B' } },
 ];
 
 const wrapper = ({ children }: { children: React.ReactNode }) => {
