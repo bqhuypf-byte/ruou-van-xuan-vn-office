@@ -157,13 +157,16 @@
 
 ### Review Feature
 
-**reviews** — *3-way link ensures verified purchases*
+**reviews** — *supports both legacy verified reviews and public guest reviews*
 | Column | Type | Constraints |
 |--------|------|-------------|
 | id | BIGINT | PK, AUTO_INCREMENT |
-| user_id | BIGINT | FK → users |
+| user_id | BIGINT | NULLABLE, FK → users (legacy/authenticated review) |
 | product_id | BIGINT | FK → products |
-| order_id | BIGINT | FK → orders |
+| order_id | BIGINT | NULLABLE, FK → orders (legacy verified review) |
+| reviewer_name | VARCHAR(100) | NULLABLE for legacy rows, required by public API |
+| reviewer_email | VARCHAR(150) | NULLABLE for legacy rows, required by public API; private |
+| reviewer_phone | VARCHAR(20) | NULLABLE for legacy rows, required by public API; private |
 | rating | TINYINT | 1-5 |
 | comment | TEXT | NULLABLE |
 | image_urls | JSON | NULLABLE, tối đa 3 URL ảnh đánh giá |

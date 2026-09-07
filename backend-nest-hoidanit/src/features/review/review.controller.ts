@@ -27,14 +27,12 @@ export class ReviewController {
     return this.reviewService.findByProduct(productId);
   }
 
-  @UseGuards(JwtAuthGuard)
   @Post('products/:id/reviews')
   create(
     @Param('id', ParseIntPipe) productId: number,
     @Body() dto: CreateReviewDto,
-    @CurrentUser() user: AuthenticatedUser,
   ) {
-    return this.reviewService.create(productId, user.id, dto);
+    return this.reviewService.create(productId, dto);
   }
 
   @UseGuards(JwtAuthGuard)

@@ -542,8 +542,6 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
         <ReviewForm
           productId={product.id}
           productName={product.name}
-          variantIds={product.variants.map((variant) => variant.id)}
-          reviews={reviews}
           mode="modal"
         />
       </Modal>

@@ -5,7 +5,7 @@ export interface ReviewResponse {
   imageUrls: string[];
   createdAt: Date;
   user: {
-    id: number;
+    id: number | null;
     fullName: string;
   };
 }

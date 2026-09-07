@@ -152,9 +152,6 @@ Types: image/jpeg, image/png, image/webp
 | **Order** |||
 | ORD_001 | 404 | Order not found |
 | ORD_002 | 400 | Cannot cancel (shipped) |
-| **Review** |||
-| REV_001 | 400 | Already reviewed |
-| REV_002 | 403 | Must purchase first |
 | **System** |||
 | SYS_001 | 500 | Internal server error |
 | SYS_002 | 400 | Validation error |
@@ -260,7 +257,7 @@ Types: image/jpeg, image/png, image/webp
 | Method | Path | Description | Auth |
 |--------|------|-------------|------|
 | GET | `/products/:id/reviews` | List reviews | No |
-| POST | `/products/:id/reviews` | Create review | Yes |
+| POST | `/products/:id/reviews` | Create public review | No |
 | PATCH | `/reviews/:id` | Update review | Yes |
 | DELETE | `/reviews/:id` | Delete review | Yes |
 | DELETE | `/admin/reviews/:id` | Admin delete | Admin |
@@ -390,7 +387,9 @@ Types: image/jpeg, image/png, image/webp
 ```json
 // Request
 {
-  "orderId": 100,
+  "fullName": "Nguyen Van A",
+  "email": "nguyen@example.com",
+  "phone": "0901234567",
   "rating": 5,
   "comment": "Great product!",
   "imageUrls": ["/uploads/review-photo.webp"]
@@ -406,18 +405,14 @@ Types: image/jpeg, image/png, image/webp
     "imageUrls": ["/uploads/review-photo.webp"],
     "createdAt": "2024-01-20T15:00:00Z",
     "user": {
-      "id": 1,
+      "id": null,
       "fullName": "Nguyen Van A"
     }
   }
 }
 ```
 
-| Error | Status | Condition |
-|-------|--------|-----------|
-| REV_002 | 403 | Not purchased |
-| REV_001 | 400 | Already reviewed |
-| ORD_001 | 404 | Order not found |
+Reviewer email and phone are stored for administration and are never returned by the public review API.
 
 ---
 

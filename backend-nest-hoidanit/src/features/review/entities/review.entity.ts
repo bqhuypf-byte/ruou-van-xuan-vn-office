@@ -10,8 +10,13 @@ export class Review {
   })
   id: number;
 
-  @Column({ type: 'bigint', name: 'user_id', transformer: bigintTransformer })
-  userId: number;
+  @Column({
+    type: 'bigint',
+    name: 'user_id',
+    nullable: true,
+    transformer: bigintTransformer,
+  })
+  userId: number | null;
 
   @Column({
     type: 'bigint',
@@ -20,8 +25,37 @@ export class Review {
   })
   productId: number;
 
-  @Column({ type: 'bigint', name: 'order_id', transformer: bigintTransformer })
-  orderId: number;
+  @Column({
+    type: 'bigint',
+    name: 'order_id',
+    nullable: true,
+    transformer: bigintTransformer,
+  })
+  orderId: number | null;
+
+  @Column({
+    type: 'varchar',
+    length: 100,
+    name: 'reviewer_name',
+    nullable: true,
+  })
+  reviewerName: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 150,
+    name: 'reviewer_email',
+    nullable: true,
+  })
+  reviewerEmail: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 20,
+    name: 'reviewer_phone',
+    nullable: true,
+  })
+  reviewerPhone: string | null;
 
   @Column({ type: 'tinyint' })
   rating: number;

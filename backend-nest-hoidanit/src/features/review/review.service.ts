@@ -1,37 +1,33 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { ReviewRepository } from './repositories/review.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
 import { Review } from './entities/review.entity';
 import { ReviewResponse } from './types/review.types';
-import { OrderService } from '../order/services/order.service';
-import { ProductVariantService } from '../product/services/product-variant.service';
 import { UsersService } from '../users/users.service';
 
 @Injectable()
 export class ReviewService {
   constructor(
     private readonly reviewRepository: ReviewRepository,
-    private readonly orderService: OrderService,
-    private readonly variantService: ProductVariantService,
     private readonly usersService: UsersService,
   ) {}
 
   private async toResponse(review: Review): Promise<ReviewResponse> {
-    const user = await this.usersService.findOne(review.userId);
+    const user = review.userId
+      ? await this.usersService.findOne(review.userId)
+      : null;
     return {
       id: review.id,
       rating: review.rating,
       comment: review.comment,
       imageUrls: review.imageUrls ?? [],
       createdAt: review.createdAt,
-      user: { id: user.id, fullName: user.fullName },
+      user: {
+        id: user?.id ?? null,
+        fullName: review.reviewerName ?? user?.fullName ?? 'Khách hàng',
+      },
     };
   }
 
@@ -40,52 +36,17 @@ export class ReviewService {
     return Promise.all(reviews.map((review) => this.toResponse(review)));
   }
 
-  private async assertPurchased(
-    productId: number,
-    userId: number,
-    orderId: number,
-  ): Promise<void> {
-    const order = await this.orderService.findOneForUser(orderId, userId);
-
-    for (const item of order.items) {
-      try {
-        const variant = await this.variantService.findById(
-          item.productVariantId,
-        );
-        if (Number(variant.productId) === productId) {
-          return;
-        }
-      } catch {
-        // Variant no longer resolves (e.g. stale snapshot); treat as non-matching
-        // rather than letting a lookup failure masquerade as a purchase-verification error.
-        continue;
-      }
-    }
-
-    throw new ForbiddenException(
-      'You must purchase this product before reviewing it',
-    );
-  }
-
   async create(
     productId: number,
-    userId: number,
     dto: CreateReviewDto,
   ): Promise<ReviewResponse> {
-    await this.assertPurchased(productId, userId, dto.orderId);
-
-    const existing = await this.reviewRepository.findByUserAndProduct(
-      userId,
-      productId,
-    );
-    if (existing) {
-      throw new BadRequestException('You have already reviewed this product');
-    }
-
     const review = this.reviewRepository.create({
-      userId,
+      userId: null,
       productId,
-      orderId: dto.orderId,
+      orderId: null,
+      reviewerName: dto.fullName.trim(),
+      reviewerEmail: dto.email.trim().toLowerCase(),
+      reviewerPhone: dto.phone.trim(),
       rating: dto.rating,
       comment: dto.comment ?? null,
       imageUrls: dto.imageUrls?.length ? dto.imageUrls : null,

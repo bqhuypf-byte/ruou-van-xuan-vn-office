@@ -1,7 +1,9 @@
 import {
   ArrayMaxSize,
+  IsEmail,
   IsArray,
   IsInt,
+  IsNotEmpty,
   IsOptional,
   IsString,
   Matches,
@@ -11,8 +13,19 @@ import {
 } from 'class-validator';
 
 export class CreateReviewDto {
-  @IsInt()
-  orderId: number;
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(100)
+  fullName: string;
+
+  @IsEmail()
+  @MaxLength(150)
+  email: string;
+
+  @IsString()
+  @IsNotEmpty()
+  @MaxLength(20)
+  phone: string;
 
   @IsInt()
   @Min(1)

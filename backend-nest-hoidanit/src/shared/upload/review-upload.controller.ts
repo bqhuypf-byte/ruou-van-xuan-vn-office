@@ -3,21 +3,18 @@ import {
   Controller,
   Post,
   UploadedFile,
-  UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { randomUUID } from 'crypto';
 import { extname } from 'path';
-import { JwtAuthGuard } from '../guards/jwt-auth.guard';
 
 const ALLOWED_IMAGE_MIME_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_REVIEW_IMAGE_SIZE = 5 * 1024 * 1024;
 
 @Controller('uploads')
 export class ReviewUploadController {
-  @UseGuards(JwtAuthGuard)
   @Post('review-image')
   @UseInterceptors(
     FileInterceptor('file', {

@@ -5,13 +5,15 @@ export interface Review {
   imageUrls: string[];
   createdAt: string;
   user: {
-    id: number;
+    id: number | null;
     fullName: string;
   };
 }
 
 export interface CreateReviewInput {
-  orderId: number;
+  fullName: string;
+  email: string;
+  phone: string;
   rating: number;
   comment?: string;
   imageUrls?: string[];
