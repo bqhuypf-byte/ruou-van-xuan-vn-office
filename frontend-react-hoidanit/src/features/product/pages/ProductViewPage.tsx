@@ -537,8 +537,6 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
       <Modal
         isOpen={isReviewModalOpen}
         onClose={() => setIsReviewModalOpen(false)}
-        title={t('review.modalTitle')}
-        description={t('review.reviewingProduct', { product: product.name })}
         size="lg"
       >
         <ReviewForm

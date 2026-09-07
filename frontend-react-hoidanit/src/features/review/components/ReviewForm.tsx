@@ -150,9 +150,20 @@ export const ReviewForm = ({
         </div>
       )}
 
-      <div className="space-y-5">
-        <div>
-          <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
+      {mode === 'modal' && (
+        <div className="mb-7 pr-8 text-center">
+          <h2 className="text-lg font-medium text-slate-800 dark:text-white">
+            {t('review.modalTitle')}
+          </h2>
+          <p className="mt-1.5 text-base font-bold text-slate-900 dark:text-white sm:text-lg">
+            {productName}
+          </p>
+        </div>
+      )}
+
+      <div className={mode === 'modal' ? 'space-y-4' : 'space-y-5'}>
+        <div className={mode === 'modal' ? 'flex flex-wrap items-center justify-center gap-3 sm:justify-start' : ''}>
+          <span className={mode === 'modal' ? 'text-sm text-slate-700 dark:text-slate-300' : 'mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300'}>
             {t('review.yourRating')}
           </span>
           <div className="flex items-center gap-1">
@@ -177,31 +188,34 @@ export const ReviewForm = ({
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('review.fullName')}
+          <label className={mode === 'modal' ? 'sm:col-span-2' : 'text-sm font-medium text-slate-700 dark:text-slate-300'}>
+            <span className={mode === 'modal' ? 'sr-only' : ''}>{t('review.fullName')}</span>
             <input
               value={user.fullName}
               readOnly
-              className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              placeholder={t('review.fullName')}
+              className={`${mode === 'modal' ? '' : 'mt-1.5'} w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-700 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300`}
             />
           </label>
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('review.email')}
+          <label className={mode === 'modal' ? '' : 'text-sm font-medium text-slate-700 dark:text-slate-300'}>
+            <span className={mode === 'modal' ? 'sr-only' : ''}>{t('review.email')}</span>
             <input
               value={user.email}
               readOnly
-              className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              placeholder={t('review.email')}
+              className={`${mode === 'modal' ? '' : 'mt-1.5'} w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-700 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300`}
             />
           </label>
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('review.phone')}
+          <label className={mode === 'modal' ? '' : 'text-sm font-medium text-slate-700 dark:text-slate-300'}>
+            <span className={mode === 'modal' ? 'sr-only' : ''}>{t('review.phone')}</span>
             <input
               value={selectedOrder?.shippingAddress.phone ?? ''}
               readOnly
-              className="mt-1.5 w-full rounded-lg border border-slate-200 bg-slate-50 px-3 py-2.5 text-slate-600 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300"
+              placeholder={t('review.phone')}
+              className={`${mode === 'modal' ? '' : 'mt-1.5'} w-full rounded-lg border border-slate-300 bg-white px-3.5 py-3 text-slate-700 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-slate-300`}
             />
           </label>
-          <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
+          <label className={`${mode === 'modal' && eligibleOrders.length === 1 ? 'hidden' : ''} text-sm font-medium text-slate-700 dark:text-slate-300 sm:col-span-2`}>
             {t('review.order')}
             <select
               value={effectiveOrderId ?? ''}
@@ -220,24 +234,18 @@ export const ReviewForm = ({
           </label>
         </div>
 
-        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">
-          {t('review.comment')}
+        <div className="overflow-hidden rounded-lg border border-slate-300 focus-within:border-brand-500 focus-within:ring-2 focus-within:ring-brand-500/20 dark:border-slate-700">
+          <label className="sr-only" htmlFor={`review-comment-${productId}`}>{t('review.comment')}</label>
           <textarea
+            id={`review-comment-${productId}`}
             value={comment}
             onChange={(event) => setComment(event.target.value)}
             maxLength={2000}
             rows={5}
             placeholder={t('review.commentPlaceholder')}
-            className="mt-1.5 w-full resize-y rounded-xl border border-slate-300 bg-white px-3 py-3 text-slate-900 placeholder:text-slate-400 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-950 dark:text-white"
+            className="block w-full resize-y border-0 bg-white px-3.5 py-4 text-slate-900 placeholder:text-slate-400 focus:outline-none dark:bg-slate-950 dark:text-white"
           />
-          <span className="mt-1 block text-right text-xs text-slate-400">{comment.length}/2000</span>
-        </label>
-
-        <div>
-          <span className="mb-2 block text-sm font-medium text-slate-700 dark:text-slate-300">
-            {t('review.images')}
-          </span>
-          <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-slate-300 px-4 py-4 text-sm text-slate-500 transition-colors hover:border-brand-500 hover:text-brand-600 dark:border-slate-700 dark:text-slate-400 dark:hover:border-brand-500 dark:hover:text-brand-400">
+          <label className="flex cursor-pointer items-center gap-2 border-t border-slate-300 px-3.5 py-3 text-sm text-slate-400 transition-colors hover:text-brand-600 dark:border-slate-700 dark:hover:text-brand-400">
             <ImagePlus className="h-5 w-5" />
             <span>{t('review.imagesHint')}</span>
             <input
@@ -252,6 +260,10 @@ export const ReviewForm = ({
               className="sr-only"
             />
           </label>
+          <span className="sr-only">{comment.length}/2000</span>
+        </div>
+
+        <div>
           {images.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {images.map((file, index) => (
@@ -285,7 +297,7 @@ export const ReviewForm = ({
           onClick={handleSubmit}
           isLoading={createReview.isPending}
           disabled={comment.trim() === '' || effectiveOrderId === null}
-          className="rounded-full px-6"
+          className={mode === 'modal' ? 'mx-auto flex rounded-md px-6' : 'rounded-full px-6'}
         >
           {t('review.submit')}
         </Button>
