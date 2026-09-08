@@ -5,7 +5,9 @@ import {
   AlertCircle,
   Check,
   ChevronRight,
+  Handshake,
   Minus,
+  PhoneCall,
   Plus,
   RotateCcw,
   ShoppingCart,
@@ -115,20 +117,26 @@ const WholesaleBanner = ({
 
   return (
     <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 dark:border-brand-800 dark:bg-brand-950/30">
-      <h3 className="text-base font-extrabold uppercase leading-6 text-brand-800 dark:text-brand-100">
-        {title}
-      </h3>
-      <p className="mt-1.5 text-sm italic leading-6 text-slate-700 dark:text-slate-300">
-        {description}
-      </p>
-      {contactPhone && phoneHref && hotlineLabel && (
-        <a
-          href={`tel:${phoneHref}`}
-          className="mt-3 inline-block text-sm font-bold text-brand-700 underline decoration-brand-300 underline-offset-4 hover:text-brand-900 dark:text-brand-300 dark:hover:text-brand-100"
-        >
-          ☎ {hotlineLabel}: {contactPhone}
-        </a>
-      )}
+      <div className="flex items-start gap-3">
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-100 text-brand-700 dark:bg-brand-900 dark:text-brand-300">
+          <Handshake className="h-5 w-5" />
+        </div>
+        <div>
+          <h3 className="text-base font-extrabold uppercase leading-6 text-brand-800 dark:text-brand-100">
+            {title}
+          </h3>
+          <p className="mt-1 text-sm leading-6 text-slate-700 dark:text-slate-300">{description}</p>
+          {contactPhone && phoneHref && hotlineLabel && (
+            <a
+              href={`tel:${phoneHref}`}
+              className="mt-2 inline-flex items-center gap-1.5 text-sm font-bold text-brand-700 underline decoration-brand-300 underline-offset-4 hover:text-brand-900 dark:text-brand-300 dark:hover:text-brand-100"
+            >
+              <PhoneCall className="h-4 w-4" />
+              {hotlineLabel}: {contactPhone}
+            </a>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
