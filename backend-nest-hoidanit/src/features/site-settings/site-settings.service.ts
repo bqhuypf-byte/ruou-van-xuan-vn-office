@@ -62,6 +62,27 @@ const DEFAULT_SETTINGS: Omit<SiteSettings, 'id' | 'updatedAt'> = {
   ],
   topCategoriesSectionTitle: 'Shop Top Categories',
   trustBadges: [],
+  productDetailServicesTitle: 'Dành Cho Đối Tác & Quà Tặng',
+  productDetailServices: [
+    {
+      icon: 'Handshake',
+      title: 'Giá Sỉ Cho Đơn Số Lượng Lớn',
+      description:
+        'Chính sách riêng cho nhà hàng, quán ăn, quán nhậu và đại lý.',
+    },
+    {
+      icon: 'ShieldCheck',
+      title: 'Chất Lượng Ổn Định, Hợp Tác Lâu Dài',
+      description:
+        'Nguồn rượu ổn định, đồng hành bền vững cùng đối tác kinh doanh.',
+    },
+    {
+      icon: 'Gift',
+      title: 'Quà Biếu Theo Yêu Cầu',
+      description:
+        'Tư vấn chọn rượu và chuẩn bị quà tặng chỉn chu cho từng dịp.',
+    },
+  ],
   paymentMethodIcons: [],
   codDescription: 'Pay in cash when your order arrives',
   storePickupDescription: 'Pick up and pay in person at the store',
@@ -95,6 +116,7 @@ export class SiteSettingsService {
     if (existing) {
       let needsSave = false;
       for (const key of [
+        'productDetailServicesTitle',
         'ageGateTitle',
         'ageGateDescription',
         'ageGateConfirmLabel',
@@ -105,7 +127,14 @@ export class SiteSettingsService {
           needsSave = true;
         }
       }
-      if (existing.ageGateEnabled === null || existing.ageGateEnabled === undefined) {
+      if (!existing.productDetailServices) {
+        existing.productDetailServices = DEFAULT_SETTINGS.productDetailServices;
+        needsSave = true;
+      }
+      if (
+        existing.ageGateEnabled === null ||
+        existing.ageGateEnabled === undefined
+      ) {
         existing.ageGateEnabled = true;
         needsSave = true;
       }

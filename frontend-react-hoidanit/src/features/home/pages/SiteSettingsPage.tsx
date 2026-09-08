@@ -33,6 +33,24 @@ const trustBadgeSchema = z.object({
   description: z.string().min(1, 'Bắt buộc').max(255, 'Tối đa 255 ký tự'),
 });
 
+const DEFAULT_PRODUCT_DETAIL_SERVICES = [
+  {
+    icon: 'Handshake',
+    title: 'Giá Sỉ Cho Đơn Số Lượng Lớn',
+    description: 'Chính sách riêng cho nhà hàng, quán ăn, quán nhậu và đại lý.',
+  },
+  {
+    icon: 'ShieldCheck',
+    title: 'Chất Lượng Ổn Định, Hợp Tác Lâu Dài',
+    description: 'Nguồn rượu ổn định, đồng hành bền vững cùng đối tác kinh doanh.',
+  },
+  {
+    icon: 'Gift',
+    title: 'Quà Biếu Theo Yêu Cầu',
+    description: 'Tư vấn chọn rượu và chuẩn bị quà tặng chỉn chu cho từng dịp.',
+  },
+];
+
 const paymentMethodIconSchema = z.object({
   name: z.string().min(1, 'Bắt buộc').max(50, 'Tối đa 50 ký tự'),
   iconUrl: z.string().min(1, 'Bắt buộc').max(500, 'Tối đa 500 ký tự'),
@@ -82,6 +100,8 @@ const settingsSchema = z.object({
   footerServicesLinks: z.array(footerLinkSchema).max(20, 'Tối đa 20 mục'),
   footerBottomLinks: z.array(footerLinkSchema).max(20, 'Tối đa 20 mục'),
   trustBadges: z.array(trustBadgeSchema).max(20, 'Tối đa 20 mục'),
+  productDetailServicesTitle: z.string().min(1, 'Bắt buộc').max(150, 'Tối đa 150 ký tự'),
+  productDetailServices: z.array(trustBadgeSchema).max(8, 'Tối đa 8 mục'),
   paymentMethodIcons: z.array(paymentMethodIconSchema).max(20, 'Tối đa 20 mục'),
   contactChannels: z.array(contactChannelSchema).max(20, 'Tối đa 20 mục'),
   ageGateEnabled: z.boolean(),
@@ -122,6 +142,8 @@ const emptyValues: SettingsFormData = {
   footerServicesLinks: [],
   footerBottomLinks: [],
   trustBadges: [],
+  productDetailServicesTitle: 'Dành Cho Đối Tác & Quà Tặng',
+  productDetailServices: DEFAULT_PRODUCT_DETAIL_SERVICES,
   paymentMethodIcons: [],
   contactChannels: [],
   ageGateEnabled: true,
@@ -216,6 +238,7 @@ export const SiteSettingsPage = () => {
   const servicesLinksArray = useFieldArray({ control, name: 'footerServicesLinks' });
   const bottomLinksArray = useFieldArray({ control, name: 'footerBottomLinks' });
   const trustBadgesArray = useFieldArray({ control, name: 'trustBadges' });
+  const productDetailServicesArray = useFieldArray({ control, name: 'productDetailServices' });
   const paymentIconsArray = useFieldArray({ control, name: 'paymentMethodIcons' });
   const contactChannelsArray = useFieldArray({ control, name: 'contactChannels' });
 
@@ -250,6 +273,10 @@ export const SiteSettingsPage = () => {
         footerServicesLinks: settings.footerServicesLinks ?? [],
         footerBottomLinks: settings.footerBottomLinks ?? [],
         trustBadges: settings.trustBadges,
+        productDetailServicesTitle:
+          settings.productDetailServicesTitle ?? 'Dành Cho Đối Tác & Quà Tặng',
+        productDetailServices:
+          settings.productDetailServices ?? DEFAULT_PRODUCT_DETAIL_SERVICES,
         paymentMethodIcons: settings.paymentMethodIcons,
         contactChannels: settings.contactChannels,
         ageGateEnabled: settings.ageGateEnabled,
@@ -760,6 +787,71 @@ export const SiteSettingsPage = () => {
               ))}
               {bottomLinksArray.fields.length === 0 && (
                 <p className="text-sm text-slate-400">Chưa có mục nào.</p>
+              )}
+            </div>
+          </div>
+
+          <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-5 shadow-sm space-y-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div>
+                <h2 className="font-semibold text-slate-900 dark:text-white">
+                  Tư Vấn Sỉ &amp; Quà Tặng Trên Trang Sản Phẩm
+                </h2>
+                <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
+                  Hiển thị dưới phần giao hàng và đổi trả. Nút gọi sử dụng số điện thoại liên hệ ở trên.
+                </p>
+              </div>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                leftIcon={<Plus className="w-4 h-4" />}
+                onClick={() =>
+                  productDetailServicesArray.append({ icon: 'Handshake', title: '', description: '' })
+                }
+                disabled={productDetailServicesArray.fields.length >= 8}
+              >
+                Thêm lợi ích
+              </Button>
+            </div>
+            <Input
+              label="Tiêu đề khối"
+              error={errors.productDetailServicesTitle?.message}
+              {...register('productDetailServicesTitle')}
+            />
+            <div className="space-y-3">
+              {productDetailServicesArray.fields.map((field, index) => (
+                <div
+                  key={field.id}
+                  className="grid gap-3 rounded-xl border border-slate-200 p-3 sm:grid-cols-[0.7fr_1fr_1.6fr_auto] dark:border-slate-700"
+                >
+                  <Input
+                    placeholder="Handshake, ShieldCheck, Gift..."
+                    error={errors.productDetailServices?.[index]?.icon?.message}
+                    {...register(`productDetailServices.${index}.icon`)}
+                  />
+                  <Input
+                    placeholder="Tiêu đề lợi ích"
+                    error={errors.productDetailServices?.[index]?.title?.message}
+                    {...register(`productDetailServices.${index}.title`)}
+                  />
+                  <Input
+                    placeholder="Mô tả ngắn"
+                    error={errors.productDetailServices?.[index]?.description?.message}
+                    {...register(`productDetailServices.${index}.description`)}
+                  />
+                  <button
+                    type="button"
+                    aria-label={`Xóa lợi ích ${index + 1}`}
+                    onClick={() => productDetailServicesArray.remove(index)}
+                    className="p-2 text-slate-400 hover:text-rose-600 dark:hover:text-rose-400 sm:mt-2"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+              {productDetailServicesArray.fields.length === 0 && (
+                <p className="text-sm text-slate-400">Khối này sẽ được ẩn khi không có lợi ích nào.</p>
               )}
             </div>
           </div>

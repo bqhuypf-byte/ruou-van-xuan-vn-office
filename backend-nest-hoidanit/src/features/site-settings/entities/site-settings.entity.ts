@@ -16,6 +16,12 @@ export interface TrustBadge {
   description: string;
 }
 
+export interface ProductDetailService {
+  icon: string;
+  title: string;
+  description: string;
+}
+
 export interface PaymentMethodIcon {
   name: string;
   iconUrl: string;
@@ -189,6 +195,17 @@ export class SiteSettings {
 
   @Column({ type: 'json', name: 'trust_badges', nullable: true })
   trustBadges: TrustBadge[] | null;
+
+  @Column({
+    type: 'varchar',
+    length: 150,
+    name: 'product_detail_services_title',
+    default: 'Dành Cho Đối Tác & Quà Tặng',
+  })
+  productDetailServicesTitle: string;
+
+  @Column({ type: 'json', name: 'product_detail_services', nullable: true })
+  productDetailServices: ProductDetailService[] | null;
 
   @Column({
     type: 'json',

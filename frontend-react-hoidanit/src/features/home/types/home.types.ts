@@ -64,6 +64,12 @@ export interface TrustBadge {
   description: string;
 }
 
+export interface ProductDetailService {
+  icon: string;
+  title: string;
+  description: string;
+}
+
 export interface PaymentMethodIcon {
   name: string;
   iconUrl: string;
@@ -114,6 +120,8 @@ export interface SiteSettings {
   footerServicesLinks: FooterLink[] | null;
   footerBottomLinks: FooterLink[] | null;
   trustBadges: TrustBadge[];
+  productDetailServicesTitle: string;
+  productDetailServices: ProductDetailService[];
   paymentMethodIcons: PaymentMethodIcon[];
   codDescription: string | null;
   storePickupDescription: string | null;

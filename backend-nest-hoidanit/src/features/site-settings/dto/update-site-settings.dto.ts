@@ -45,6 +45,20 @@ export class TrustBadgeDto {
   description: string;
 }
 
+export class ProductDetailServiceDto {
+  @IsString()
+  @MaxLength(50)
+  icon: string;
+
+  @IsString()
+  @MaxLength(100)
+  title: string;
+
+  @IsString()
+  @MaxLength(255)
+  description: string;
+}
+
 export class PaymentMethodIconDto {
   @IsString()
   @MaxLength(100)
@@ -251,6 +265,18 @@ export class UpdateSiteSettingsDto {
   @ValidateNested({ each: true })
   @Type(() => TrustBadgeDto)
   trustBadges?: TrustBadgeDto[];
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(150)
+  productDetailServicesTitle?: string;
+
+  @IsOptional()
+  @IsArray()
+  @ArrayMaxSize(8)
+  @ValidateNested({ each: true })
+  @Type(() => ProductDetailServiceDto)
+  productDetailServices?: ProductDetailServiceDto[];
 
   @IsOptional()
   @IsArray()
