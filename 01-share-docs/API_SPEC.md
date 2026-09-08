@@ -262,7 +262,7 @@ Types: image/jpeg, image/png, image/webp
 | DELETE | `/reviews/:id` | Delete review | Yes |
 | DELETE | `/admin/reviews/:id` | Admin delete | Admin |
 | GET | `/admin/reviews` | Admin list/filter reviews | Admin |
-| PATCH | `/admin/reviews/:id/status` | Admin moderate review | Admin |
+| PATCH | `/admin/reviews/:id/status` | Admin hide/restore review | Admin |
 
 ---
 

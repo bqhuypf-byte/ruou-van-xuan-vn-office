@@ -252,7 +252,7 @@
     "imageTypeError": "Only JPEG, PNG, or WebP images are accepted.",
     "imageUploadError": "Couldn't upload the review image. Please try again.",
     "submit": "Submit Review",
-    "submitSuccess": "Your review was submitted and is awaiting approval. Thank you for sharing.",
+    "submitSuccess": "Your review was published successfully. Thank you for sharing.",
     "submitError": "Couldn't submit your review. Please try again."
   },
   "promo": {

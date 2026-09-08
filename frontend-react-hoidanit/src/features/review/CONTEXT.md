@@ -10,7 +10,7 @@ Displays product reviews and lets authenticated customers submit one review for 
 - `components/StarRating.tsx`, `ReviewList.tsx`, `ReviewForm.tsx`
 - `pages/AdminReviewsPage.tsx`, `hooks/useAdminReviews.ts` — Admin list, filters, moderation, contact details, and deletion
 
-New reviews enter `pending`. Storefront queries only receive `approved` reviews; Admin can approve, hide, return to pending, or permanently delete them.
+New reviews are published immediately as `approved`. Storefront queries exclude only reviews hidden by Admin; Admin can hide, restore, or permanently delete them.
 
 ## Integration
 

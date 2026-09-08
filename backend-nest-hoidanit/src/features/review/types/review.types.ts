@@ -18,7 +18,7 @@ export interface AdminReviewResponse extends ReviewResponse {
   product: {
     id: number;
     name: string;
-    slug: string;
+    slug: string | null;
     thumbnailUrl: string | null;
   };
 }

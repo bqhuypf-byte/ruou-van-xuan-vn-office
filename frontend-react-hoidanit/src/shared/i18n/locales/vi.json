@@ -252,7 +252,7 @@
     "imageTypeError": "Chỉ chấp nhận ảnh JPEG, PNG hoặc WebP.",
     "imageUploadError": "Không thể tải ảnh đánh giá. Vui lòng thử lại.",
     "submit": "Gửi Đánh Giá",
-    "submitSuccess": "Đánh giá đã được gửi và đang chờ duyệt. Cảm ơn bạn đã chia sẻ.",
+    "submitSuccess": "Đánh giá đã được đăng thành công. Cảm ơn bạn đã chia sẻ.",
     "submitError": "Không thể gửi đánh giá. Vui lòng thử lại."
   },
   "promo": {

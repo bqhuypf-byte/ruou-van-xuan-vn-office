@@ -170,7 +170,7 @@
 | rating | TINYINT | 1-5 |
 | comment | TEXT | NULLABLE |
 | image_urls | JSON | NULLABLE, tối đa 3 URL ảnh đánh giá |
-| status | VARCHAR(20) | `pending`, `approved`, or `hidden`; existing rows default to `approved` |
+| status | VARCHAR(20) | `approved` or `hidden`; reviews are visible immediately by default |
 | created_at | DATETIME | AUTO |
 
 ---

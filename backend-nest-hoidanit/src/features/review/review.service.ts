@@ -52,10 +52,10 @@ export class ReviewService {
       reviewerPhone: review.reviewerPhone,
       orderId: review.orderId,
       product: {
-        id: review.product.id,
-        name: review.product.name,
-        slug: review.product.slug,
-        thumbnailUrl: review.product.thumbnailUrl,
+        id: review.product?.id ?? review.productId,
+        name: review.product?.name ?? 'Sản phẩm đã xóa',
+        slug: review.product?.slug ?? null,
+        thumbnailUrl: review.product?.thumbnailUrl ?? null,
       },
     };
   }
@@ -74,7 +74,7 @@ export class ReviewService {
       rating: dto.rating,
       comment: dto.comment ?? null,
       imageUrls: dto.imageUrls?.length ? dto.imageUrls : null,
-      status: 'pending',
+      status: 'approved',
     });
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);
@@ -95,7 +95,6 @@ export class ReviewService {
   ): Promise<ReviewResponse> {
     const review = await this.findOwned(id, userId);
     assignDefined(review, dto);
-    review.status = 'pending';
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);
   }

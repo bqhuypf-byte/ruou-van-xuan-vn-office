@@ -9,7 +9,7 @@ import {
 import { bigintTransformer } from '../../../shared/utils/bigint.transformer';
 import { Product } from '../../product/entities/product.entity';
 
-export const REVIEW_STATUSES = ['pending', 'approved', 'hidden'] as const;
+export const REVIEW_STATUSES = ['approved', 'hidden'] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 
 @Entity('reviews')
@@ -83,7 +83,7 @@ export class Review {
   @CreateDateColumn({ name: 'created_at' })
   createdAt: Date;
 
-  @ManyToOne(() => Product)
+  @ManyToOne(() => Product, { nullable: true })
   @JoinColumn({ name: 'product_id' })
-  product: Product;
+  product: Product | null;
 }

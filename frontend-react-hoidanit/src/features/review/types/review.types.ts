@@ -19,7 +19,7 @@ export interface CreateReviewInput {
   imageUrls?: string[];
 }
 
-export const REVIEW_STATUSES = ['pending', 'approved', 'hidden'] as const;
+export const REVIEW_STATUSES = ['approved', 'hidden'] as const;
 export type ReviewStatus = (typeof REVIEW_STATUSES)[number];
 
 export interface AdminReview extends Review {
@@ -30,7 +30,7 @@ export interface AdminReview extends Review {
   product: {
     id: number;
     name: string;
-    slug: string;
+    slug: string | null;
     thumbnailUrl: string | null;
   };
 }

@@ -7,9 +7,7 @@ import {
   Mail,
   MessageSquareText,
   Phone,
-  RotateCcw,
   Search,
-  ShieldCheck,
   Trash2,
 } from 'lucide-react';
 import { Badge, Button, Input, Modal, Select, Spinner } from '@/shared/components/ui';
@@ -20,10 +18,9 @@ import type { AdminReview, ReviewStatus } from '../types/review.types';
 
 const STATUS_META: Record<
   ReviewStatus,
-  { label: string; variant: 'warning' | 'success' | 'default' }
+  { label: string; variant: 'success' | 'default' }
 > = {
-  pending: { label: 'Chờ duyệt', variant: 'warning' },
-  approved: { label: 'Đã duyệt', variant: 'success' },
+  approved: { label: 'Đang hiển thị', variant: 'success' },
   hidden: { label: 'Đã ẩn', variant: 'default' },
 };
 
@@ -45,7 +42,6 @@ export const AdminReviewsPage = () => {
   const counts = useMemo(
     () => ({
       all: reviews.length,
-      pending: reviews.filter((review) => review.status === 'pending').length,
       approved: reviews.filter((review) => review.status === 'approved').length,
       hidden: reviews.filter((review) => review.status === 'hidden').length,
     }),
@@ -111,17 +107,17 @@ export const AdminReviewsPage = () => {
 
   const renderActions = (review: AdminReview) => (
     <div className="flex flex-wrap gap-2">
-      {review.status !== 'approved' && (
+      {review.status === 'hidden' && (
         <Button
           size="sm"
           leftIcon={<Check className="h-3.5 w-3.5" />}
           disabled={busyId === review.id}
           onClick={() => handleModerate(review, 'approved')}
         >
-          Duyệt
+          Hiện lại
         </Button>
       )}
-      {review.status !== 'hidden' && (
+      {review.status === 'approved' && (
         <Button
           size="sm"
           variant="secondary"
@@ -130,17 +126,6 @@ export const AdminReviewsPage = () => {
           onClick={() => handleModerate(review, 'hidden')}
         >
           Ẩn
-        </Button>
-      )}
-      {review.status !== 'pending' && (
-        <Button
-          size="sm"
-          variant="outline"
-          leftIcon={<RotateCcw className="h-3.5 w-3.5" />}
-          disabled={busyId === review.id}
-          onClick={() => handleModerate(review, 'pending')}
-        >
-          Chờ duyệt
         </Button>
       )}
       <Button
@@ -162,7 +147,7 @@ export const AdminReviewsPage = () => {
           Quản Lý Đánh Giá
         </h1>
         <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
-          Duyệt nội dung khách hàng gửi trước khi hiển thị trên trang sản phẩm.
+          Đánh giá được hiển thị ngay; Admin có thể ẩn, hiện lại hoặc xóa khi cần.
         </p>
       </div>
 
@@ -184,12 +169,11 @@ export const AdminReviewsPage = () => {
         </div>
       )}
 
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         {(
           [
             ['all', 'Tất cả', MessageSquareText],
-            ['pending', 'Chờ duyệt', ShieldCheck],
-            ['approved', 'Đã duyệt', Check],
+            ['approved', 'Đang hiển thị', Check],
             ['hidden', 'Đã ẩn', EyeOff],
           ] as const
         ).map(([value, label, Icon]) => (
@@ -270,15 +254,21 @@ export const AdminReviewsPage = () => {
                       {review.comment || 'Không có nội dung nhận xét.'}
                     </p>
                   </button>
-                  <Link
-                    to={`/admin/products/${review.product.slug}`}
-                    className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:underline dark:text-brand-400"
-                  >
-                    {review.product.thumbnailUrl && (
-                      <img src={review.product.thumbnailUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
-                    )}
-                    {review.product.name}
-                  </Link>
+                  {review.product.slug ? (
+                    <Link
+                      to={`/admin/products/${review.product.slug}`}
+                      className="mt-3 inline-flex items-center gap-2 text-sm font-medium text-brand-700 hover:underline dark:text-brand-400"
+                    >
+                      {review.product.thumbnailUrl && (
+                        <img src={review.product.thumbnailUrl} alt="" className="h-8 w-8 rounded-lg object-cover" />
+                      )}
+                      {review.product.name}
+                    </Link>
+                  ) : (
+                    <p className="mt-3 text-sm font-medium text-slate-400">
+                      {review.product.name}
+                    </p>
+                  )}
                 </div>
                 <div className="shrink-0">{renderActions(review)}</div>
               </div>
