@@ -1,7 +1,18 @@
 import { useRef, useState } from 'react';
 import { Controller, useFieldArray, useWatch, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 import { z } from 'zod';
-import { Loader2, Package, Link2, Plus, Tags, Trash2, Upload, X } from 'lucide-react';
+import {
+  ArrowDown,
+  ArrowUp,
+  Loader2,
+  Package,
+  Link2,
+  Plus,
+  Tags,
+  Trash2,
+  Upload,
+  X,
+} from 'lucide-react';
 import { Button, ImageDropzone, Input, RichTextEditor } from '@/shared/components/ui';
 import { uploadService } from '@/shared/services/upload.service';
 import type { Product, VariantAttributeGroup } from '../types/product.types';
@@ -213,8 +224,14 @@ const ClassificationGroupEditor = ({
   setValue,
   onRemove,
 }: ClassificationGroupEditorProps) => {
-  const { fields, append, remove } = useFieldArray({ control, name: `${namePrefix}.values` });
+  const { fields, append, remove, move } = useFieldArray({
+    control,
+    name: `${namePrefix}.values`,
+  });
   const watchedValues = useWatch({ control, name: `${namePrefix}.values` });
+  const filledOptionIndexes = (watchedValues ?? [])
+    .map((option, index) => (option.value.trim() ? index : -1))
+    .filter((index) => index >= 0);
   const normalizedValues = (watchedValues ?? [])
     .map((option) => option.value.trim().toLocaleLowerCase('vi-VN'))
     .filter(Boolean);
@@ -274,6 +291,42 @@ const ClassificationGroupEditor = ({
                 onChange: (e) => handleValueChange(index, e.target.value),
               })}
             />
+            {(watchedValues?.[index]?.value.trim() ?? '') !== '' && (
+              <div className="flex shrink-0 items-center">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={filledOptionIndexes.indexOf(index) <= 0}
+                  onClick={() => {
+                    const position = filledOptionIndexes.indexOf(index);
+                    if (position > 0) move(index, filledOptionIndexes[position - 1]);
+                  }}
+                  title="Di chuyển tùy chọn lên trước"
+                  aria-label={`Di chuyển ${watchedValues?.[index]?.value ?? 'tùy chọn'} lên trước`}
+                  className="px-1.5"
+                >
+                  <ArrowUp className="h-4 w-4" />
+                </Button>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="sm"
+                  disabled={filledOptionIndexes.indexOf(index) === filledOptionIndexes.length - 1}
+                  onClick={() => {
+                    const position = filledOptionIndexes.indexOf(index);
+                    if (position >= 0 && position < filledOptionIndexes.length - 1) {
+                      move(index, filledOptionIndexes[position + 1]);
+                    }
+                  }}
+                  title="Di chuyển tùy chọn xuống sau"
+                  aria-label={`Di chuyển ${watchedValues?.[index]?.value ?? 'tùy chọn'} xuống sau`}
+                  className="px-1.5"
+                >
+                  <ArrowDown className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
             {index < fields.length - 1 && (
               <Button
                 type="button"

@@ -86,14 +86,32 @@ const reconcileRows = (
 
   return nextRows.map((nextRow) => {
     const currentRow = currentByKey.get(nextRow.key);
-    if (!currentRow) return nextRow;
+    if (currentRow) {
+      return {
+        ...nextRow,
+        sku: currentRow.sku,
+        price: currentRow.price,
+        salePrice: currentRow.salePrice,
+        stockQuantity: currentRow.stockQuantity,
+      };
+    }
+
+    // Adding a second classification changes every row key. Inherit the
+    // unsaved price/stock values from the matching parent row instead of
+    // rebuilding them from the last server response. Keep the newly generated
+    // SKU because one parent row can expand into several distinct variants.
+    const parentRow = currentRows.find((candidate) =>
+      Object.entries(candidate.attributes).every(
+        ([name, value]) => nextRow.attributes[name] === value,
+      ),
+    );
+    if (!parentRow) return nextRow;
 
     return {
       ...nextRow,
-      sku: currentRow.sku,
-      price: currentRow.price,
-      salePrice: currentRow.salePrice,
-      stockQuantity: currentRow.stockQuantity,
+      price: parentRow.price,
+      salePrice: parentRow.salePrice,
+      stockQuantity: parentRow.stockQuantity,
     };
   });
 };
