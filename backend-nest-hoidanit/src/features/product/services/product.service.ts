@@ -18,6 +18,7 @@ import { CreateImageDto } from '../dto/create-image.dto';
 import { Product } from '../entities/product.entity';
 import { ProductVariant } from '../entities/product-variant.entity';
 import { ProductImage } from '../entities/product-image.entity';
+import { Review } from '../../review/entities/review.entity';
 import { PaginationMeta } from '../../../shared/types/pagination.type';
 import {
   findLowestPricedVariant,
@@ -268,6 +269,7 @@ export class ProductService {
     await queryRunner.startTransaction();
 
     try {
+      await queryRunner.manager.delete(Review, { productId: id });
       await queryRunner.manager.delete(ProductVariant, { productId: id });
       await queryRunner.manager.delete(ProductImage, { productId: id });
       await queryRunner.manager.delete(Product, { id });

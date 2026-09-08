@@ -173,6 +173,8 @@
 | status | VARCHAR(20) | `approved` or `hidden`; reviews are visible immediately by default |
 | created_at | DATETIME | AUTO |
 
+Reviews are deleted together with a permanently deleted product. A cleanup migration removes legacy reviews whose product no longer exists.
+
 ---
 
 ## ERD Diagram

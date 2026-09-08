@@ -18,3 +18,5 @@ Reviews support public storefront submissions. New guest reviews store `reviewer
 The public response exposes only reviewer name. Contact data is retained for administration and never returned from the public endpoint.
 
 Reviews are published immediately as `approved`. Admin can hide or restore them, and the public product endpoint only returns `approved` reviews. The Admin response also tolerates orphaned legacy reviews whose product has already been deleted.
+
+Orphaned legacy reviews are removed by migration. Future permanent product deletion removes that product's reviews in the same transaction.
