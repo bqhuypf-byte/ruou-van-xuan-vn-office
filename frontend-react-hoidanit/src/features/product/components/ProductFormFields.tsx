@@ -1,4 +1,4 @@
-import { useRef, useState, type DragEvent } from 'react';
+import { useRef, useState, type PointerEvent } from 'react';
 import { Controller, useFieldArray, useWatch, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 import { z } from 'zod';
 import {
@@ -230,6 +230,8 @@ const ClassificationGroupEditor = ({
   const watchedValues = useWatch({ control, name: `${namePrefix}.values` });
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
   const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
+  const draggedIndexRef = useRef<number | null>(null);
+  const dragOverIndexRef = useRef<number | null>(null);
   const normalizedValues = (watchedValues ?? [])
     .map((option) => option.value.trim().toLocaleLowerCase('vi-VN'))
     .filter(Boolean);
@@ -254,20 +256,41 @@ const ClassificationGroupEditor = ({
     remove(index);
   };
 
-  const handleDragStart = (event: DragEvent<HTMLButtonElement>, index: number) => {
-    setDraggedIndex(index);
-    event.dataTransfer.effectAllowed = 'move';
-    event.dataTransfer.setData('text/plain', String(index));
-  };
-
-  const handleDrop = (event: DragEvent<HTMLDivElement>, targetIndex: number) => {
-    event.preventDefault();
-    const sourceIndex = draggedIndex ?? Number(event.dataTransfer.getData('text/plain'));
-    if (Number.isInteger(sourceIndex) && sourceIndex !== targetIndex) {
-      move(sourceIndex, targetIndex);
-    }
+  const resetDrag = () => {
+    draggedIndexRef.current = null;
+    dragOverIndexRef.current = null;
     setDraggedIndex(null);
     setDragOverIndex(null);
+  };
+
+  const handlePointerDown = (event: PointerEvent<HTMLButtonElement>, index: number) => {
+    if (event.button !== 0) return;
+    event.preventDefault();
+    event.currentTarget.setPointerCapture?.(event.pointerId);
+    draggedIndexRef.current = index;
+    setDraggedIndex(index);
+  };
+
+  const handlePointerMove = (event: PointerEvent<HTMLButtonElement>) => {
+    if (draggedIndexRef.current === null) return;
+    event.preventDefault();
+    const target = document
+      .elementFromPoint(event.clientX, event.clientY)
+      ?.closest<HTMLElement>('[data-option-index]');
+    const targetIndex = Number(target?.dataset.optionIndex);
+    if (!Number.isInteger(targetIndex) || targetIndex === draggedIndexRef.current) return;
+    dragOverIndexRef.current = targetIndex;
+    setDragOverIndex(targetIndex);
+  };
+
+  const handlePointerUp = (event: PointerEvent<HTMLButtonElement>) => {
+    const sourceIndex = draggedIndexRef.current;
+    const targetIndex = dragOverIndexRef.current;
+    if (sourceIndex !== null && targetIndex !== null && sourceIndex !== targetIndex) {
+      move(sourceIndex, targetIndex);
+    }
+    event.currentTarget.releasePointerCapture?.(event.pointerId);
+    resetDrag();
   };
 
   return (
@@ -294,30 +317,21 @@ const ClassificationGroupEditor = ({
           <div
             key={field.id}
             data-option-row
+            data-option-index={isDraggable ? index : undefined}
             className={`flex items-center gap-1.5 rounded-lg transition-all ${
               dragOverIndex === index ? 'ring-2 ring-brand-500/40' : ''
             } ${draggedIndex === index ? 'opacity-50' : ''}`}
-            onDragOver={(event) => {
-              if (!isDraggable || draggedIndex === null || draggedIndex === index) return;
-              event.preventDefault();
-              event.dataTransfer.dropEffect = 'move';
-              setDragOverIndex(index);
-            }}
-            onDragLeave={() => setDragOverIndex((current) => (current === index ? null : current))}
-            onDrop={(event) => isDraggable && handleDrop(event, index)}
           >
             {isDraggable && (
               <button
                 type="button"
-                draggable
-                onDragStart={(event) => handleDragStart(event, index)}
-                onDragEnd={() => {
-                  setDraggedIndex(null);
-                  setDragOverIndex(null);
-                }}
+                onPointerDown={(event) => handlePointerDown(event, index)}
+                onPointerMove={handlePointerMove}
+                onPointerUp={handlePointerUp}
+                onPointerCancel={resetDrag}
                 title="Kéo để đổi vị trí tùy chọn"
                 aria-label={`Kéo để di chuyển ${optionValue}`}
-                className="flex h-9 w-7 shrink-0 cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-200 hover:text-brand-600 active:cursor-grabbing dark:hover:bg-slate-700"
+                className="flex h-9 w-7 shrink-0 touch-none cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-200 hover:text-brand-600 active:cursor-grabbing dark:hover:bg-slate-700"
               >
                 <GripVertical className="h-4 w-4" />
               </button>

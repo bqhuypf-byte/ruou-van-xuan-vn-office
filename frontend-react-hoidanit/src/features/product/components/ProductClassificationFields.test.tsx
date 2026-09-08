@@ -1,6 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import {
   emptyProductFormValues,
   ProductClassificationFields,
@@ -41,19 +41,19 @@ describe('ProductClassificationFields option ordering', () => {
     const sourceHandle = screen.getByRole('button', { name: 'Kéo để di chuyển 50 độ' });
     const targetHandle = screen.getByRole('button', { name: 'Kéo để di chuyển 40 độ' });
     const targetRow = targetHandle.closest('[data-option-row]');
-    const dataTransfer = {
-      effectAllowed: 'none',
-      dropEffect: 'none',
-      setData: () => undefined,
-      getData: () => '2',
-    };
+    const elementFromPoint = vi.fn().mockReturnValue(targetRow as Element);
+    Object.defineProperty(document, 'elementFromPoint', {
+      configurable: true,
+      value: elementFromPoint,
+    });
 
-    fireEvent.dragStart(sourceHandle, { dataTransfer });
-    fireEvent.dragOver(targetRow!, { dataTransfer });
-    fireEvent.drop(targetRow!, { dataTransfer });
+    fireEvent.pointerDown(sourceHandle, { button: 0, pointerId: 1 });
+    fireEvent.pointerMove(sourceHandle, { pointerId: 1, clientX: 10, clientY: 10 });
+    fireEvent.pointerUp(sourceHandle, { pointerId: 1 });
 
     expect(
       screen.getAllByPlaceholderText('Nhập').map((input) => (input as HTMLInputElement).value),
     ).toEqual(['30 độ', '50 độ', '40 độ', '']);
+    Reflect.deleteProperty(document, 'elementFromPoint');
   });
 });
