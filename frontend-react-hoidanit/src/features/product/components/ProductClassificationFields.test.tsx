@@ -1,5 +1,4 @@
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { useForm } from 'react-hook-form';
 import { describe, expect, it } from 'vitest';
 import {
@@ -37,10 +36,21 @@ const ReorderFixture = () => {
 
 describe('ProductClassificationFields option ordering', () => {
   it('moves an option together with its associated form data', async () => {
-    const user = userEvent.setup();
     render(<ReorderFixture />);
 
-    await user.click(screen.getByRole('button', { name: 'Di chuyển 50 độ lên trước' }));
+    const sourceHandle = screen.getByRole('button', { name: 'Kéo để di chuyển 50 độ' });
+    const targetHandle = screen.getByRole('button', { name: 'Kéo để di chuyển 40 độ' });
+    const targetRow = targetHandle.closest('[data-option-row]');
+    const dataTransfer = {
+      effectAllowed: 'none',
+      dropEffect: 'none',
+      setData: () => undefined,
+      getData: () => '2',
+    };
+
+    fireEvent.dragStart(sourceHandle, { dataTransfer });
+    fireEvent.dragOver(targetRow!, { dataTransfer });
+    fireEvent.drop(targetRow!, { dataTransfer });
 
     expect(
       screen.getAllByPlaceholderText('Nhập').map((input) => (input as HTMLInputElement).value),

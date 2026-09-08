@@ -37,7 +37,7 @@ Two audiences share this feature: admin CRUD for `categories`/`products`/`produc
 - **`useCategories`' `flattenCategories`**: walks the nested tree once into a flat, depth-annotated list, then resolves `parentName` via a `parentId` lookup pass — used for both the admin table and the `parentId`/`categoryId` `<select>` dropdowns (rendered with `—` indentation per depth).
 - **Error handling**: unlike `RolesPage`/`UsersPage` (which inline `err: any` + optional chaining — pre-existing lint debt, not touched here), this feature's pages use the existing `shared/utils/getApiErrorMessage.ts` util to stay `no-explicit-any`-clean.
 - **Price fields**: `ProductVariant.price`/`salePrice` arrive from the backend as decimal strings (TypeORM `decimal` → JSON string). `VariantFormModal` keeps them as form strings (Zod `.refine()` instead of `z.coerce.number()`, which broke `zodResolver`'s type inference with `react-hook-form`) and converts to `number` only in the submit handler.
-- **Classification option ordering**: Admin can move each option earlier/later. Reordering carries the option image with it and reconciles matrix rows by their attribute values, so existing or unsaved SKU prices and stock do not jump between options.
+- **Classification option ordering**: Admin can drag options by their grip handle to reorder them. Reordering carries the option image with it and reconciles matrix rows by their attribute values, so existing or unsaved SKU prices and stock do not jump between options.
 
 ## Tests
 

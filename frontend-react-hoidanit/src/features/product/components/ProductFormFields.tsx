@@ -1,9 +1,8 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, type DragEvent } from 'react';
 import { Controller, useFieldArray, useWatch, type Control, type FieldErrors, type UseFormRegister, type UseFormSetValue } from 'react-hook-form';
 import { z } from 'zod';
 import {
-  ArrowDown,
-  ArrowUp,
+  GripVertical,
   Loader2,
   Package,
   Link2,
@@ -229,9 +228,8 @@ const ClassificationGroupEditor = ({
     name: `${namePrefix}.values`,
   });
   const watchedValues = useWatch({ control, name: `${namePrefix}.values` });
-  const filledOptionIndexes = (watchedValues ?? [])
-    .map((option, index) => (option.value.trim() ? index : -1))
-    .filter((index) => index >= 0);
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
+  const [dragOverIndex, setDragOverIndex] = useState<number | null>(null);
   const normalizedValues = (watchedValues ?? [])
     .map((option) => option.value.trim().toLocaleLowerCase('vi-VN'))
     .filter(Boolean);
@@ -256,6 +254,22 @@ const ClassificationGroupEditor = ({
     remove(index);
   };
 
+  const handleDragStart = (event: DragEvent<HTMLButtonElement>, index: number) => {
+    setDraggedIndex(index);
+    event.dataTransfer.effectAllowed = 'move';
+    event.dataTransfer.setData('text/plain', String(index));
+  };
+
+  const handleDrop = (event: DragEvent<HTMLDivElement>, targetIndex: number) => {
+    event.preventDefault();
+    const sourceIndex = draggedIndex ?? Number(event.dataTransfer.getData('text/plain'));
+    if (Number.isInteger(sourceIndex) && sourceIndex !== targetIndex) {
+      move(sourceIndex, targetIndex);
+    }
+    setDraggedIndex(null);
+    setDragOverIndex(null);
+  };
+
   return (
     <div className="space-y-3 rounded-xl bg-slate-50 dark:bg-slate-800/40 p-4">
       <div className="flex items-center justify-between gap-2">
@@ -273,8 +287,41 @@ const ClassificationGroupEditor = ({
         {showImages && ' — bấm vào ảnh để gắn ảnh riêng cho từng tùy chọn (dùng luôn cho bảng biến thể)'}
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-        {fields.map((field, index) => (
-          <div key={field.id} className="flex items-center gap-1.5">
+        {fields.map((field, index) => {
+          const optionValue = watchedValues?.[index]?.value.trim() ?? '';
+          const isDraggable = optionValue !== '';
+          return (
+          <div
+            key={field.id}
+            data-option-row
+            className={`flex items-center gap-1.5 rounded-lg transition-all ${
+              dragOverIndex === index ? 'ring-2 ring-brand-500/40' : ''
+            } ${draggedIndex === index ? 'opacity-50' : ''}`}
+            onDragOver={(event) => {
+              if (!isDraggable || draggedIndex === null || draggedIndex === index) return;
+              event.preventDefault();
+              event.dataTransfer.dropEffect = 'move';
+              setDragOverIndex(index);
+            }}
+            onDragLeave={() => setDragOverIndex((current) => (current === index ? null : current))}
+            onDrop={(event) => isDraggable && handleDrop(event, index)}
+          >
+            {isDraggable && (
+              <button
+                type="button"
+                draggable
+                onDragStart={(event) => handleDragStart(event, index)}
+                onDragEnd={() => {
+                  setDraggedIndex(null);
+                  setDragOverIndex(null);
+                }}
+                title="Kéo để đổi vị trí tùy chọn"
+                aria-label={`Kéo để di chuyển ${optionValue}`}
+                className="flex h-9 w-7 shrink-0 cursor-grab items-center justify-center rounded-md text-slate-400 hover:bg-slate-200 hover:text-brand-600 active:cursor-grabbing dark:hover:bg-slate-700"
+              >
+                <GripVertical className="h-4 w-4" />
+              </button>
+            )}
             {showImages && (
               <Controller
                 control={control}
@@ -291,42 +338,6 @@ const ClassificationGroupEditor = ({
                 onChange: (e) => handleValueChange(index, e.target.value),
               })}
             />
-            {(watchedValues?.[index]?.value.trim() ?? '') !== '' && (
-              <div className="flex shrink-0 items-center">
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={filledOptionIndexes.indexOf(index) <= 0}
-                  onClick={() => {
-                    const position = filledOptionIndexes.indexOf(index);
-                    if (position > 0) move(index, filledOptionIndexes[position - 1]);
-                  }}
-                  title="Di chuyển tùy chọn lên trước"
-                  aria-label={`Di chuyển ${watchedValues?.[index]?.value ?? 'tùy chọn'} lên trước`}
-                  className="px-1.5"
-                >
-                  <ArrowUp className="h-4 w-4" />
-                </Button>
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  disabled={filledOptionIndexes.indexOf(index) === filledOptionIndexes.length - 1}
-                  onClick={() => {
-                    const position = filledOptionIndexes.indexOf(index);
-                    if (position >= 0 && position < filledOptionIndexes.length - 1) {
-                      move(index, filledOptionIndexes[position + 1]);
-                    }
-                  }}
-                  title="Di chuyển tùy chọn xuống sau"
-                  aria-label={`Di chuyển ${watchedValues?.[index]?.value ?? 'tùy chọn'} xuống sau`}
-                  className="px-1.5"
-                >
-                  <ArrowDown className="h-4 w-4" />
-                </Button>
-              </div>
-            )}
             {index < fields.length - 1 && (
               <Button
                 type="button"
@@ -339,7 +350,8 @@ const ClassificationGroupEditor = ({
               </Button>
             )}
           </div>
-        ))}
+          );
+        })}
       </div>
       {hasDuplicateValues && (
         <p className="text-xs font-medium text-rose-600 dark:text-rose-400">
