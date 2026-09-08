@@ -16,7 +16,9 @@ export class ProductRatingRepository {
     private readonly repository: Repository<Review>,
   ) {}
 
-  async findByProductIds(productIds: number[]): Promise<ProductRatingSummary[]> {
+  async findByProductIds(
+    productIds: number[],
+  ): Promise<ProductRatingSummary[]> {
     if (productIds.length === 0) return [];
 
     const rows = await this.repository
@@ -25,8 +27,13 @@ export class ProductRatingRepository {
       .addSelect('AVG(review.rating)', 'avgRating')
       .addSelect('COUNT(*)', 'reviewCount')
       .where('review.productId IN (:...productIds)', { productIds })
+      .andWhere('review.status = :status', { status: 'approved' })
       .groupBy('review.productId')
-      .getRawMany<{ productId: string; avgRating: string; reviewCount: string }>();
+      .getRawMany<{
+        productId: string;
+        avgRating: string;
+        reviewCount: string;
+      }>();
 
     return rows.map((row) => ({
       productId: Number(row.productId),

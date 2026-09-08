@@ -8,6 +8,9 @@ Displays product reviews and lets authenticated customers submit one review for 
 - `hooks/useProductReviews.ts` — fetches + computes `averageRating`/`reviewCount` client-side (no separate summary endpoint)
 - `hooks/useCreateReview.ts` — submits and refreshes the review/product query caches
 - `components/StarRating.tsx`, `ReviewList.tsx`, `ReviewForm.tsx`
+- `pages/AdminReviewsPage.tsx`, `hooks/useAdminReviews.ts` — Admin list, filters, moderation, contact details, and deletion
+
+New reviews enter `pending`. Storefront queries only receive `approved` reviews; Admin can approve, hide, return to pending, or permanently delete them.
 
 ## Integration
 

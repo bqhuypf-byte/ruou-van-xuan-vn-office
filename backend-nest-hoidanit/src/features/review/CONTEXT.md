@@ -12,5 +12,9 @@ Reviews support public storefront submissions. New guest reviews store `reviewer
 | PATCH | `/reviews/:id` | Update a legacy authenticated review | Yes |
 | DELETE | `/reviews/:id` | Delete a legacy authenticated review | Yes |
 | DELETE | `/admin/reviews/:id` | Admin delete any review | Admin |
+| GET | `/admin/reviews` | List reviews with status/rating/product/search filters | Admin |
+| PATCH | `/admin/reviews/:id/status` | Approve, hide, or return a review to pending | Admin |
 
 The public response exposes only reviewer name. Contact data is retained for administration and never returned from the public endpoint.
+
+Existing reviews are migrated as `approved`. New reviews start as `pending`, and the public product endpoint only returns `approved` reviews.

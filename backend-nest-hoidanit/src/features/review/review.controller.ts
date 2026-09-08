@@ -7,6 +7,7 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { CurrentUser } from '../../shared/decorators/current-user.decorator';
@@ -17,6 +18,8 @@ import type { AuthenticatedUser } from '../auth/types/jwt-payload.type';
 import { ReviewService } from './review.service';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
+import { QueryAdminReviewsDto } from './dto/query-admin-reviews.dto';
+import { ModerateReviewDto } from './dto/moderate-review.dto';
 
 @Controller()
 export class ReviewController {
@@ -53,6 +56,23 @@ export class ReviewController {
   ) {
     await this.reviewService.remove(id, user.id);
     return { success: true };
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Get('admin/reviews')
+  findAllAdmin(@Query() query: QueryAdminReviewsDto) {
+    return this.reviewService.findAllAdmin(query);
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('admin')
+  @Patch('admin/reviews/:id/status')
+  moderate(
+    @Param('id', ParseIntPipe) id: number,
+    @Body() dto: ModerateReviewDto,
+  ) {
+    return this.reviewService.moderate(id, dto.status);
   }
 
   @UseGuards(JwtAuthGuard, RolesGuard)

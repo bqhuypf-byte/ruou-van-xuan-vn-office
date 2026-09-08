@@ -1,5 +1,11 @@
 import { axiosInstance } from '@/shared/lib/axios';
-import type { CreateReviewInput, Review } from '../types/review.types';
+import type {
+  AdminReview,
+  AdminReviewFilters,
+  CreateReviewInput,
+  Review,
+  ReviewStatus,
+} from '../types/review.types';
 
 export const reviewService = {
   getProductReviews: async (productId: number): Promise<Review[]> => {
@@ -17,5 +23,17 @@ export const reviewService = {
       input,
     );
     return response.data.data;
+  },
+  getAdminReviews: async (filters?: AdminReviewFilters): Promise<AdminReview[]> => {
+    const response = await axiosInstance.get<{ data: AdminReview[] }>('/admin/reviews', {
+      params: filters,
+    });
+    return response.data.data;
+  },
+  moderateReview: async (id: number, status: ReviewStatus): Promise<void> => {
+    await axiosInstance.patch(`/admin/reviews/${id}/status`, { status });
+  },
+  deleteReview: async (id: number): Promise<void> => {
+    await axiosInstance.delete(`/admin/reviews/${id}`);
   },
 };

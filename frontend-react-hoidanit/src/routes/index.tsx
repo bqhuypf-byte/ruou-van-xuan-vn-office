@@ -20,6 +20,7 @@ import { CartPage } from '@/features/cart';
 import { CheckoutPage } from '@/features/checkout';
 import { OrdersPage, OrderDetailPage, AdminOrdersPage } from '@/features/order';
 import { AccountSecurityPage, AddressesPage } from '@/features/user-profile';
+import { AdminReviewsPage } from '@/features/review';
 import { SiteContentPage } from '@/features/site-content';
 import {
   BannersPage,
@@ -94,6 +95,7 @@ export const router = createBrowserRouter([
           { path: 'products/new', element: <ProductCreatePage /> },
           { path: 'products/:slug', element: <ProductDetailPage /> },
           { path: 'orders', element: <AdminOrdersPage /> },
+          { path: 'reviews', element: <AdminReviewsPage /> },
         ],
       },
     ],

@@ -19,6 +19,7 @@ import {
   LayoutList,
   CreditCard,
   Ticket,
+  MessageSquareText,
 } from 'lucide-react';
 import { useAuthStore, useLogout } from '@/features/auth';
 import { ScrollToTop } from '@/shared/components/layout';
@@ -106,6 +107,11 @@ export const AdminLayout = () => {
       label: 'Đơn Hàng',
       path: ROUTES.ADMIN_ORDERS,
       icon: ShoppingBag,
+    },
+    {
+      label: 'Đánh Giá',
+      path: ROUTES.ADMIN_REVIEWS,
+      icon: MessageSquareText,
     },
   ];
 

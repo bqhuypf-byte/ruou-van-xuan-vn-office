@@ -3,9 +3,10 @@ import { assignDefined } from '../../shared/utils/assign-defined.util';
 import { ReviewRepository } from './repositories/review.repository';
 import { CreateReviewDto } from './dto/create-review.dto';
 import { UpdateReviewDto } from './dto/update-review.dto';
-import { Review } from './entities/review.entity';
-import { ReviewResponse } from './types/review.types';
+import { Review, ReviewStatus } from './entities/review.entity';
+import { AdminReviewResponse, ReviewResponse } from './types/review.types';
 import { UsersService } from '../users/users.service';
+import { QueryAdminReviewsDto } from './dto/query-admin-reviews.dto';
 
 @Injectable()
 export class ReviewService {
@@ -36,6 +37,29 @@ export class ReviewService {
     return Promise.all(reviews.map((review) => this.toResponse(review)));
   }
 
+  async findAllAdmin(
+    query: QueryAdminReviewsDto,
+  ): Promise<AdminReviewResponse[]> {
+    const reviews = await this.reviewRepository.findAllAdmin(query);
+    return Promise.all(reviews.map((review) => this.toAdminResponse(review)));
+  }
+
+  private async toAdminResponse(review: Review): Promise<AdminReviewResponse> {
+    return {
+      ...(await this.toResponse(review)),
+      status: review.status,
+      reviewerEmail: review.reviewerEmail,
+      reviewerPhone: review.reviewerPhone,
+      orderId: review.orderId,
+      product: {
+        id: review.product.id,
+        name: review.product.name,
+        slug: review.product.slug,
+        thumbnailUrl: review.product.thumbnailUrl,
+      },
+    };
+  }
+
   async create(
     productId: number,
     dto: CreateReviewDto,
@@ -50,6 +74,7 @@ export class ReviewService {
       rating: dto.rating,
       comment: dto.comment ?? null,
       imageUrls: dto.imageUrls?.length ? dto.imageUrls : null,
+      status: 'pending',
     });
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);
@@ -70,6 +95,7 @@ export class ReviewService {
   ): Promise<ReviewResponse> {
     const review = await this.findOwned(id, userId);
     assignDefined(review, dto);
+    review.status = 'pending';
     const saved = await this.reviewRepository.save(review);
     return this.toResponse(saved);
   }
@@ -85,5 +111,14 @@ export class ReviewService {
       throw new NotFoundException(`Review #${id} not found`);
     }
     await this.reviewRepository.remove(review);
+  }
+
+  async moderate(id: number, status: ReviewStatus): Promise<void> {
+    const review = await this.reviewRepository.findById(id);
+    if (!review) {
+      throw new NotFoundException(`Review #${id} not found`);
+    }
+    review.status = status;
+    await this.reviewRepository.save(review);
   }
 }
