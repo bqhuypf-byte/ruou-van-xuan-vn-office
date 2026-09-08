@@ -14,7 +14,7 @@ const DEFAULT_SETTINGS: Omit<SiteSettings, 'id' | 'updatedAt'> = {
   faviconUrl: null,
   topBarMessage: 'Welcome to worldwide MegaMart!',
   deliverToText: 'Deliver to 423651',
-  contactPhone: '+1 202-918-2132',
+  contactPhone: '0964995498',
   whatsappNumber: '+1 202-918-2132',
   contactAddresses: null,
   facebookUrl: null,
@@ -62,25 +62,13 @@ const DEFAULT_SETTINGS: Omit<SiteSettings, 'id' | 'updatedAt'> = {
   ],
   topCategoriesSectionTitle: 'Shop Top Categories',
   trustBadges: [],
-  productDetailServicesTitle: 'Dành Cho Đối Tác & Quà Tặng',
+  productDetailServicesTitle: 'RƯỢU NHÀ NẤU – NHẬN BỎ SỈ SỐ LƯỢNG LỚN',
   productDetailServices: [
     {
-      icon: 'Handshake',
-      title: 'Giá Sỉ Cho Đơn Số Lượng Lớn',
+      icon: 'PhoneCall',
+      title: 'Liên hệ lấy giá sỉ',
       description:
-        'Chính sách riêng cho nhà hàng, quán ăn, quán nhậu và đại lý.',
-    },
-    {
-      icon: 'ShieldCheck',
-      title: 'Chất Lượng Ổn Định, Hợp Tác Lâu Dài',
-      description:
-        'Nguồn rượu ổn định, đồng hành bền vững cùng đối tác kinh doanh.',
-    },
-    {
-      icon: 'Gift',
-      title: 'Quà Biếu Theo Yêu Cầu',
-      description:
-        'Tư vấn chọn rượu và chuẩn bị quà tặng chỉn chu cho từng dịp.',
+        'Bỏ sỉ cho quán ăn, quán nhậu, đại lý & người kinh doanh rượu',
     },
   ],
   paymentMethodIcons: [],

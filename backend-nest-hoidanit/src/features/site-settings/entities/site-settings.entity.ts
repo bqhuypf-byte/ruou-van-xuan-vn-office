@@ -200,7 +200,7 @@ export class SiteSettings {
     type: 'varchar',
     length: 150,
     name: 'product_detail_services_title',
-    default: 'Dành Cho Đối Tác & Quà Tặng',
+    default: 'RƯỢU NHÀ NẤU – NHẬN BỎ SỈ SỐ LƯỢNG LỚN',
   })
   productDetailServicesTitle: string;
 

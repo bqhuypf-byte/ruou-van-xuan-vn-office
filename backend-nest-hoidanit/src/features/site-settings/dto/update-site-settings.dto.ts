@@ -273,7 +273,7 @@ export class UpdateSiteSettingsDto {
 
   @IsOptional()
   @IsArray()
-  @ArrayMaxSize(8)
+  @ArrayMaxSize(1)
   @ValidateNested({ each: true })
   @Type(() => ProductDetailServiceDto)
   productDetailServices?: ProductDetailServiceDto[];

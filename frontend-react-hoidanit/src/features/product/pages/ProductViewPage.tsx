@@ -5,17 +5,11 @@ import {
   AlertCircle,
   Check,
   ChevronRight,
-  Gift,
-  Handshake,
   Minus,
-  PackageCheck,
-  PhoneCall,
   Plus,
   RotateCcw,
-  ShieldCheck,
   ShoppingCart,
   Truck,
-  type LucideIcon,
 } from 'lucide-react';
 import { Badge, Button, Modal, RichTextContent, Spinner } from '@/shared/components/ui';
 import { BottleIcon } from '@/shared/components/icons';
@@ -25,7 +19,6 @@ import { getApiErrorMessage } from '@/shared/utils/getApiErrorMessage';
 import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { useAddCartItem } from '@/features/cart';
 import { useSiteSettings } from '@/features/home/hooks/useSiteSettings';
-import type { ProductDetailService } from '@/features/home/types/home.types';
 import { ReviewForm, ReviewList, StarRating, useProductReviews } from '@/features/review';
 import { ROUTES } from '@/routes/routes';
 import { ProductCard } from '../components/ProductCard';
@@ -105,61 +98,37 @@ const buildBreadcrumb = (
   return path;
 };
 
-const PRODUCT_SERVICE_ICONS: Record<string, LucideIcon> = {
-  Gift,
-  Handshake,
-  PackageCheck,
-  PhoneCall,
-  RotateCcw,
-  ShieldCheck,
-  Truck,
-};
-
-const ProductBusinessServices = ({
+const WholesaleBanner = ({
   title,
-  services,
+  description,
+  hotlineLabel,
   contactPhone,
 }: {
   title: string;
-  services: ProductDetailService[];
+  description?: string;
+  hotlineLabel?: string;
   contactPhone?: string;
 }) => {
-  if (services.length === 0) return null;
+  if (!title || !description) return null;
 
   const phoneHref = contactPhone?.replace(/[^\d+]/g, '');
 
   return (
-    <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50/70 p-4 dark:border-brand-800 dark:bg-brand-950/30">
-      <div className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-bold text-brand-800 dark:text-brand-200">{title}</h3>
-        {contactPhone && phoneHref && (
-          <a
-            href={`tel:${phoneHref}`}
-            className="inline-flex shrink-0 items-center gap-1.5 rounded-full bg-brand-600 px-3 py-2 text-xs font-semibold text-white transition-colors hover:bg-brand-700"
-          >
-            <PhoneCall className="h-3.5 w-3.5" />
-            {contactPhone}
-          </a>
-        )}
-      </div>
-      <div className="mt-4 grid gap-3 sm:grid-cols-3">
-        {services.map((service, index) => {
-          const Icon = PRODUCT_SERVICE_ICONS[service.icon] ?? PackageCheck;
-          return (
-            <div key={`${service.title}-${index}`} className="flex items-start gap-2.5 sm:block">
-              <Icon className="h-5 w-5 shrink-0 text-brand-600 sm:mb-2 dark:text-brand-400" />
-              <div>
-                <p className="text-xs font-semibold leading-5 text-slate-900 dark:text-white">
-                  {service.title}
-                </p>
-                <p className="mt-0.5 text-xs leading-5 text-slate-600 dark:text-slate-400">
-                  {service.description}
-                </p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+    <div className="mt-4 rounded-2xl border border-brand-200 bg-brand-50 px-5 py-4 dark:border-brand-800 dark:bg-brand-950/30">
+      <h3 className="text-base font-extrabold uppercase leading-6 text-brand-800 dark:text-brand-100">
+        {title}
+      </h3>
+      <p className="mt-1.5 text-sm italic leading-6 text-slate-700 dark:text-slate-300">
+        {description}
+      </p>
+      {contactPhone && phoneHref && hotlineLabel && (
+        <a
+          href={`tel:${phoneHref}`}
+          className="mt-3 inline-block text-sm font-bold text-brand-700 underline decoration-brand-300 underline-offset-4 hover:text-brand-900 dark:text-brand-300 dark:hover:text-brand-100"
+        >
+          ☎ {hotlineLabel}: {contactPhone}
+        </a>
+      )}
     </div>
   );
 };
@@ -520,9 +489,10 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 </div>
               </div>
             </div>
-            <ProductBusinessServices
+            <WholesaleBanner
               title={siteSettings?.productDetailServicesTitle ?? ''}
-              services={siteSettings?.productDetailServices ?? []}
+              description={siteSettings?.productDetailServices?.[0]?.description}
+              hotlineLabel={siteSettings?.productDetailServices?.[0]?.title}
               contactPhone={siteSettings?.contactPhone}
             />
           </div>
