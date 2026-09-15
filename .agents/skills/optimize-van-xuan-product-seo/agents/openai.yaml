@@ -1,0 +1,4 @@
+interface:
+  display_name: "SEO đầy đủ sản phẩm Vạn Xuân"
+  short_description: "Làm trọn bộ SEO và mô tả cho từng sản phẩm"
+  default_prompt: "Use $optimize-van-xuan-product-seo to create a complete SEO pack and full description for every included product."

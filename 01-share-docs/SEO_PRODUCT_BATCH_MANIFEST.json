@@ -1,0 +1,173 @@
+{
+  "generatedAt": "2026-09-14",
+  "referenceProduct": "Rượu Nếp Vạn Xuân 1 Lít (ảnh mẫu do người dùng cung cấp)",
+  "status": "partially_applied_gift_products_excluded",
+  "preserveByDefault": [
+    "id",
+    "categoryId",
+    "slug",
+    "thumbnailUrl",
+    "isActive",
+    "variantAttributes",
+    "variants",
+    "images"
+  ],
+  "products": [
+    {
+      "id": 27,
+      "slug": "set-qua-whisky-song-hanh",
+      "keywordTopic": "set quà whisky 2 chai mini",
+      "writeStatus": "excluded_not_required",
+      "excludedReason": "Người dùng xác nhận các hộp/set quà không cần tối ưu trong đợt này.",
+      "current": {
+        "name": "Set Quà Whisky Song Hành",
+        "shortDescription": null,
+        "description": "Set 2 chai whisky mini kèm hộp quà tặng dành cho doanh nhân."
+      },
+      "proposed": {
+        "name": "Set Quà Whisky Song Hành",
+        "shortDescription": "Set quà whisky gồm 2 chai mini kèm hộp quà, được chuẩn bị cho nhu cầu quà tặng doanh nhân gọn gàng và trang trọng.",
+        "description": "<h2>Set Quà Whisky Song Hành</h2><p>Set quà gồm 2 chai whisky mini đi kèm hộp quà, được chuẩn bị cho nhu cầu quà tặng doanh nhân.</p><h2>Thông tin hiện có</h2><ul><li>Quy cách: 2 chai whisky mini.</li><li>Phụ kiện: hộp quà tặng.</li><li>Mục đích: quà tặng doanh nhân.</li></ul><p>Vui lòng kiểm tra hình ảnh thực tế và thông tin từng chai trước khi đặt hàng. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "warnings": ["Thiếu thumbnail và gallery", "Chưa có tên, dung tích và nồng độ từng chai"]
+    },
+    {
+      "id": 28,
+      "slug": "hop-qua-ruou-vang-nhap-khau",
+      "keywordTopic": "hộp quà rượu vang nhập khẩu",
+      "writeStatus": "excluded_not_required",
+      "excludedReason": "Người dùng xác nhận các hộp/set quà không cần tối ưu trong đợt này.",
+      "current": {
+        "name": "Hộp Quà Rượu Vang Nhập Khẩu",
+        "shortDescription": null,
+        "description": "Hộp quà vang nhập khẩu cao cấp, đóng gói sang trọng, kèm thiệp chúc."
+      },
+      "proposed": {
+        "name": "Hộp Quà Rượu Vang Nhập Khẩu",
+        "shortDescription": "Hộp quà rượu vang nhập khẩu được đóng gói trang trọng và kèm thiệp chúc, phù hợp cho nhu cầu biếu tặng.",
+        "description": "<h2>Hộp Quà Rượu Vang Nhập Khẩu</h2><p>Sản phẩm là hộp quà rượu vang nhập khẩu, được đóng gói trang trọng và đi kèm thiệp chúc cho nhu cầu biếu tặng.</p><h2>Thông tin hiện có</h2><ul><li>Dòng sản phẩm: hộp quà rượu vang nhập khẩu.</li><li>Đóng gói: hộp quà.</li><li>Đi kèm: thiệp chúc.</li></ul><p>Vui lòng kiểm tra hình ảnh, nhãn vang, xuất xứ, dung tích và thành phần hộp quà thực tế trước khi đặt hàng. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "warnings": ["Thiếu thumbnail và gallery", "Thiếu nhãn vang, xuất xứ, dung tích và thành phần hộp"]
+    },
+    {
+      "id": 30,
+      "slug": "hop-qua-whisky-chivas-18",
+      "keywordTopic": "hộp quà Chivas 18",
+      "writeStatus": "excluded_not_required",
+      "excludedReason": "Người dùng xác nhận các hộp/set quà không cần tối ưu trong đợt này.",
+      "current": {
+        "name": "Hộp Quà Whisky Chivas 18",
+        "shortDescription": null,
+        "description": "Hộp quà Chivas Regal 18 năm, phiên bản quà tặng giới hạn."
+      },
+      "proposed": {
+        "name": "Hộp Quà Chivas Regal 18 Năm",
+        "shortDescription": "Hộp quà Chivas Regal 18 năm dành cho nhu cầu biếu tặng; khách hàng nên kiểm tra phiên bản và thành phần bộ quà trước khi đặt.",
+        "description": "<h2>Hộp Quà Chivas Regal 18 Năm</h2><p>Hộp quà Chivas Regal 18 năm được chuẩn bị cho nhu cầu biếu tặng.</p><h2>Thông tin cần kiểm tra khi chọn mua</h2><p>Phiên bản hộp, dung tích chai và phụ kiện có thể là những thông tin quan trọng khi lựa chọn. Vui lòng đối chiếu hình ảnh và thành phần bộ quà thực tế trước khi đặt hàng.</p><p>Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "warnings": ["Đã loại bỏ claim phiên bản giới hạn vì chưa có bằng chứng", "Thumbnail dùng URL localhost", "Cần xác minh phiên bản và thành phần hộp"]
+    },
+    {
+      "id": 32,
+      "slug": "ruou-nep-sua-van-xuan",
+      "keywordTopic": "rượu nếp sữa Vạn Xuân",
+      "writeStatus": "blocked",
+      "current": {
+        "name": "Rượu Nếp Sữa Vạn Xuân (Nếp Đuc)",
+        "shortDescription": null,
+        "description": "Rượu nếp sữa Vạn Xuân, nước cốt nếp sữa tinh khiết, lên men tự nhiên, chưng cất truyền thống, nguyên chất không pha cồn."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Sữa Vạn Xuân",
+        "shortDescription": "Rượu Nếp Sữa Vạn Xuân sử dụng nước cốt nếp sữa, lên men tự nhiên và chưng cất theo phương pháp truyền thống.",
+        "description": "<h2>Rượu Nếp Sữa Vạn Xuân</h2><p>Rượu Nếp Sữa Vạn Xuân sử dụng nước cốt nếp sữa, được lên men tự nhiên và chưng cất theo phương pháp truyền thống.</p><h2>Đặc điểm đã có trong hồ sơ sản phẩm</h2><ul><li>Nguyên liệu chính được mô tả: nước cốt nếp sữa.</li><li>Phương pháp: lên men tự nhiên và chưng cất truyền thống.</li></ul><p>Vui lòng chọn đúng dung tích và nồng độ theo thông tin SKU khi dữ liệu biến thể được hoàn thiện. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "blockers": ["Cần xác nhận nếp sữa hay nếp đục", "Tên hiện tại sai chính tả", "Thiếu dung tích và nồng độ", "Thumbnail dùng URL localhost"]
+    },
+    {
+      "id": 33,
+      "slug": "ruou-nep-van-xuan-can-10-lit",
+      "keywordTopic": "rượu nếp can 10 lít",
+      "writeStatus": "ready_for_content_approval",
+      "current": {
+        "name": "Rượu Nếp Vạn Xuân Can 10 Lít",
+        "shortDescription": null,
+        "description": "Có video YouTube dQw4w9WgXcQ và đoạn mô tả rượu nếp can 10 lít."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Vạn Xuân Can 10 Lít",
+        "shortDescription": "Rượu Nếp Vạn Xuân can 10 lít, làm từ nếp và men rượu truyền thống, phù hợp cho nhu cầu sử dụng số lượng lớn.",
+        "description": "<h2>Rượu Nếp Vạn Xuân Can 10 Lít</h2><p>Rượu Nếp Vạn Xuân được đóng can 10 lít, làm từ nếp và men rượu truyền thống.</p><h2>Thông tin sản phẩm</h2><ul><li>Quy cách: can 10 lít.</li><li>Nguyên liệu được mô tả: nếp và men rượu truyền thống.</li><li>Phương pháp: chưng cất truyền thống.</li></ul><p>Vui lòng kiểm tra nồng độ trên nhãn hoặc SKU trước khi sử dụng. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "warnings": ["Loại bỏ video YouTube thử nghiệm", "Thiếu nồng độ", "Thumbnail dùng URL localhost", "Claim không pha cồn công nghiệp cần bằng chứng"]
+    },
+    {
+      "id": 34,
+      "slug": "ruou-nep-chuoi-hot-van-xuan",
+      "keywordTopic": "rượu chuối hột Vạn Xuân",
+      "writeStatus": "ready_for_content_approval",
+      "current": {
+        "name": "Rượu Nếp Chuối Hột Vạn Xuân",
+        "shortDescription": null,
+        "description": "Rượu nếp chuối hột Vạn Xuân, lên men tự nhiên và chưng cất truyền thống từ nếp và chuối hột rừng, không hóa chất độc hại."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Chuối Hột Vạn Xuân",
+        "shortDescription": "Rượu Nếp Chuối Hột Vạn Xuân kết hợp nếp và chuối hột rừng, lên men tự nhiên và chưng cất theo phương pháp truyền thống.",
+        "description": "<h2>Rượu Nếp Chuối Hột Vạn Xuân</h2><p>Rượu Nếp Chuối Hột Vạn Xuân kết hợp nếp và chuối hột rừng, được lên men tự nhiên và chưng cất theo phương pháp truyền thống.</p><h2>Đặc điểm đã có trong hồ sơ sản phẩm</h2><ul><li>Nguyên liệu được mô tả: nếp và chuối hột rừng.</li><li>Phương pháp: lên men tự nhiên và chưng cất truyền thống.</li></ul><p>Vui lòng kiểm tra dung tích và nồng độ trên nhãn hoặc SKU trước khi sử dụng. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "warnings": ["Thiếu dung tích và nồng độ", "Thumbnail dùng URL localhost", "Đã bỏ claim không hóa chất độc hại vì chưa có bằng chứng"]
+    },
+    {
+      "id": 35,
+      "slug": "ruou-nep-than-van-xuan",
+      "keywordTopic": "rượu nếp than Vạn Xuân",
+      "writeStatus": "blocked",
+      "current": {
+        "name": "Rượu Nếp Than Vạn Xuân",
+        "shortDescription": null,
+        "description": "Rượu nếp than Vạn Xuân, nấu từ nếp than nguyên liệu tự nhiên, lên men và chưng cất truyền thống, an toàn cho sức khỏe."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Than Vạn Xuân",
+        "shortDescription": "Rượu Nếp Than Vạn Xuân được làm từ nếp than tự nhiên, lên men và chưng cất theo phương pháp truyền thống.",
+        "description": "<h2>Rượu Nếp Than Vạn Xuân</h2><p>Rượu Nếp Than Vạn Xuân được làm từ nếp than tự nhiên, trải qua quá trình lên men và chưng cất theo phương pháp truyền thống.</p><h2>Đặc điểm đã có trong hồ sơ sản phẩm</h2><ul><li>Nguyên liệu chính được mô tả: nếp than.</li><li>Phương pháp: lên men và chưng cất truyền thống.</li></ul><p>Vui lòng chọn đúng dung tích và nồng độ sau khi dữ liệu SKU được hoàn thiện. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "blockers": ["Hai SKU chưa có thuộc tính phân biệt", "Một SKU hết hàng", "Thiếu dung tích/nồng độ", "Thumbnail dùng URL localhost", "Đã loại bỏ claim sức khỏe"]
+    },
+    {
+      "id": 36,
+      "slug": "ruou-nep-van-xuan-40-do",
+      "keywordTopic": "rượu nếp 40 độ 1 lít",
+      "writeStatus": "blocked",
+      "current": {
+        "name": "Rượu Nếp Vạn Xuân 1 Lít 40 Độ",
+        "shortDescription": null,
+        "description": "Có video local, video YouTube và đoạn mô tả rượu nếp 40 độ."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Vạn Xuân 1 Lít 40 Độ",
+        "shortDescription": "Rượu Nếp Vạn Xuân 1 lít 40 độ, lên men tự nhiên và chưng cất theo phương pháp truyền thống.",
+        "description": "<h2>Rượu Nếp Vạn Xuân 1 Lít 40 Độ</h2><p>Rượu Nếp Vạn Xuân dung tích 1 lít, nồng độ 40 độ, được lên men tự nhiên và chưng cất theo phương pháp truyền thống.</p><h2>Thông tin chính</h2><ul><li>Dung tích: 1 lít.</li><li>Nồng độ: 40 độ.</li><li>Phương pháp: lên men tự nhiên và chưng cất truyền thống.</li></ul><p>Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "blockers": ["Giá 5.000đ cần xác minh", "Video local không phải URL public", "Thumbnail dùng URL localhost", "Claim không pha cồn công nghiệp cần bằng chứng"]
+    },
+    {
+      "id": 37,
+      "slug": "ruou-nep-duc-van-xuan",
+      "keywordTopic": "rượu nếp đục Vạn Xuân",
+      "writeStatus": "blocked",
+      "current": {
+        "name": "Rượu Nếp Đục Vạn Xuân",
+        "shortDescription": null,
+        "description": "Rượu nếp đục Vạn Xuân, lên men tự nhiên từ nếp cái hoa vàng bằng men rượu gia truyền, chưng cất truyền thống, nguyên chất không pha cồn."
+      },
+      "proposed": {
+        "name": "Rượu Nếp Đục Vạn Xuân 1 Lít",
+        "shortDescription": "Rượu Nếp Đục Vạn Xuân lên men tự nhiên từ nếp cái hoa vàng và men rượu gia truyền, chưng cất theo phương pháp truyền thống.",
+        "description": "<h2>Rượu Nếp Đục Vạn Xuân 1 Lít</h2><p>Rượu Nếp Đục Vạn Xuân được lên men tự nhiên từ nếp cái hoa vàng và men rượu gia truyền, sau đó chưng cất theo phương pháp truyền thống.</p><h2>Đặc điểm đã có trong hồ sơ sản phẩm</h2><ul><li>Nguyên liệu được mô tả: nếp cái hoa vàng.</li><li>Men rượu được mô tả: men gia truyền.</li><li>Phương pháp: lên men tự nhiên và chưng cất truyền thống.</li></ul><p>Nồng độ, giá và hình ảnh phải thay đổi theo đúng SKU sau khi dữ liệu biến thể được chuẩn hóa. Sản phẩm có cồn, không dành cho người dưới 18 tuổi.</p>"
+      },
+      "blockers": ["Tên/giá trị thuộc tính sai chính tả", "Ma trận biến thể và SKU không đồng nhất", "Giá/tồn kho bất thường", "Chưa xác nhận dung tích áp dụng cho mọi SKU", "Ảnh và nồng độ có dấu hiệu không khớp", "Claim không pha cồn cần bằng chứng"]
+    }
+  ]
+}

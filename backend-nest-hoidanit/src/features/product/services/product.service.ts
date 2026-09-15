@@ -134,6 +134,10 @@ export class ProductService {
     return this.productRepository.findById(id);
   }
 
+  findAllActiveForSitemap(): Promise<Product[]> {
+    return this.productRepository.findAllActiveForSitemap();
+  }
+
   async findManyWithPricing(ids: number[]): Promise<
     Array<
       Product & {

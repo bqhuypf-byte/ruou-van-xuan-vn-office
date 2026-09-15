@@ -36,6 +36,9 @@ export const productSchema = z.object({
     .regex(/^[a-z0-9-]+$/, 'Slug chỉ chứa chữ thường, số và dấu gạch ngang (-)'),
   description: z.string().optional(),
   shortDescription: z.string().max(500, 'Mô tả ngắn tối đa 500 ký tự').optional(),
+  seoTitle: z.string().max(255, 'Tiêu đề SEO tối đa 255 ký tự').optional(),
+  seoDescription: z.string().max(500, 'Mô tả SEO tối đa 500 ký tự').optional(),
+  imageAltText: z.string().max(255, 'Alt ảnh tối đa 255 ký tự').optional(),
   thumbnailUrl: z.string().optional(),
   isActive: z.boolean(),
   isFeaturedDeal: z.boolean(),
@@ -53,6 +56,9 @@ export interface ProductFormSubmitData {
   slug: string;
   description?: string;
   shortDescription?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  imageAltText?: string | null;
   thumbnailUrl?: string;
   isActive: boolean;
   isFeaturedDeal: boolean;
@@ -79,6 +85,9 @@ export const emptyProductFormValues = (): ProductFormData => ({
   slug: '',
   description: '',
   shortDescription: '',
+  seoTitle: '',
+  seoDescription: '',
+  imageAltText: '',
   thumbnailUrl: '',
   isActive: true,
   isFeaturedDeal: false,
@@ -96,6 +105,9 @@ export const productFormValuesFrom = (product: Product): ProductFormData => {
     slug: product.slug,
     description: product.description ?? '',
     shortDescription: product.shortDescription ?? '',
+    seoTitle: product.seoTitle ?? '',
+    seoDescription: product.seoDescription ?? '',
+    imageAltText: product.imageAltText ?? '',
     thumbnailUrl: product.thumbnailUrl ?? '',
     isActive: product.isActive,
     isFeaturedDeal: product.isFeaturedDeal,
@@ -151,6 +163,9 @@ export const buildProductSubmitPayload = (data: ProductFormData): ProductFormSub
     slug: data.slug,
     description: data.description || undefined,
     shortDescription: data.shortDescription?.trim() || null,
+    seoTitle: data.seoTitle?.trim() || null,
+    seoDescription: data.seoDescription?.trim() || null,
+    imageAltText: data.imageAltText?.trim() || null,
     thumbnailUrl: data.thumbnailUrl || undefined,
     isActive: data.isActive,
     isFeaturedDeal: data.isFeaturedDeal,
@@ -436,6 +451,14 @@ export const ProductBasicInfoFields = ({
       )}
     />
 
+    <Input
+      label="Alt Ảnh Đại Diện"
+      placeholder="Mô tả ngắn nội dung thật của ảnh"
+      error={errors.imageAltText?.message}
+      helperText="Dùng cho khả năng tiếp cận và giúp công cụ tìm kiếm hiểu ảnh. Không nhồi từ khóa."
+      {...register('imageAltText')}
+    />
+
     <label className="flex items-center gap-2 text-sm font-medium text-slate-700 dark:text-slate-300">
       <input
         type="checkbox"
@@ -472,6 +495,59 @@ export interface ProductDescriptionFieldProps {
 
 export const ProductDescriptionField = ({ control, errors }: ProductDescriptionFieldProps) => (
   <div className="space-y-5">
+    <Controller
+      name="seoTitle"
+      control={control}
+      render={({ field }) => (
+        <div className="w-full space-y-1.5">
+          <label htmlFor="seoTitle" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Tiêu Đề SEO
+          </label>
+          <input
+            id="seoTitle"
+            maxLength={255}
+            placeholder="Để trống để dùng Tên sản phẩm | Tên website"
+            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            value={field.value ?? ''}
+            onChange={field.onChange}
+          />
+          <span className="block text-right text-xs text-slate-400">
+            {(field.value ?? '').length}/255
+          </span>
+          {errors.seoTitle && (
+            <p className="text-xs text-rose-600 dark:text-rose-400">{errors.seoTitle.message}</p>
+          )}
+        </div>
+      )}
+    />
+
+    <Controller
+      name="seoDescription"
+      control={control}
+      render={({ field }) => (
+        <div className="w-full space-y-1.5">
+          <label htmlFor="seoDescription" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
+            Mô Tả SEO
+          </label>
+          <textarea
+            id="seoDescription"
+            rows={3}
+            maxLength={500}
+            placeholder="Để trống để dùng Mô tả ngắn"
+            className="block w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-white"
+            value={field.value ?? ''}
+            onChange={field.onChange}
+          />
+          <span className="block text-right text-xs text-slate-400">
+            {(field.value ?? '').length}/500
+          </span>
+          {errors.seoDescription && (
+            <p className="text-xs text-rose-600 dark:text-rose-400">{errors.seoDescription.message}</p>
+          )}
+        </div>
+      )}
+    />
+
     <Controller
       name="shortDescription"
       control={control}

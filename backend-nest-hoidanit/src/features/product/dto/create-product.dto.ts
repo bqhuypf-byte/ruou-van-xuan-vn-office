@@ -37,6 +37,21 @@ export class CreateProductDto {
 
   @IsOptional()
   @IsString()
+  @MaxLength(255)
+  seoTitle?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(500)
+  seoDescription?: string | null;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(255)
+  imageAltText?: string | null;
+
+  @IsOptional()
+  @IsString()
   @MaxLength(500)
   thumbnailUrl?: string;
 

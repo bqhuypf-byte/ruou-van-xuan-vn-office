@@ -7,6 +7,7 @@ export interface ProductVariant {
   salePrice: string | null;
   stockQuantity: number;
   imageUrl: string | null;
+  isActive?: boolean;
 }
 
 export interface CreateVariantInput {

@@ -195,6 +195,7 @@ Types: image/jpeg, image/png, image/webp
 | GET | `/products/:slug` | Product + variants | No |
 | GET | `/products/:id/variants` | List variants | No |
 | GET | `/variants/:id` | Variant detail | No |
+| GET | `/sitemap.xml` | XML sitemap with active canonical product URLs | No |
 
 **Admin Endpoints:**
 

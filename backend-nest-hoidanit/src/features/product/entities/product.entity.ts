@@ -49,6 +49,30 @@ export class Product {
 
   @Column({
     type: 'varchar',
+    length: 255,
+    name: 'seo_title',
+    nullable: true,
+  })
+  seoTitle: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 500,
+    name: 'seo_description',
+    nullable: true,
+  })
+  seoDescription: string | null;
+
+  @Column({
+    type: 'varchar',
+    length: 255,
+    name: 'image_alt_text',
+    nullable: true,
+  })
+  imageAltText: string | null;
+
+  @Column({
+    type: 'varchar',
     length: 500,
     name: 'thumbnail_url',
     nullable: true,

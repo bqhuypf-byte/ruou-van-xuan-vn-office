@@ -100,6 +100,14 @@ export class ProductRepository {
     return this.repository.find({ where: { isActive: true } });
   }
 
+  findAllActiveForSitemap(): Promise<Product[]> {
+    return this.repository.find({
+      where: { isActive: true },
+      select: { id: true, slug: true, updatedAt: true },
+      order: { updatedAt: 'DESC' },
+    });
+  }
+
   findBySlug(slug: string): Promise<Product | null> {
     return this.repository.findOne({
       where: { slug },

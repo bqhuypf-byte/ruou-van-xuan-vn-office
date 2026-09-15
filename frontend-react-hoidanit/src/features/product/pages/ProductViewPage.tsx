@@ -37,6 +37,7 @@ import {
   getAttributeOptionImage,
   getConfiguredAttributeOptions,
 } from '../utils/variantImage.utils';
+import { normalizePublicMediaUrl } from '@/shared/utils/publicMediaUrl';
 
 export const ProductViewPage = () => {
   const { t } = useTranslation();
@@ -157,10 +158,12 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
     Object.fromEntries(attributeNames.map((name) => [name, attributeOptions[name]?.[0] ?? null])),
   );
   const [quantity, setQuantity] = useState(1);
-  const [activeImage, setActiveImage] = useState<string | null>(
+  const initialImageUrl =
     product.thumbnailUrl ??
-      product.images.slice().sort((a, b) => a.sortOrder - b.sortOrder)[0]?.imageUrl ??
-      null,
+    product.images.slice().sort((a, b) => a.sortOrder - b.sortOrder)[0]?.imageUrl ??
+    null;
+  const [activeImage, setActiveImage] = useState<string | null>(
+    initialImageUrl ? normalizePublicMediaUrl(initialImageUrl) : null,
   );
   const [activeTab, setActiveTab] = useState<'details' | 'reviews'>('details');
   const reviewSectionRef = useRef<HTMLDivElement>(null);
@@ -196,7 +199,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
 
     const nextVariant = findVariant(nextAttributes);
     const nextImage = getOptionImage(name, value) ?? nextVariant?.imageUrl;
-    if (nextImage) setActiveImage(nextImage);
+    if (nextImage) setActiveImage(normalizePublicMediaUrl(nextImage));
   };
 
   const handleAddToCart = async () => {
@@ -245,7 +248,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
           .map((image) => image.imageUrl),
         ...(product.variantAttributes ?? []).flatMap((group) => Object.values(group.images ?? {})),
         ...product.variants.map((variant) => variant.imageUrl),
-      ].filter((url): url is string => !!url),
+      ].filter((url): url is string => !!url).map(normalizePublicMediaUrl),
     ),
   ];
 
@@ -280,7 +283,7 @@ const ProductPurchasePanel = ({ product }: { product: ProductDetail }) => {
                 <img
                   key={activeImage}
                   src={activeImage}
-                  alt={product.name}
+                  alt={product.imageAltText?.trim() || product.name}
                   className="w-full h-full object-contain animate-in fade-in zoom-in-95 duration-300"
                 />
               ) : (

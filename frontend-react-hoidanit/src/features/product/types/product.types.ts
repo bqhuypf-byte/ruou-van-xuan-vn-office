@@ -12,6 +12,9 @@ export interface Product {
   slug: string;
   description: string | null;
   shortDescription: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  imageAltText?: string | null;
   thumbnailUrl: string | null;
   isActive: boolean;
   isFeaturedDeal: boolean;
@@ -36,6 +39,9 @@ export interface CreateProductInput {
   slug: string;
   description?: string;
   shortDescription?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  imageAltText?: string | null;
   thumbnailUrl?: string;
   isActive?: boolean;
   isFeaturedDeal?: boolean;
@@ -49,6 +55,9 @@ export interface UpdateProductInput {
   slug?: string;
   description?: string;
   shortDescription?: string | null;
+  seoTitle?: string | null;
+  seoDescription?: string | null;
+  imageAltText?: string | null;
   thumbnailUrl?: string;
   isActive?: boolean;
   isFeaturedDeal?: boolean;

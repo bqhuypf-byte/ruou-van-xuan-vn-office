@@ -84,6 +84,9 @@
 | name | VARCHAR(255) | NOT NULL |
 | slug | VARCHAR(255) | NOT NULL, UNIQUE |
 | short_description | VARCHAR(500) | NULLABLE, plain text shown on product cards |
+| seo_title | VARCHAR(255) | NULLABLE, optional Admin-managed `<title>` override |
+| seo_description | VARCHAR(500) | NULLABLE, optional Admin-managed meta description override |
+| image_alt_text | VARCHAR(255) | NULLABLE, optional Admin-managed primary product image alt text |
 | description | TEXT | NULLABLE |
 | thumbnail_url | VARCHAR(500) | NULLABLE |
 | is_active | BOOLEAN | DEFAULT TRUE |

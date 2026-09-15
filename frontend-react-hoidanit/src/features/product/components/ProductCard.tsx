@@ -9,6 +9,7 @@ import type { Product } from '../types/product.types';
 import { ROUTES } from '@/routes/routes';
 import { getPlaceholderTint } from '@/shared/utils/placeholderTint';
 import { formatPrice } from '@/shared/utils/formatPrice';
+import { normalizePublicMediaUrl } from '@/shared/utils/publicMediaUrl';
 
 export interface ProductCardProps {
   product: Product;
@@ -72,8 +73,8 @@ export const ProductCard = ({ product, categoryName, categorySlug }: ProductCard
         )}
         {product.thumbnailUrl ? (
           <img
-            src={product.thumbnailUrl}
-            alt={product.name}
+            src={normalizePublicMediaUrl(product.thumbnailUrl)}
+            alt={product.imageAltText?.trim() || product.name}
             className="block h-full w-full object-cover"
           />
         ) : (
