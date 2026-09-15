@@ -119,6 +119,10 @@ for (const product of products) {
   const images = Array.isArray(product.images) ? product.images : [];
   if (!images.length) add('warning', product, 'images', 'No gallery images included in this export.');
   for (const image of images) {
+    if (!image || typeof image !== 'object') {
+      add('blocker', product, 'images', 'Gallery contains an invalid empty image entry.');
+      continue;
+    }
     if (localUrlPattern.test(String(image.imageUrl ?? image.image_url ?? ''))) {
       add('blocker', product, 'images.imageUrl', 'Gallery image contains a localhost URL.');
     }
@@ -144,6 +148,10 @@ for (const product of products) {
   }
   const localSkus = new Set();
   for (const variant of variants) {
+    if (!variant || typeof variant !== 'object') {
+      add('blocker', product, 'variants', 'Variants contain an invalid empty entry.');
+      continue;
+    }
     const sku = String(variant.sku ?? '').trim();
     if (!sku) add('blocker', product, 'variants.sku', 'Variant is missing SKU.');
     if (sku.length > 50) add('blocker', product, 'variants.sku', `SKU ${sku} exceeds 50 characters.`);

@@ -4,6 +4,11 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      product_seo_payload_b64:
+        description: Optional base64-encoded product SEO batch
+        required: false
+        type: string
 
 jobs:
   deploy:
@@ -21,4 +26,10 @@ jobs:
             git fetch origin main
             git reset --hard origin/main
             docker compose up -d --build
+            if [ -n '${{ inputs.product_seo_payload_b64 }}' ]; then
+              docker compose exec -T \
+                -e PRODUCT_SEO_APPLY_CONFIRM=APPLY \
+                backend node dist/scripts/apply-product-seo.js \
+                '${{ inputs.product_seo_payload_b64 }}'
+            fi
             docker image prune -f
