@@ -21,7 +21,7 @@ export const AgeGate = ({ children }: { children: ReactNode }) => {
   }, [confirmed, settings?.ageGateEnabled]);
 
   if (confirmed || settings?.ageGateEnabled === false) return <>{children}</>;
-  if (isLoading) return null;
+  if (isLoading) return <>{children}</>;
   if (!settings) return <>{children}</>;
 
   const accept = () => {
@@ -35,7 +35,9 @@ export const AgeGate = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
+    <>
+      {children}
+      <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/75 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-labelledby="age-gate-title">
       <div className="w-full max-w-2xl rounded-2xl border border-amber-200 bg-[#fffaf0] p-6 text-center shadow-2xl sm:p-10">
         <Wine className="mx-auto mb-4 h-10 w-10 text-brand-700" aria-hidden="true" />
         <h1 id="age-gate-title" className="text-2xl font-bold uppercase leading-tight text-brand-800 sm:text-3xl">
@@ -57,6 +59,7 @@ export const AgeGate = ({ children }: { children: ReactNode }) => {
           </>
         )}
       </div>
-    </div>
+      </div>
+    </>
   );
 };
