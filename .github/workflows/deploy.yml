@@ -22,10 +22,20 @@ jobs:
           password: ${{ secrets.VPS_PASSWORD }}
           command_timeout: 30m
           script: |
+            set -e
             cd /root/app
             git fetch origin main
             git reset --hard origin/main
-            docker compose up -d --build
+            attempt=1
+            until docker compose up -d --build; do
+              if [ "$attempt" -ge 3 ]; then
+                echo "Deploy failed after 3 attempts"
+                exit 1
+              fi
+              attempt=$((attempt + 1))
+              echo "Deploy attempt failed; retrying ($attempt/3)..."
+              sleep 15
+            done
             if [ -n '${{ inputs.product_seo_payload_b64 }}' ]; then
               docker compose exec -T \
                 -e PRODUCT_SEO_APPLY_CONFIRM=APPLY \
