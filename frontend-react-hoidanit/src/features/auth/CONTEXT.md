@@ -5,7 +5,7 @@ Login, register, and session management per `01-share-docs/API_SPEC.md`'s Auth F
 ## Components
 
 - `LoginForm` / `RegisterForm`: React Hook Form + Zod forms, presentational only (`onSubmit` is injected).
-- `AuthProvider`: wraps the whole app (mounted in `main.tsx`). On mount, calls `authService.refresh()` (using the httpOnly refresh cookie) then `authService.getMe()` to restore a session after a page reload, since the access token lives in memory only (see [[axios lib]]). Shows a full-page spinner while `isInitializing`.
+- `AuthProvider`: wraps the whole app (mounted in `main.tsx`). On mount, calls `authService.refresh()` (using the httpOnly refresh cookie) then `authService.getMe()` to restore a session after a page reload, since the access token lives in memory only (see [[axios lib]]). Public routes render immediately so crawlers are not blocked by session restoration; protected routes show the initialization spinner.
 
 ## Store
 
