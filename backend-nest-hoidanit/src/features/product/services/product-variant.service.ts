@@ -45,16 +45,41 @@ export class ProductVariantService {
         existing.isActive = true;
         return this.variantRepository.save(existing);
       }
-      throw new ConflictException(`SKU "${dto.sku}" already exists`);
+      if (existing.productId === productId) {
+        throw new ConflictException(`SKU "${dto.sku}" already exists`);
+      }
     }
+
+    const sku = existing
+      ? await this.findAvailableSku(dto.sku, productId)
+      : dto.sku;
 
     const variant = this.variantRepository.create({
       ...dto,
+      sku,
       productId,
       price: dto.price.toFixed(2),
       salePrice: dto.salePrice?.toFixed(2) ?? null,
     });
     return this.variantRepository.save(variant);
+  }
+
+  private async findAvailableSku(
+    sku: string,
+    productId: number,
+  ): Promise<string> {
+    for (let attempt = 1; attempt <= 99; attempt += 1) {
+      const suffix =
+        attempt === 1 ? `-P${productId}` : `-P${productId}-${attempt}`;
+      const candidate = `${sku.slice(0, 50 - suffix.length)}${suffix}`;
+      if (!(await this.variantRepository.findBySku(candidate))) {
+        return candidate;
+      }
+    }
+
+    throw new ConflictException(
+      `Unable to generate a unique SKU from "${sku}"`,
+    );
   }
 
   async update(id: number, dto: UpdateVariantDto): Promise<ProductVariant> {

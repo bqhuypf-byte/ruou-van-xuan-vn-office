@@ -67,7 +67,13 @@ const buildRows = (
       attributes,
       groupValue: groups[0] ? attributes[groups[0].name] : key,
       variantId: variant?.id ?? null,
-      sku: variant?.sku ?? generateVariantSku(productSlug, groups.map((g) => attributes[g.name]), stableSuffix(key)),
+      sku:
+        variant?.sku ??
+        generateVariantSku(
+          productSlug,
+          groups.map((g) => attributes[g.name]),
+          stableSuffix(`${productSlug}__${key}`),
+        ),
       price: variant?.price ?? '',
       salePrice: variant?.salePrice ?? '',
       stockQuantity: variant ? String(variant.stockQuantity) : '0',

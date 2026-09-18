@@ -201,9 +201,12 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
               }),
         ),
       );
-      const failedCount = results.filter((r) => r.status === 'rejected').length;
+      const failures = results.filter((result) => result.status === 'rejected');
+      const failedCount = failures.length;
       if (failedCount > 0) {
-        throw new Error(`Không thể lưu ${failedCount}/${rows.length} biến thể.`);
+        const reason = failures[0]?.reason;
+        const detail = getApiErrorMessage(reason, 'Vui lòng kiểm tra SKU, giá và tồn kho.');
+        throw new Error(`Không thể lưu ${failedCount}/${rows.length} biến thể: ${detail}`);
       }
     } finally {
       setIsSavingMatrix(false);
