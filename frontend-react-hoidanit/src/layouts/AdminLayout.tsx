@@ -49,6 +49,11 @@ export const AdminLayout = () => {
       icon: Users,
     },
     {
+      label: 'Kh?ch H?ng ??ng K?',
+      path: ROUTES.ADMIN_CUSTOMERS,
+      icon: UserCheck,
+    },
+    {
       label: 'Danh Mục',
       path: ROUTES.ADMIN_CATEGORIES,
       icon: FolderTree,

@@ -13,6 +13,7 @@ export const ROUTES = {
   ACCOUNT_SECURITY: '/account-security',
   ADMIN_ROLES: '/admin/roles',
   ADMIN_USERS: '/admin/users',
+  ADMIN_CUSTOMERS: '/admin/customers',
   ADMIN_CATEGORIES: '/admin/categories',
   ADMIN_SITE_CONTENT: '/admin/site-content',
   ADMIN_HOMEPAGE_SECTIONS: '/admin/homepage-sections',

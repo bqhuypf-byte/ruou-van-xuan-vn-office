@@ -5,6 +5,7 @@ import { AuthLayout } from '@/layouts/AuthLayout';
 import { LoginPage, RegisterPage } from '@/features/auth';
 import { RolesPage } from '@/features/roles';
 import { UsersPage } from '@/features/users';
+import { CustomersPage } from '@/features/users/pages/CustomersPage';
 import {
   CategoriesPage,
   ProductsPage,
@@ -81,6 +82,7 @@ export const router = createBrowserRouter([
           { index: true, element: <Navigate to={ROUTES.ADMIN_ROLES} replace /> },
           { path: 'roles', element: <RolesPage /> },
           { path: 'users', element: <UsersPage /> },
+          { path: 'customers', element: <CustomersPage /> },
           { path: 'categories', element: <CategoriesPage /> },
           { path: 'site-content', element: <SiteContentPage /> },
           { path: 'homepage-sections', element: <HomepageSectionsPage /> },
