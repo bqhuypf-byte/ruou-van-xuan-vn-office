@@ -99,6 +99,7 @@ const EMPTY_MATRIX_STATE: VariantMatrixChangeState = {
   rows: [],
   hasChanges: false,
   hasInvalidRows: false,
+  missingImageOptions: [],
 };
 
 const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormProps) => {
@@ -219,6 +220,15 @@ const ProductEditForm = ({ product, allCategories, onRefetch }: ProductEditFormP
 
   const handleSaveAllChanges = async (data: ProductFormData) => {
     if (!hasProductChanges && !matrixChangeState.hasChanges) return;
+
+    if (matrixChangeState.missingImageOptions.length > 0) {
+      setFeedback({
+        type: 'error',
+        message: `Vui lòng thêm ảnh cho các tùy chọn: ${matrixChangeState.missingImageOptions.join(', ')}.`,
+      });
+      setActiveTab('variants');
+      return;
+    }
 
     if (matrixChangeState.hasInvalidRows) {
       setFeedback({

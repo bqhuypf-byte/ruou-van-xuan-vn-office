@@ -186,11 +186,14 @@ describe('ProductDetailPage', () => {
   it('enables one save button only after changes and updates renamed classification attributes', async () => {
     const classifiedProduct: ProductDetail = {
       ...mockDetail,
-      variantAttributes: [{ name: 'Độ', values: ['30 độ'] }],
+      variantAttributes: [
+        { name: 'Độ', values: ['30 độ'], images: { '30 độ': '/30-do.webp' } },
+      ],
       variants: [
         {
           ...mockDetail.variants[0],
           attributes: { Độ: '30 độ' },
+          imageUrl: '/30-do.webp',
         },
       ],
     };
@@ -230,7 +233,13 @@ describe('ProductDetailPage', () => {
         expect.objectContaining({
           id: 1,
           input: expect.objectContaining({
-            variantAttributes: [{ name: 'Nồng độ', values: ['30 độ'] }],
+            variantAttributes: [
+              {
+                name: 'Nồng độ',
+                values: ['30 độ'],
+                images: { '30 độ': '/30-do.webp' },
+              },
+            ],
           }),
         }),
       ),

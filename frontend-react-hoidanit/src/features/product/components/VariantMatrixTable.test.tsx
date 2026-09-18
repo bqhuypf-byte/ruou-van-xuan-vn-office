@@ -32,6 +32,31 @@ const initialGroups: VariantAttributeGroup[] = [
 ];
 
 describe('VariantMatrixTable', () => {
+  it('reports missing option images and invalid prices', async () => {
+    const onChangeState = vi.fn();
+    render(
+      <VariantMatrixTable
+        productName="Rượu Nếp"
+        productSlug="ruou-nep"
+        groups={[{ name: 'Độ', values: ['30 độ', '40 độ'], images: { '30 độ': '/30.webp' } }]}
+        variants={[
+          { ...variants[0], imageUrl: '/30.webp' },
+          { ...variants[1], price: '0' },
+        ]}
+        onChangeState={onChangeState}
+      />,
+    );
+
+    await waitFor(() =>
+      expect(onChangeState).toHaveBeenLastCalledWith(
+        expect.objectContaining({
+          hasInvalidRows: true,
+          missingImageOptions: ['40 độ'],
+        }),
+      ),
+    );
+  });
+
   it('preserves unsaved row values when a classification value is added', async () => {
     const { rerender } = render(
       <VariantMatrixTable

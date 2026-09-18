@@ -42,6 +42,7 @@ const EMPTY_MATRIX_STATE: VariantMatrixChangeState = {
   rows: [],
   hasChanges: false,
   hasInvalidRows: false,
+  missingImageOptions: [],
 };
 
 export const ProductCreatePage = () => {
@@ -119,6 +120,14 @@ export const ProductCreatePage = () => {
   };
 
   const handleCreate = async (data: ProductFormData) => {
+    if (activeMatrixState.missingImageOptions.length > 0) {
+      setFeedback(
+        `Vui lòng thêm ảnh cho các tùy chọn: ${activeMatrixState.missingImageOptions.join(', ')}.`,
+      );
+      setActiveTab('variants');
+      return;
+    }
+
     if (activeMatrixState.hasInvalidRows) {
       setFeedback('Vui lòng nhập giá lớn hơn 0 cho tất cả phân loại.');
       setActiveTab('variants');

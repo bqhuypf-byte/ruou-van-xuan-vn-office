@@ -38,6 +38,7 @@ export interface VariantMatrixChangeState {
   rows: VariantMatrixSaveRow[];
   hasChanges: boolean;
   hasInvalidRows: boolean;
+  missingImageOptions: string[];
 }
 
 export interface VariantMatrixTableProps {
@@ -101,10 +102,17 @@ export const VariantMatrixTable = ({
     const dirtyRows: VariantMatrixSaveRow[] = [];
     let hasChanges = false;
     let hasInvalidRows = false;
+    const missingImageOptions = (groups[0]?.values ?? []).filter(
+      (value) => !groupImages[value],
+    );
 
     for (const row of rows) {
       const originalVariant = variants.find((v) => v.id === row.variantId);
       const imageUrl = groups[0] ? groupImages[row.groupValue] : undefined;
+      const price = Number(row.price);
+      if (!row.price || Number.isNaN(price) || price <= 0) {
+        hasInvalidRows = true;
+      }
       const changed =
         !originalVariant ||
         originalVariant.sku !== row.sku ||
@@ -117,9 +125,7 @@ export const VariantMatrixTable = ({
       if (!changed) continue;
       hasChanges = true;
 
-      const price = Number(row.price);
       if (!row.price || Number.isNaN(price) || price <= 0) {
-        hasInvalidRows = true;
         continue;
       }
 
@@ -134,7 +140,7 @@ export const VariantMatrixTable = ({
       });
     }
 
-    onChangeState({ rows: dirtyRows, hasChanges, hasInvalidRows });
+    onChangeState({ rows: dirtyRows, hasChanges, hasInvalidRows, missingImageOptions });
     // groupsSignature/variantsSignature intentionally represent the array inputs;
     // depending on the arrays directly would re-run forever because the form
     // derives a fresh groups array on every parent render.
