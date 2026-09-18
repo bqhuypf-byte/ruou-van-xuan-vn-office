@@ -55,6 +55,8 @@ describe('VariantMatrixTable', () => {
         }),
       ),
     );
+    expect(screen.getByText(/Thiếu ảnh cho tùy chọn:/i)).toHaveTextContent('40 độ');
+    expect(screen.getByTitle('Tùy chọn này chưa có ảnh')).toBeInTheDocument();
   });
 
   it('preserves unsaved row values when a classification value is added', async () => {

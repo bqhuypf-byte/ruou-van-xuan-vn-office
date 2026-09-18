@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { ImageOff } from 'lucide-react';
+import { AlertCircle, ImageOff } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
 import type { VariantAttributeGroup } from '../types/product.types';
 import type { ProductVariant } from '../types/variant.types';
@@ -80,6 +80,10 @@ export const VariantMatrixTable = ({
   // The signatures intentionally stabilize form-derived arrays to avoid a render loop.
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const groupImages = useMemo(() => buildGroupImages(groups, variants), [groupsSignature, variantsSignature]);
+  const missingImageOptions = (groups[0]?.values ?? []).filter(
+    (value) => !groupImages[value],
+  );
+  const missingImageOptionSet = new Set(missingImageOptions);
 
   const updateRow = (key: string, patch: Partial<MatrixRow>) => {
     setRows((prev) => prev.map((row) => (row.key === key ? { ...row, ...patch } : row)));
@@ -102,10 +106,9 @@ export const VariantMatrixTable = ({
     const dirtyRows: VariantMatrixSaveRow[] = [];
     let hasChanges = false;
     let hasInvalidRows = false;
-    const missingImageOptions = (groups[0]?.values ?? []).filter(
+    const currentMissingImageOptions = (groups[0]?.values ?? []).filter(
       (value) => !groupImages[value],
     );
-
     for (const row of rows) {
       const originalVariant = variants.find((v) => v.id === row.variantId);
       const imageUrl = groups[0] ? groupImages[row.groupValue] : undefined;
@@ -140,7 +143,12 @@ export const VariantMatrixTable = ({
       });
     }
 
-    onChangeState({ rows: dirtyRows, hasChanges, hasInvalidRows, missingImageOptions });
+    onChangeState({
+      rows: dirtyRows,
+      hasChanges,
+      hasInvalidRows,
+      missingImageOptions: currentMissingImageOptions,
+    });
     // groupsSignature/variantsSignature intentionally represent the array inputs;
     // depending on the arrays directly would re-run forever because the form
     // derives a fresh groups array on every parent render.
@@ -160,6 +168,14 @@ export const VariantMatrixTable = ({
           </p>
         </div>
       </div>
+      {missingImageOptions.length > 0 && (
+        <div className="mx-5 mt-4 flex items-start gap-2 rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700 dark:border-rose-800 dark:bg-rose-950/40 dark:text-rose-300">
+          <AlertCircle className="mt-0.5 h-4 w-4 shrink-0" />
+          <span>
+            Thiếu ảnh cho tùy chọn: <strong>{missingImageOptions.join(', ')}</strong>. Vui lòng thêm đủ ảnh trước khi lưu.
+          </span>
+        </div>
+      )}
       <div className="flex flex-wrap items-center gap-2 px-5 py-3 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/30">
         <div className="flex items-center gap-1.5 rounded-lg border border-slate-300 dark:border-slate-700 px-2.5 py-1.5 bg-white dark:bg-slate-900">
           <span className="text-slate-400 text-xs">₫</span>
@@ -224,7 +240,14 @@ export const VariantMatrixTable = ({
                             className="w-12 h-12 shrink-0 rounded-lg object-cover border border-slate-200 dark:border-slate-700"
                           />
                         ) : (
-                          <div className="w-12 h-12 shrink-0 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center">
+                          <div
+                            title={missingImageOptionSet.has(row.groupValue) ? 'Tùy chọn này chưa có ảnh' : undefined}
+                            className={`w-12 h-12 shrink-0 rounded-lg flex items-center justify-center ${
+                              missingImageOptionSet.has(row.groupValue)
+                                ? 'border border-rose-300 bg-rose-50 text-rose-500 dark:border-rose-800 dark:bg-rose-950/40'
+                                : 'bg-slate-100 text-slate-400 dark:bg-slate-800'
+                            }`}
+                          >
                             <ImageOff className="w-4 h-4" />
                           </div>
                         )}
