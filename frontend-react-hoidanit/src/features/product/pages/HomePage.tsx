@@ -3,10 +3,24 @@ import { useNavigate } from 'react-router';
 import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/shared/components/ui';
-import { useBanners, useSiteSettings, TrustBadgeStrip, FaqAccordion } from '@/features/home';
+import { useBanners } from '@/features/home/hooks/useBanners';
+import { useSiteSettings } from '@/features/home/hooks/useSiteSettings';
+import { TrustBadgeStrip } from '@/features/home/components/TrustBadgeStrip';
+import { FaqAccordion } from '@/features/home/components/FaqAccordion';
 import { DealsSection } from '../components/DealsSection';
 import { useHomepageSections, toSectionDeal } from '../hooks/useHomepageSections';
 import type { FeaturedDeal } from '../hooks/useFeaturedDeals';
+
+const hasDarkBackground = (value?: string | null) => {
+  if (!value) return false;
+  const match = value.trim().match(/^#([\da-f]{3}|[\da-f]{6})$/i);
+  if (!match) return false;
+  const hex = match[1].length === 3
+    ? match[1].split('').map((character) => character + character).join('')
+    : match[1];
+  const [red, green, blue] = [0, 2, 4].map((offset) => Number.parseInt(hex.slice(offset, offset + 2), 16));
+  return (red * 299 + green * 587 + blue * 114) / 1000 < 150;
+};
 
 export const HomePage = () => {
   const { t } = useTranslation();
@@ -19,6 +33,8 @@ export const HomePage = () => {
 
   const heroBanners = banners ?? [];
   const banner = heroBanners[activeBanner];
+  const isFullImageBanner = banner?.bgColor === 'transparent';
+  const useLightText = hasDarkBackground(banner?.bgColor);
 
   const handleBannerCta = () => {
     if (!banner?.ctaLink) return;
@@ -35,25 +51,27 @@ export const HomePage = () => {
       {banner && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <section
-            className="relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[300px] sm:min-h-[440px] flex items-center px-6 sm:px-16"
+            className={`relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[300px] sm:min-h-[440px] flex items-center ${isFullImageBanner ? '' : 'px-6 sm:px-16'}`}
             style={{ backgroundColor: banner.bgColor ?? 'var(--color-accent-mint)' }}
           >
-            <div
-              className="hidden sm:block absolute -right-16 -top-24 w-[420px] h-[420px] rounded-full opacity-40"
-              style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
-              aria-hidden
-            />
-            <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
+            {!isFullImageBanner && (
+              <div
+                className="hidden sm:block absolute -right-16 -top-24 w-[420px] h-[420px] rounded-full opacity-40"
+                style={{ backgroundColor: 'rgba(255,255,255,0.35)' }}
+                aria-hidden
+              />
+            )}
+            {!isFullImageBanner && <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
               {banner.subtitle && (
-                <p className="text-brand-700 font-semibold text-sm uppercase tracking-wide">
+                <p className={`font-semibold text-sm uppercase tracking-wide ${useLightText ? 'text-amber-200' : 'text-brand-700'}`}>
                   {banner.subtitle}
                 </p>
               )}
-              <h1 className="mt-3 text-2xl sm:text-5xl font-bold text-brand-900 leading-[1.1]">
+              <h1 className={`mt-3 text-2xl sm:text-5xl font-bold leading-[1.1] ${useLightText ? 'text-white' : 'text-brand-900'}`}>
                 {banner.title}
               </h1>
               {banner.badgeText && (
-                <p className="mt-4 text-sm sm:text-base text-brand-800/80 max-w-sm">
+                <p className={`mt-4 max-w-sm text-sm sm:text-base ${useLightText ? 'text-white/85' : 'text-brand-800/80'}`}>
                   {banner.badgeText}
                 </p>
               )}
@@ -65,12 +83,14 @@ export const HomePage = () => {
                   {t('home.shopNow')}
                 </Button>
               )}
-            </div>
+            </div>}
             {banner.imageUrl && (
               <img
                 src={banner.imageUrl}
                 alt={banner.title}
-                className="absolute -right-8 bottom-0 w-[52%] sm:right-10 sm:top-1/2 sm:w-auto sm:max-h-[85%] sm:-translate-y-1/2 object-contain opacity-50 sm:opacity-100 drop-shadow-xl"
+                className={isFullImageBanner
+                  ? 'absolute inset-0 h-full w-full object-cover'
+                  : 'absolute -right-8 bottom-0 w-[52%] object-contain opacity-50 drop-shadow-xl sm:right-10 sm:top-1/2 sm:w-auto sm:max-h-[85%] sm:-translate-y-1/2 sm:opacity-100'}
               />
             )}
             {heroBanners.length > 1 && (
@@ -97,7 +117,9 @@ export const HomePage = () => {
                       key={b.id}
                       onClick={() => setActiveBanner(i)}
                       className={`h-1.5 rounded-full transition-all ${
-                        i === activeBanner ? 'w-6 bg-brand-700' : 'w-1.5 bg-brand-700/40'
+                        i === activeBanner
+                          ? `w-6 ${useLightText ? 'bg-white' : 'bg-brand-700'}`
+                          : `w-1.5 ${useLightText ? 'bg-white/45' : 'bg-brand-700/40'}`
                       }`}
                       aria-label={t('home.viewBanner', { n: i + 1 })}
                     />

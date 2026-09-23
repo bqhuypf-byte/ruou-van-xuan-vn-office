@@ -12,6 +12,7 @@ const bannerSchema = z.object({
   badgeText: z.string().max(100, 'Tối đa 100 ký tự').optional(),
   imageUrl: z.string().max(500).optional(),
   ctaLink: z.string().max(500).optional(),
+  useBackground: z.boolean(),
   bgColor: z.string().max(20).optional(),
   sortOrder: z.string().optional(),
   isActive: z.boolean(),
@@ -44,6 +45,7 @@ const emptyValues: BannerFormData = {
   badgeText: '',
   imageUrl: '',
   ctaLink: '',
+  useBackground: true,
   bgColor: '',
   sortOrder: '0',
   isActive: true,
@@ -63,6 +65,8 @@ export const BannerFormModal = ({
     control,
     handleSubmit,
     reset,
+    setValue,
+    watch,
     formState: { errors },
   } = useForm<BannerFormData>({
     resolver: zodResolver(bannerSchema),
@@ -78,7 +82,8 @@ export const BannerFormModal = ({
           badgeText: bannerToEdit.badgeText ?? '',
           imageUrl: bannerToEdit.imageUrl ?? '',
           ctaLink: bannerToEdit.ctaLink ?? '',
-          bgColor: bannerToEdit.bgColor ?? '',
+          useBackground: bannerToEdit.bgColor !== 'transparent',
+          bgColor: bannerToEdit.bgColor === 'transparent' ? '' : (bannerToEdit.bgColor ?? ''),
           sortOrder: String(bannerToEdit.sortOrder),
           isActive: bannerToEdit.isActive,
         });
@@ -95,12 +100,18 @@ export const BannerFormModal = ({
       badgeText: data.badgeText || undefined,
       imageUrl: data.imageUrl || undefined,
       ctaLink: data.ctaLink || undefined,
-      bgColor: data.bgColor || undefined,
+      bgColor: data.useBackground ? (data.bgColor || undefined) : 'transparent',
       sortOrder: data.sortOrder ? Number(data.sortOrder) : undefined,
       isActive: data.isActive,
     });
     onClose();
   };
+
+  const useBackground = watch('useBackground');
+  const backgroundColor = watch('bgColor');
+  const colorPickerValue = /^#[\da-f]{6}$/i.test(backgroundColor ?? '')
+    ? backgroundColor
+    : '#2b1626';
 
   return (
     <Modal
@@ -150,13 +161,51 @@ export const BannerFormModal = ({
           error={errors.ctaLink?.message}
           {...register('ctaLink')}
         />
+        <div className="rounded-xl border border-slate-200 p-4 dark:border-slate-700">
+          <label className="flex items-start gap-3 text-sm font-medium text-slate-700 dark:text-slate-300">
+            <input
+              type="checkbox"
+              className="mt-0.5 rounded border-slate-300 text-brand-600 focus:ring-brand-500/20 dark:border-slate-700"
+              {...register('useBackground')}
+            />
+            <span>
+              Dùng màu nền
+              <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">
+                Bỏ chọn nếu ảnh đã có sẵn nền và chữ; ảnh sẽ phủ toàn bộ banner.
+              </span>
+            </span>
+          </label>
+
+          {useBackground && (
+            <div className="mt-4">
+              <label className="mb-1.5 block text-sm font-medium text-slate-700 dark:text-slate-300">
+                Màu nền
+              </label>
+              <div className="flex items-center gap-3">
+                <input
+                  type="color"
+                  value={colorPickerValue}
+                  onChange={(event) => setValue('bgColor', event.target.value, { shouldDirty: true })}
+                  className="h-11 w-14 cursor-pointer rounded-lg border border-slate-300 bg-white p-1 dark:border-slate-700 dark:bg-slate-900"
+                  aria-label="Chọn màu nền banner"
+                />
+                <div className="min-w-0 flex-1">
+                  <Input
+                    aria-label="Mã màu nền"
+                    placeholder="#2b1626"
+                    error={errors.bgColor?.message}
+                    {...register('bgColor')}
+                  />
+                </div>
+              </div>
+              <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
+                Bấm vào ô màu để chọn trực quan hoặc nhập mã HEX.
+              </p>
+            </div>
+          )}
+        </div>
+
         <div className="grid sm:grid-cols-2 gap-4">
-          <Input
-            label="Màu nền (hex)"
-            placeholder="#212844"
-            error={errors.bgColor?.message}
-            {...register('bgColor')}
-          />
           <Input
             label="Thứ tự hiển thị"
             type="number"
