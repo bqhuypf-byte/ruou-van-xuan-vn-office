@@ -33,7 +33,9 @@ export const HomePage = () => {
 
   const heroBanners = banners ?? [];
   const banner = heroBanners[activeBanner];
-  const isFullImageBanner = banner?.bgColor === 'transparent';
+  // Uploaded hero artwork is a complete banner, so it should fill the frame instead
+  // of being treated as a small product cutout beside a second layer of copy.
+  const isFullImageBanner = Boolean(banner?.imageUrl);
   const useLightText = hasDarkBackground(banner?.bgColor);
 
   const handleBannerCta = () => {
@@ -88,9 +90,7 @@ export const HomePage = () => {
               <img
                 src={banner.imageUrl}
                 alt={banner.title}
-                className={isFullImageBanner
-                  ? 'absolute inset-0 h-full w-full object-cover'
-                  : 'absolute -right-8 bottom-0 w-[52%] object-contain opacity-50 drop-shadow-xl sm:right-10 sm:top-1/2 sm:w-auto sm:max-h-[85%] sm:-translate-y-1/2 sm:opacity-100'}
+                className="absolute inset-0 h-full w-full object-cover"
               />
             )}
             {heroBanners.length > 1 && (
@@ -99,19 +99,19 @@ export const HomePage = () => {
                   onClick={() =>
                     setActiveBanner((i) => (i - 1 + heroBanners.length) % heroBanners.length)
                   }
-                  className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute left-2 sm:left-3 top-1/2 z-10 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
                   aria-label={t('home.prevBanner')}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setActiveBanner((i) => (i + 1) % heroBanners.length)}
-                  className="absolute right-2 sm:right-3 top-1/2 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute right-2 sm:right-3 top-1/2 z-10 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
                   aria-label={t('home.nextBanner')}
                 >
                   <ChevronRight className="w-5 h-5" />
                 </button>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
+                <div className="absolute bottom-4 left-1/2 z-10 -translate-x-1/2 flex gap-1.5">
                   {heroBanners.map((b, i) => (
                     <button
                       key={b.id}

@@ -151,6 +151,7 @@ export const BannerFormModal = ({
               value={field.value}
               onChange={field.onChange}
               error={errors.imageUrl?.message}
+              helperText="Ảnh tải lên sẽ tự động phủ kín toàn bộ khung banner trên mọi slide."
             />
           )}
         />
@@ -171,7 +172,7 @@ export const BannerFormModal = ({
             <span>
               Dùng màu nền
               <span className="mt-1 block text-xs font-normal text-slate-500 dark:text-slate-400">
-                Bỏ chọn nếu ảnh đã có sẵn nền và chữ; ảnh sẽ phủ toàn bộ banner.
+                Màu nền dùng khi banner chưa có ảnh. Khi có ảnh, ảnh luôn phủ kín toàn bộ khung banner.
               </span>
             </span>
           </label>
