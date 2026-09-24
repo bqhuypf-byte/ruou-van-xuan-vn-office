@@ -12,9 +12,18 @@ import { useHomepageSections, toSectionDeal } from '../hooks/useHomepageSections
 import type { FeaturedDeal } from '../hooks/useFeaturedDeals';
 
 const DEFAULT_BANNER_IMAGES = [
-  '/banners/ruou-nep-truyen-thong-1600x580.png',
-  '/banners/ruou-nep-chuoi-hot-1600x580.png',
-  '/banners/ruou-nep-than-1600x580.png',
+  {
+    desktop: '/banners/ruou-nep-truyen-thong-1600x580.png',
+    mobile: '/banners/ruou-nep-truyen-thong-mobile.png',
+  },
+  {
+    desktop: '/banners/ruou-nep-chuoi-hot-1600x580.png',
+    mobile: '/banners/ruou-nep-chuoi-hot-mobile.png',
+  },
+  {
+    desktop: '/banners/ruou-nep-than-1600x580.png',
+    mobile: '/banners/ruou-nep-than-mobile.png',
+  },
 ];
 
 const hasDarkBackground = (value?: string | null) => {
@@ -39,8 +48,10 @@ export const HomePage = () => {
 
   const heroBanners = banners ?? [];
   const banner = heroBanners[activeBanner];
+  const themeImages = DEFAULT_BANNER_IMAGES[activeBanner % DEFAULT_BANNER_IMAGES.length];
   const bannerImageUrl = banner?.imageUrl
-    || DEFAULT_BANNER_IMAGES[activeBanner % DEFAULT_BANNER_IMAGES.length];
+    || themeImages.desktop;
+  const bannerMobileImageUrl = banner?.imageUrl ? undefined : themeImages.mobile;
   // Uploaded hero artwork is a complete banner, so it should fill the frame instead
   // of being treated as a small product cutout beside a second layer of copy.
   const isFullImageBanner = Boolean(bannerImageUrl);
@@ -62,7 +73,7 @@ export const HomePage = () => {
       {banner && (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-6">
           <section
-            className={`relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[300px] sm:min-h-[440px] flex items-center ${isFullImageBanner ? '' : 'px-6 sm:px-16'}`}
+            className={`relative overflow-hidden rounded-2xl sm:rounded-3xl min-h-[300px] sm:min-h-[440px] flex items-center ${usesThemeFallback ? 'px-6 sm:px-12 lg:px-16' : ''}`}
             style={{ backgroundColor: banner.bgColor ?? 'var(--color-accent-mint)' }}
           >
             {!isFullImageBanner && (
@@ -81,7 +92,7 @@ export const HomePage = () => {
                   {banner.subtitle}
                 </p>
               )}
-              <h1 className={`mt-3 text-2xl sm:text-5xl font-bold leading-[1.1] ${useLightText ? 'text-white' : 'text-brand-900'}`}>
+              <h1 className={`mt-3 text-2xl sm:text-4xl lg:text-5xl font-bold leading-[1.1] ${useLightText ? 'text-white' : 'text-brand-900'}`}>
                 {banner.title}
               </h1>
               {banner.badgeText && (
@@ -99,11 +110,16 @@ export const HomePage = () => {
               )}
             </div>}
             {bannerImageUrl && (
-              <img
-                src={bannerImageUrl}
-                alt={banner.title}
-                className="absolute inset-0 z-0 h-full w-full object-cover"
-              />
+              <picture className="absolute inset-0 z-0 block h-full w-full">
+                {bannerMobileImageUrl && (
+                  <source media="(max-width: 767px)" srcSet={bannerMobileImageUrl} />
+                )}
+                <img
+                  src={bannerImageUrl}
+                  alt={banner.title}
+                  className="h-full w-full object-cover object-center max-md:object-bottom"
+                />
+              </picture>
             )}
             {heroBanners.length > 1 && (
               <>
