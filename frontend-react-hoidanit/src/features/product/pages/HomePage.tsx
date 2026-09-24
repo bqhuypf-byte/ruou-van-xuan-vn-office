@@ -86,7 +86,7 @@ export const HomePage = () => {
             {usesThemeFallback && (
               <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/50 via-black/15 to-transparent" aria-hidden />
             )}
-            {usesThemeFallback && <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
+            {usesThemeFallback && <div className="relative z-10 w-full max-w-[calc(100%-1rem)] py-8 pr-3 sm:max-w-[62%] sm:py-10 sm:pr-0 lg:max-w-md">
               {banner.subtitle && (
                 <p className={`font-semibold text-sm uppercase tracking-wide ${useLightText ? 'text-amber-200' : 'text-brand-700'}`}>
                   {banner.subtitle}
@@ -127,14 +127,14 @@ export const HomePage = () => {
                   onClick={() =>
                     setActiveBanner((i) => (i - 1 + heroBanners.length) % heroBanners.length)
                   }
-                  className="absolute left-2 sm:left-3 top-1/2 z-10 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute bottom-3 left-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/80 text-brand-900 shadow-sm hover:bg-white md:bottom-auto md:left-3 md:top-1/2 md:-translate-y-1/2"
                   aria-label={t('home.prevBanner')}
                 >
                   <ChevronLeft className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => setActiveBanner((i) => (i + 1) % heroBanners.length)}
-                  className="absolute right-2 sm:right-3 top-1/2 z-10 -translate-y-1/2 w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-white/70 hover:bg-white text-brand-900 flex items-center justify-center"
+                  className="absolute bottom-3 right-3 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-white/80 text-brand-900 shadow-sm hover:bg-white md:bottom-auto md:right-3 md:top-1/2 md:-translate-y-1/2"
                   aria-label={t('home.nextBanner')}
                 >
                   <ChevronRight className="w-5 h-5" />
