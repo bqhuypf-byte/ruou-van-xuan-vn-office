@@ -11,6 +11,12 @@ import { DealsSection } from '../components/DealsSection';
 import { useHomepageSections, toSectionDeal } from '../hooks/useHomepageSections';
 import type { FeaturedDeal } from '../hooks/useFeaturedDeals';
 
+const DEFAULT_BANNER_IMAGES = [
+  '/banners/ruou-nep-truyen-thong-1600x580.png',
+  '/banners/ruou-nep-chuoi-hot-1600x580.png',
+  '/banners/ruou-nep-than-1600x580.png',
+];
+
 const hasDarkBackground = (value?: string | null) => {
   if (!value) return false;
   const match = value.trim().match(/^#([\da-f]{3}|[\da-f]{6})$/i);
@@ -33,10 +39,13 @@ export const HomePage = () => {
 
   const heroBanners = banners ?? [];
   const banner = heroBanners[activeBanner];
+  const bannerImageUrl = banner?.imageUrl
+    || DEFAULT_BANNER_IMAGES[activeBanner % DEFAULT_BANNER_IMAGES.length];
   // Uploaded hero artwork is a complete banner, so it should fill the frame instead
   // of being treated as a small product cutout beside a second layer of copy.
-  const isFullImageBanner = Boolean(banner?.imageUrl);
-  const useLightText = hasDarkBackground(banner?.bgColor);
+  const isFullImageBanner = Boolean(bannerImageUrl);
+  const usesThemeFallback = !banner?.imageUrl;
+  const useLightText = isFullImageBanner || hasDarkBackground(banner?.bgColor);
 
   const handleBannerCta = () => {
     if (!banner?.ctaLink) return;
@@ -63,7 +72,10 @@ export const HomePage = () => {
                 aria-hidden
               />
             )}
-            {!isFullImageBanner && <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
+            {usesThemeFallback && (
+              <div className="absolute inset-0 z-[1] bg-gradient-to-r from-black/50 via-black/15 to-transparent" aria-hidden />
+            )}
+            {usesThemeFallback && <div className="relative z-10 max-w-[75%] sm:max-w-md py-8 sm:py-10">
               {banner.subtitle && (
                 <p className={`font-semibold text-sm uppercase tracking-wide ${useLightText ? 'text-amber-200' : 'text-brand-700'}`}>
                   {banner.subtitle}
@@ -86,11 +98,11 @@ export const HomePage = () => {
                 </Button>
               )}
             </div>}
-            {banner.imageUrl && (
+            {bannerImageUrl && (
               <img
-                src={banner.imageUrl}
+                src={bannerImageUrl}
                 alt={banner.title}
-                className="absolute inset-0 h-full w-full object-cover"
+                className="absolute inset-0 z-0 h-full w-full object-cover"
               />
             )}
             {heroBanners.length > 1 && (
